@@ -1,0 +1,645 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="XFC Signal System" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"></span> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>The XFC
+Signal System</h1>
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a class="mhl" href="signal_system.html#SS01">GTK+ Signals</a></li>
+        <li><a class="mhl" href="signal_system.html#SS02">Two XFC
+Signal Systems</a></li>
+        <li><a class="mhl" href="signal_system.html#SS03">Libsigc++
+Signals and
+Slots</a></li>
+        <li><a class="mhl" href="signal_system.html#SS04">GDK Events</a><br>
+        </li>
+        <li><a class="mhl" href="signal_system.html#SS05">The Signal
+Connection</a><br>
+        </li>
+        <li><a class="mhl" href="signal_system.html#SS06">Virtual
+Signal Classes</a><br>
+        </li>
+      </ol>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <h2><a name="SS01"></a>GTK+
+Signals</h2>
+GTK+ is an event driven toolkit. When an application-specific event
+occurs, such as a keystroke or a mouse event, GTK+ generates a signal
+emission. Signals are emitted on a given type instance and are
+identified by strings, like "clicked" for the GtkButton clicked signal.
+When a signal is emitted, the set of callbacks connected to the
+signal are invoked in a precisely defined manner. There are two
+distinct
+callback types, per-object callbacks and user provided callbacks. <br>
+      <br>
+Per-object callbacks are also called object signal handlers, and are
+virtual because they are inherited and can be overridden in derived
+objects. GTK+ objects provide default signal handlers at signal
+creation time. Derived objects can then assign object signal
+handlers
+to override one or more of the parent's default signal handlers. It is
+important to
+note that derived object signal handlers may or may not choose to call
+the
+parent's default signal handler. This allows a derived object to
+override its default implementation, changing the way it behaves.<br>
+      <br>
+User provided callbacks are just called signal handlers, and are
+frequently connected to and disconnected from certain signals on
+certain object instances. Signal handlers are called in the order they
+were
+connected in. All handlers may prematurely stop a signal emission, and
+any number of
+handlers may be connected, disconnected, blocked or unblocked during a
+signal emission. Unlike per-object callbacks, user provided callbacks
+cannot override or change an object's default implementation. <br>
+      <br>
+      <h2><a name="SS02"></a>Two
+XFC Signal
+Systems</h2>
+XFC provides the same signal functionality as GTK+ by implementing two
+separate signal systems, libsigc++ signals and slots
+and abstract virtual signal classes. Each system is distinct from the
+other so it's important to understand the difference. Libsigc++ signals
+and slots are used to connect user provided callbacks and the virtual
+signal classes are used to override per-object callbacks in derived
+classes.<br>
+      <br>
+Libsigc++ signals and slots are template classes that wrap the GTK+
+signal connection and emission process, and provide a mechanism for
+typesafe user provided callbacks. XFC objects that can receive a
+signal's
+emission wrap the signal's
+connection and emission mechanism in a protected signal template.
+Protected signals are declared static and so require an object
+instance. For each protected signal an XFC object also provides a
+public
+proxy signal function. Proxy signals are instance specific. Their only
+purpose is to pass the object's 'this' pointer to its protected signals
+as the instance argument. <br>
+      <br>
+Virtual signal handlers wrap the GTK+ per-object callbacks and are
+implemented in XFC as an abstract signal class hierarchy. To override
+one or
+more object virtual signal handlers your class must multiplely inherit
+from the object and either the object's signal class or one of its
+parent signal classes. This separation of
+object and virtual signal handlers helps to reduce application size and
+improve application performance. <br>
+      <br>
+Other C++ language bindings put the virtual signal handlers directly
+into the object classes, and then hard link the virtual function calls
+into the GTK+ signal emission mechanism. This increases application
+size because each object ends up with a large virtual function table,
+and it reduces application performance because each virtual signal
+handler is called on every signal emission whether your class uses the
+handler or not. For example, widgets inherit some 70+ virtual signal
+handlers, but most applications use standard widgets that don't need
+them. In a large
+application this gratuitous overhead can become significant.<br>
+      <br>
+In XFC, the virtual function overhead is minimized because virtual
+signal handlers are implemented in a separate abstract class
+hierarchy that must be specifically inherited from. When you use
+standard widgets in your application and connect signal handlers using
+libsigc++
+slots there is no hidden virtual function overhead. As result your
+application will be smaller and faster than if it were written with any
+comparable C++ language binding.<br>
+      <br>
+      <h2><a name="SS03"></a>Libsigc++
+Signals and Slots</h2>
+The template classes used to implement GTK+ signals can be found
+in the file &lt;xfc/glib/signals.hh&gt;. The class
+G::Signal&lt;&gt; is
+a convenience wrapper around numbered G::Signal#&lt;&gt;
+classes.
+G::Signal&lt;&gt; determines which numbered signal template to
+use
+based on the number of template arguments supplied.<br>
+      <br>
+Class signals are protected data members and are declared static. As an
+example take a look at Gtk::Widget's "size_request" signal:<br>
+      <br>
+      <div class="fbox"><code>typedef
+G::Signal&lt;void,
+Gtk::Requisition*&gt;
+SizeRequestSignalType;<br>
+typedef
+G::SignalProxy&lt;G::TypeInstance, SizeRequestSignalType&gt;
+SizeRequestSignalProxy;<br>
+static const SizeRequestSignalType
+size_request_signal;</code></div>
+&nbsp;<br>
+For convenience, the first line typedefs the size_request type
+G::Signal&lt;void,
+Requisition*&gt;. The first template argument specifies the signal
+handler's return
+value. All other
+template arguments specify the parameters passed to the signal
+handler, in order. In the case of SizeRequestSignalType, connected
+signal handlers
+take only
+one argument, a Gtk::Requisition pointer. <br>
+      <br>
+The second line declares the return type for the signal's proxy signal
+function. The
+third line declares the static const variable 'size_request_signal'.
+You can
+use this variable to connect a signal handler to the "size_request"
+signal, but only in
+derived classes because it's declared protected. <br>
+      <br>
+You would connect to size_request_signal like this:<br>
+      <br>
+      <div class="fbox"><code>size_request_signal.connect(this,
+sigc::mem_fun(this,
+&amp;MyWindow::on_size_request));</code></div>
+      <code><br>
+      </code>sigc::mem_fun() is new
+in libsigc++ 2.0 and simply returns
+a member
+function slot. <br>
+      <br>
+You wont connect to signals in derived classes like this very often.
+Instead you would use a signal's public proxy function. For
+size_request_signal the proxy
+signal function is defined inline like this:<br>
+      <br>
+      <div class="fbox"><code>inline
+const
+Xfc::Gtk::Widget::SizeRequestSignalProxy<br>
+Xfc::Gtk::Widget::signal_size_request()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; return
+SizeRequestSignalProxy(this,
+&amp;size_request_signal);<br>
+}</code></div>
+      <code>&nbsp;</code><br>
+SizeRequestSignalProxy is an inline proxy object that provides access
+the protected signal's connect() method. As you can see
+signal_size_request() returns a temporary proxy object by value and
+passes
+the object's 'this' pointer as the object instance (to
+size_request_signal).<br>
+      <br>
+Using the proxy signal function you would connect to the "size_request"
+signal like this:<br>
+      <br>
+      <div class="fbox"><code>signal_size_request().connect(sigc::mem_fun(this,
+&amp;MyWindow::on_size_request));</code></div>
+      <samp></samp><br>
+and the on_size_request() signal handler would be declared like this: <br>
+      <br>
+      <div class="fbox"><code>void<br>
+MyWindow::on_size_request(Gtk::Requisition *requisition)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; requisition.set(width,
+height); <br>
+}</code></div>
+      <br>
+Libsigc++ slots are type-safe representations of callback methods and
+functions. A slot can be constructed from any function, regardless of
+whether it is a global function, a member method, static, or virtual.<br>
+      <br>
+Earlier versions of libsigc++ (&lt; 2.0) used a slot() function to
+return a slot. In libsigc++ 2.0 sigc::slot&lt;&gt; refers to a
+convenience wrapper around the numbered sigc::slot#&lt;&gt;
+templates.
+Like G::Signal&lt;&gt;, sigc::slot&lt;&gt; determines
+which numbered
+slot template to use based on the number of template arguments
+supplied. In libsigc++ 2.0, sigc::mem_fun() returns a member function
+slot and sigc::ptr_fun()
+returns a global function slot.<br>
+      <br>
+To create a new member function slot use sigc::mem_fun():<br>
+      <br>
+      <div class="fbox"><code>sigc::slot&lt;void,
+Gtk::Requisition*&gt; s = sigc::mem_fun(this,
+&amp;MyWindow::on_size_request);</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">and
+to create a new global
+function slot use
+sigc::ptr_fun():<br>
+      </div>
+      <br>
+      <div class="fbox"><code>sigc::slot&lt;void&gt;
+s = sigc::ptr_fun(<span style="color: rgb(153, 0, 0);"></span>&amp;somefunction);</code></div>
+      <br>
+      <div style="text-align: left;">You
+don't have to declare slot
+variables though. You can just pass
+sigc::mem_fun() and sigc::ptr_fun() directly to a signal's connect
+method or any API method. The compiler will complain if the slot has
+the
+wrong signature.<br>
+      <br>
+Two other useful libsigc++ functions are sigc::bind() and sigc::hide().
+      <br>
+      <br>
+The main use of sigc::bind() with signals is to connect a signal
+handler taking an extra argument(s) to a signal expecting a lesser
+number of arguments. sigc::bind() is useful when you want to connect
+several widgets to the one signal handler. For example, the
+hellobuttons
+example application uses sigc::bind() to pass the name of the button
+clicked to a common signal handler that prints out the button's name.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>button-&gt;signal_clicked().connect(sigc::bind(sigc::mem_fun(this,
+&amp;HelloButtons::on_clicked), "button 1"));<br>
+button-&gt;signal_clicked().connect(sigc::bind(sigc::mem_fun(this,
+&amp;HelloButtons::on_clicked), "button 2"));</code><br>
+      </div>
+      <br>
+      <div style="text-align: left;">The
+on_clicked() handler is
+defined like this:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>void<br>
+HelloButtons::on_clicked(const char *text)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; std::cout &lt;&lt; "Hello again"
+&lt;&lt; " - "
+&lt;&lt; text &lt;&lt; " " &lt;&lt; "was
+pressed" &lt;&lt; std::endl;<br>
+}</code></div>
+      <br>
+      <div style="text-align: left;">What
+sigc::bind() does here is
+take the on_clicked() method that
+accepts one argument, and returns a function slot accepting no
+arguments
+that can be connected to the signal_clicked() proxy signal. When the
+"clicked" signal is emitted the HelloButtons on_clicked() method is
+called and
+the bound argument is passed as the text parameter. <br>
+      <br>
+sigc::hide() does the reverse. It allows you to connect a handler
+taking a lesser number of arguments to a signal expecting more
+arguments. For example, the expander example application uses
+sigc::hide() to connect the main window's inherited dispose() method,
+which takes no arguments, to the Gtk::Dialog "response" signal which
+expects one argument, an integer.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>signal_response().connect(sigc::hide(sigc::mem_fun(this,
+&amp;ExpanderDialog::dispose)));</code><br>
+      </div>
+      <br>
+      <div style="text-align: left;">sigc::bind()
+and sigc::hide() are
+more powerful than these simple usages
+so you should take a look at the libsigc++ documentation. For example,
+sigc::bind() lets you bind up to 7 arguments at a time and lets you
+specify the zero-based index of each bound function argument. <br>
+      </div>
+      <br>
+      <h2><a name="SS04"></a>GDK
+Events</h2>
+In addition to the widget signals described
+above, there is a set of GDK signals that reflect the X event
+mechanism.
+Slots can be connected to these signals using the proxy signal
+functions declared in the Gtk::Widget class:<br>
+      <ul style="list-style-type: square;">
+        <li>signal_event()</li>
+        <li>signal_button_press_event()</li>
+        <li>signal_button_release_event()</li>
+        <li>signal_scroll_event()</li>
+        <li>signal_motion_notify_event()</li>
+        <li>signal_delete()<br>
+        </li>
+        <li>signal_destroy_event()</li>
+        <li>signal_expose_event()</li>
+        <li>signal_key_press_event()</li>
+        <li>signal_key_release_event()</li>
+        <li>signal_enter_notify_event()</li>
+        <li>signal_leave_notify_event()</li>
+        <li>signal_configure_event()</li>
+        <li>signal_focus_in_event()</li>
+        <li>signal_focus_out_event()</li>
+        <li>signal_map_event()</li>
+        <li>signal_unmap_event()</li>
+        <li>signal_property_notify_event()</li>
+        <li>signal_selection_clear_event()</li>
+        <li>signal_selection_request_event()</li>
+        <li>signal_selection_notify_event()</li>
+        <li>signal_proximity_in_event()</li>
+        <li>signal_proximity_out_event()</li>
+        <li>signal_visibility_notify_event()</li>
+        <li>signal_client_event()</li>
+        <li>signal_no_expose_event()</li>
+        <li>signal_window_state_event()</li>
+      </ul>
+A function slot connected to one of these signals gets passed an event
+structure containing data specific to the event that occurred. For
+example, the event strucure passed to a button event handler is
+Gdk::EventButton. You would declare a 'button_press_event' handler like
+this:<br>
+      <br>
+      <div class="fbox"><code>bool
+on_button_press_event(const
+Gdk::EventButton&amp;
+event);</code></div>
+      <br>
+The value returned from this function indicates whether the event
+should be propagated further by the GTK+ event handling mechanism.
+Returning true indicates that the event has been handled, and that it
+should not propagate further. Returning false will continue the event's
+normal handling.<br>
+      <br>
+The GDK selection and drag-and-drop APIs also emit a number of events
+which are reflected in GTK+ by signals. These signals are also declared
+in the Gtk::Widget class and are:<br>
+      <ul style="list-style-type: square;">
+        <li>&nbsp;signal_selection_received()</li>
+        <li>&nbsp;signal_selection_get()</li>
+        <li>&nbsp;signal_drag_begin_event()</li>
+        <li>&nbsp;signal_drag_end_event()</li>
+        <li>&nbsp;signal_drag_data_delete()</li>
+        <li>&nbsp;signal_drag_motion()</li>
+        <li>&nbsp;signal_drag_drop()</li>
+        <li>&nbsp;signal_drag_data_get()</li>
+        <li>&nbsp;signal_drag_data_received()</li>
+      </ul>
+      <br>
+      <h2><a name="SS05"></a>The
+Signal
+Connection</h2>
+      <div style="text-align: left;">Lets
+take a closer look at the
+signal connection methods defined in
+&lt;xfc/glib/signals.hh&gt;. The
+signal connection method for a protected signal is declared like this:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>sigc::connection
+connect(G::TypeInstance *instance, const
+SlotType&amp; slot, const char *detail = 0, bool after = false)
+const;</code><br>
+      </div>
+      <br>
+and the connection method for the public proxy signal is declared like
+this:<br>
+      <br>
+      <div class="fbox"><code>sigc::connection
+connect(const SlotType&amp;
+slot, bool after = false) const;</code></div>
+      <br>
+      <div style="text-align: left;">Protected
+signals are declared
+static so their connection method takes an instance pointer. Public
+proxy signals are instance specific so their connection method does not
+need an instance pointer, it uses the object 'this' pointer instead.
+The 'detail' argument is only
+used by the G::Object "notify" signal so you can mostly ignore it. The
+thing to note about both these connection methods is the return value.<br>
+      </div>
+      <br>
+      <div style="text-align: left;">All
+signal connection methods
+return a 'sigc::connection'
+object that identifies your slot. Keeping a copy of this object gives
+you further control over your connection.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>sigc::connection
+c = signal_size_request().connect(sigc::mem_fun(this,
+&amp;MyWindow::on_size_request));</code></div>
+      <br>
+      <div style="text-align: left;"><span style="font-style: italic;"></span>sigc::connection
+is a convinience class for safe disconnection and can be used to
+disconnect the referred slot at any time:<br>
+      <br>
+      <div class="fbox"><code>c.disconnect();</code></div>
+      <br>
+If the slot has already been destroyed, disconnect() does nothing. You
+can call empty(), connected() or operator bool() to test whether the
+connection is still active. <br>
+      </div>
+      <br>
+      <div class="fbox"><code>if
+(c.empty())<br>
+&nbsp;&nbsp;&nbsp; do_nothing();<br>
+else<br>
+&nbsp;&nbsp;&nbsp; do_something();<br>
+      <br>
+or<br>
+      <br>
+if
+(c.connected())<br>
+&nbsp;&nbsp;&nbsp; do_something();<br>
+else<br>
+&nbsp;&nbsp;&nbsp; do_nothing(); <br>
+      <br>
+or<br>
+      <br>
+if (c())<br>
+&nbsp;&nbsp;&nbsp; do_something();<br>
+else<br>
+&nbsp;&nbsp;&nbsp; do_nothing();</code> </div>
+      <br>
+      <div style="text-align: left;">sigc::connection::empty()
+returns
+false if the connection is still active. Conversely, connected() and
+operator bool() return true if the connection is still active.<br>
+      <br>
+The signal connection can also be blocked and unblocked at any time:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>c.block();<br>
+      <br>
+or <br>
+      <br>
+c.unblock();</code> </div>
+      <br>
+      <div style="text-align: left;">You
+can call blocked() to test
+whether a signal connection is blocked:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>if
+(c.blocked())<br>
+&nbsp;&nbsp;&nbsp; c.unblock();</code></div>
+      <br>
+      <h2><a name="SS06"></a>Virtual
+Signal Classes</h2>
+      <div style="text-align: left;">Virtual
+signal classes are and
+interesting new feature in XFC, and
+something you wont find in other C++ language bindings. Their purpose
+is
+to improve application performance by minimizing the overhead
+associated with using virtual signal handlers. XFC provides a virtual
+signal handler for almost every GTK+ signal. GtkWidget has 63 signals.
+Add to this the widget-specific signals and GtkButton has 73 signals,
+GtkEntry has 75 signals and GtkMenuItem has 74 signals, and so on.
+Providing a virtual signal handler for all these signals can add a
+significant virtual function overhead to an application. <br>
+      <br>
+The approach taken by other C++ language bindings is to put the virtual
+signal handlers into the object or widget class that emits the
+corresponding signal. What this does is hard-link the virtual signal
+handler directly into the GTK+ signal emission chain, so that every
+time a
+GTK+ signal is emitted its virtual signal handler gets called. These
+virtual function calls really are gratuitous because they do nothing
+other than call the default GTK+ signal handler. Virtual signal
+handlers can only be used by derived classes. Considering that most
+widgets used in an application are standard widgets, virtual signal
+handlers are unnecessary. <br>
+      <br>
+What XFC has done is remove all the virtual signal handlers from the
+object and widget classes and puts them into an abstract class
+hierarchy.&nbsp; These classes have names that correspond to the
+object
+and widget class names, such as Gtk::WidgetSignals, Gtk::ButtonSignals
+and
+Gtk::MenuItemSignals. Only those classes that emit signals have a
+corresponding signal class. To override one or more widget virtual
+signal
+handlers your widget class must derive from the
+widget and either the widget's signal class or one of its parent signal
+classes. <br>
+      <br>
+For example, a main window might be declared like this:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>#include
+&lt;xfc/gtk/window.hh&gt; <br>
+#include &lt;xfc/gtk/windowsignals.hh&gt; <br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class MyWindow
+: public Gtk::Window, protected Gtk::WindowSignals<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; MyWindow();<br>
+};<br>
+      <br>
+or <br>
+      <br>
+#include &lt;xfc/gtk/window.hh&gt; <br>
+#include &lt;xfc/gtk/widgetsignals.hh&gt; <br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class
+MyWindow
+: public Gtk::Window, protected Gtk::WidgetSignals<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; MyWindow();<br>
+};</code> </div>
+      <br>
+      <div style="text-align: left;">The
+first MyWindow declaration
+inherits from Gtk::WindowSignals. The
+second inherits from Gtk::WidgetSignals because it only needs to
+override Gtk::Widget virtual signal handlers.<br>
+      <br>
+The MyWindow constructors should be defined like this:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>MyWindow::MyWindow()<br>
+: Gtk::WindowSignals(this)<br>
+{<br>
+}<br>
+      <br>
+or <br>
+      <br>
+MyWindow::MyWindow()<br>
+: Gtk::WidgetSignals(this)<br>
+{<br>
+}</code> </div>
+      <br>
+      <div style="text-align: left;">There
+is only one constructor for
+each signal class and it takes a
+pointer to the corresponding object or widget.<br>
+      <br>
+The Gtk::WidgetSignals constructor is declared like this:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>WidgetSignals(Widget
+*widget);</code></div>
+      <br>
+      <div style="text-align: left;">and
+the Gtk::WindowSignals
+constructor is declared like this:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>WindowSignals(Window
+*window);</code></div>
+      <br>
+      <div style="text-align: left;">Virtual
+signal
+handlers are only hard-linked into the GTK+ signal emission chain when
+you inherit from a virtual signal class. This linking is done in the
+signal class constructor and not in the class_init function as is
+usual.
+This ensures that their is no unecessary virtual function overhead and
+it improves application performance. </div>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team<br>
+            </font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="signal_system.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

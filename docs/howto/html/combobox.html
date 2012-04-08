@@ -1,0 +1,609 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Combo Boxes" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><br>
+      <h1>Combo
+Boxes</h1>
+      <h3><span style="font-weight: bold;">Table of Contents</span></h3>
+      <h3></h3>
+      <ol>
+        <li><a class="mhl" href="combobox.html#CB01">ComboBox</a></li>
+        <li><a class="mhl" href="combobox.html#CB02">ComboBoxText</a></li>
+        <li><a class="mhl" href="combobox.html#example1">ComboBox
+Example</a></li>
+        <li><a class="mhl" href="combobox.html#CB03">ComboBoxEntry</a></li>
+        <li><a class="mhl" href="combobox.html#CB04">ComboBoxEntryText</a></li>
+        <li><a class="mhl" href="combobox.html#example2">CombeBoxEntry
+Example</a></li>
+      </ol>
+      <br>
+Prior to version 2.4, GTK+ offered two widgets for the task of
+selecting one item from a list of options. GtkOptionMenu presented the
+list of options as a menu while GtkCombo presented them in a
+Windows-style pop-up list. The only difference between the two is that
+a
+GtkCombo allowed you to manually edit the selected value, while the
+GtkOptionMenu did not. In version 2.4, GTK+ introduced the new
+GtkComboBox widget as a
+replacement for both. A powerful new widget, GtkComboBox uses
+the GtkTreeModel and GtkCellRenderer architectures already implemented
+for
+GtkTreeView. In XFC, Gtk::ComboBox and its derived classes wrap the
+GtkComboBox and GtkComboBoxEntry widgets.<span
+ style="font-weight: bold;"><br>
+      </span><br>
+      <h2><span style="color: rgb(21, 67, 116);"><a name="CB01"></a></span>ComboBox</h2>
+Gtk::ComboBox is the base combo box class, and itself displays a
+non-editable
+drop down list. There is a new 'grid' mode which allows the
+available
+options to be displayed not in a linear list, but in a grid. You can
+also display images in the selected item, something not
+previously possible. Three classes derive from Gtk::ComboBox:
+Gtk::ComboBoxText,
+Gtk::ComboBoxEntry and Gtk::ComboBoxEntryText. <br>
+      <br>
+To use a ComboBox you create a Gtk::TreeModel,
+usually a Gtk::ListStore, and set it as the model used by the ComboBox.
+The model can either be passed as an argument to the ComboBox
+constructor or it can be set later. <br>
+      <br>
+To create a ComboBox widget use either of the following constructors: <br>
+      <br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">
+      <div style="text-align: left;">
+      <div class="fbox"><code>ComboBox();<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; <br>
+ComboBox(Gtk::TreeModel&amp; model);</code></div>
+      </div>
+      <br>
+      <div style="text-align: left;">The first constructor creates a
+ComboBox with no model. The second
+constructor creates a ComboBox initialized with the specified model.<br>
+      <br>
+To set the model used by a ComboBox call the following method:<br>
+      <br>
+      <div class="fbox"><code>void
+set_model(Gtk::TreeModel&amp; model);</code></div>
+      <br>
+      </div>
+You can set or retrieve the active item in the ComboBox, either by
+zero-based
+index:<br>
+      <div style="text-align: left;"> <br>
+      <div class="fbox"><code> void set_active(int index);<br>
+      <br>
+int
+get_active() const;</code> </div>
+      <br>
+or by iterator:<br>
+      <br>
+      <div class="fbox"><code>void set_active_iter(const
+Gtk::TreeIter&amp; iter);<br>
+      <br>
+bool
+get_active_iter(Gtk::TreeIter&amp; iter) const;</code></div>
+      <br>
+If successful, get_active_iter() returns true to indicate that 'iter'
+was set to point to the active item.<br>
+      <br>
+You can set the preferred number of columns when you want the popup to
+be
+laid out in a grid:<br>
+      <br>
+      <div class="fbox"><code>void
+set_wrap_width(int width);</code></div>
+      <br>
+You can also set the number rows or columns an item should span by
+calling
+the following methods respectively:<br>
+      <br>
+      <div class="fbox"><code>void set_row_span_column(int row_span);<br>
+      <br>
+void
+set_column_span_column(int
+column_span);</code></div>
+      <br>
+Here is an example of how to use a Gtk::ComboBox:<br>
+      <br>
+      <div class="fbox"><code>#include
+&lt;xfc/gtk/cellrenderertext.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/cellrendererpixbuf.hh&gt;<br
+ style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/combobox.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/liststore.hh&gt;<br
+ style="color: rgb(51, 51, 255);">
+      <br>
+Gtk::ListStore *store = new
+Gtk::ListStore(2, GDK_TYPE_PIXBUF, G_TYPE_STRING);<br>
+      <br>
+Gtk::TreeIter iter = store-&gt;append();<br>
+store-&gt;set_value(iter, 0,
+pixbuf1);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+store-&gt;set_value(iter, 1, "First
+Item");&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+      <br>
+iter = store-&gt;append();&nbsp; <br>
+store-&gt;set_value(iter, 0,
+pixbuf2);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+store-&gt;set_value(iter, 1, "Second
+Item");&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+      <br>
+iter = store-&gt;append();&nbsp; <br>
+store-&gt;set_value(iter, 0,
+pixbuf3);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+store-&gt;set_value(iter, 1, "Third
+Item");&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+      <br>
+Gtk::ComboBox *combo_box = new
+Gtk::ComboBox(*store);<br>
+Gtk::CellRenderer *renderer = new
+Gtk::CellRendererPixbuf;<br>
+combo_box-&gt;pack_start(*renderer, false);<br>
+combo_box-&gt;add_attribute(*renderer, "pixbuf", 0);<br>
+      <br>
+renderer = = new
+Gtk::CellRendererText;<br>
+combo_box-&gt;pack_start(*renderer, true);<br>
+combo_box-&gt;add_attribute(*renderer, "text", 1);</code> </div>
+      <br>
+      <h2><a name="CB02"></a>ComboBoxText</h2>
+ComboBoxText is a convenience class that creates a
+text combo box, which is a ComboBox just displaying strings. You don't
+have to worry about creating a model for this combo box. ComboBoxText
+creates and manages a text model for you. <br>
+      <br>
+To create a ComboBoxText widget call the following constructor:<br>
+      <br>
+      <div class="fbox"><code>ComboBoxText();</code></div>
+      <br>
+then to add a string to the combo box list, just call one of the
+following methods:<br>
+      <br>
+      <div class="fbox"><code>void append(const String&amp; text);<br>
+      <br>
+void prepend(const String&amp; text);<br>
+      <br>
+void insert(int position, const String&amp; text);</code></div>
+      <br>
+The append() method adds the 'text' string to the end of the list,
+prepend() adds the text string to the beginning of the list and
+insert() adds the text string to the list at the specified position.<br>
+      <br>
+To remove a text string from the combo box list call the following
+method:<br>
+      <br>
+      <div class="fbox"><code>void remove(int position);</code></div>
+      <br>
+The 'position' argument is the zero-based index of the text string in
+the combo box list.<br>
+      <br>
+You would use ComboBoxText like this:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/gtk/combobox.hh&gt;<br>
+      <br>
+Gtk::ComboBoxText *combo_box = new
+Gtk::ComboBoxText;<br>
+      <br>
+combo_box-&gt;append("First Item");<br>
+combo_box-&gt;append("Second Item");<br>
+combo_box-&gt;append("Third Item");</code></div>
+      <br>
+      <h2><a name="example1"></a>ComboBox
+Example</h2>
+This example creates a combo box with a single list of text
+strings. The header file is &lt;combobox.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br
+ style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/combobox.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/window.hh&gt;<br style="color: rgb(0, 102, 0);">
+#include &lt;xfc/gtk/widgetsignals.hh&gt;<br
+ style="color: rgb(51, 51, 255);">
+      <br>
+using namespace
+Xfc;<br>
+      <br>
+class Window : public Gtk::Window, protected Gtk::WidgetSignals<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Gtk::ComboBoxText *combobox;<br>
+&nbsp;&nbsp;&nbsp; <br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; virtual bool
+on_delete_event(const
+Gdk::EventAny&amp; event);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; Window();<br>
+&nbsp;&nbsp;&nbsp; virtual
+~Window();<br>
+};</code></div>
+      <br>
+and the source file is &lt;combobox.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "combobox.hh"<br
+ style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/box.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/treemodel.hh&gt;<br
+ style="color: rgb(51, 51, 255);">
+#include &lt;iostream&gt;<br>
+      <br>
+Window::Window()<br>
+: Gtk::WidgetSignals(this)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("ComboBox Example");&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; set_border_width(10);<br>
+&nbsp;&nbsp;&nbsp; Gtk::VBox *vbox = new Gtk::VBox;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; add(*vbox);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+A Gtk::ComboBoxText widget<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; combobox = new
+Gtk::ComboBoxText;<br>
+&nbsp;&nbsp;&nbsp; for
+(int i = 0; i &lt; 6; i++)<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; String s = String::format("Item
+Number %i", i);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+combobox-&gt;append(s);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp; combobox-&gt;set_active(0);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;add(*combobox);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;show_all();<br>
+}<br>
+      <br>
+Window::~Window()<br>
+{<br>
+}<br>
+      <br>
+bool <br>
+Window::on_delete_event(const
+Gdk::EventAny&amp;)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Gtk::TreeIter iter;<br>
+&nbsp;&nbsp;&nbsp; if
+(combobox-&gt;get_active_iter(iter))<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; String text;<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+combobox-&gt;get_model()-&gt;get_value(iter, 0,
+text);&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; std::cout &lt;&lt; "You selected:
+" &lt;&lt; text &lt;&lt; std::endl;<br>
+&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp; return false;<br>
+}<br>
+      <br>
+int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace
+Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Window window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp;&nbsp; window.show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return
+0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling ComboBox<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for ComboBox in the
+&lt;examples/howto/combobox&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/combobox&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for ComboBox, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+comboboxtext: comboboxtext.cc comboboxtext.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) comboboxtext.cc -o comboboxtext $(CFLAGS)
+`pkg-config xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o comboboxtext</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 210px; height: 93px;" alt=""
+ src="../../images/combobox.png"><br>
+      </div>
+      <br>
+Clicking on the combo box down arrow will pop up a list of
+strings to choose from.<br>
+      <br>
+      <h2><a name="CB03"></a>ComboBoxEntry</h2>
+ComboBoxEntry is a widget with an editable
+text entry field and a drop down list. To use a ComboBoxEntry you
+create
+a Gtk::TreeModel,
+usually a Gtk::ListStore, and set it as the model used by the ComboBox.
+You also need to set the text column, which is the column in the model
+to get the strings from.<br>
+      <br>
+To create a ComboBoxEntry widget call one of the following
+constructors: <br>
+      <br>
+      <div class="fbox"><code>ComboBoxEntry();<br>
+      <br>
+ComboBoxEntry(Gtk::TreeModel&amp; model, int text_column);</code></div>
+      <br>
+The first constructor creates a ComboBoxEntry widget with no model. The
+second
+constructor creates a ComboBoxEntry widget initialized with the
+specified 'model' and 'text_column'.<br>
+      <br>
+To set the model used by a ComboBoxEntry call the Gtk::ComboBox method:<br>
+      <br>
+      <div class="fbox"><code>void
+set_model(Gtk::TreeModel&amp; model);</code></div>
+      <br>
+and to set the text column call:<br>
+      <br>
+      <div class="fbox"><code>void set_text_column(int text_column);</code></div>
+      <br>
+The 'text_column' argument is the column in the model which the entry
+box should use to get the strings from.<br>
+      <br>
+      <h2><a name="CB04"></a>ComboBoxEntryText</h2>
+ComboBoxEntryText is an editable text combo box, which is a
+ComboBoxEntry just displaying strings. You don't have to worry about
+creating a model for this combo box. ComboBoxEntryText creates and
+manages a text model
+for you. <br>
+      <br>
+To create a ComboBoxEntryText widget call the following constructor:<br>
+      <br>
+      <div class="fbox"><code>ComboBoxEntryText();</code></div>
+      <br>
+then to add a string to the combo box list just call one of the
+following methods:<br>
+      <br>
+      <div class="fbox"><code>void append(const String&amp; text);<br>
+      <br>
+void prepend(const String&amp; text);<br>
+      <br>
+void insert(int position, const String&amp; text);</code></div>
+      <br>
+To remove a text string from the combo box list call the following
+method:<br>
+      <br>
+      <div class="fbox"><code>void remove(int position);</code></div>
+      <br>
+The 'position' argument is the zero-based index of the text string in
+the combo box list.<br>
+      <br>
+      <h2><a name="example2"></a>ComboBoxEntry
+Example</h2>
+This example creates a combo box widget with a single list of text
+strings that can be edited. The header file is
+&lt;comboboxentry.hh&gt;:<br>
+&nbsp; <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br
+ style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/comboboxentry.hh&gt;<br
+ style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/liststore.hh&gt;<br
+ style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/window.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/widgetsignals.hh&gt;<br>
+      <br>
+using namespace
+Xfc;<br>
+      <br>
+/*&nbsp; ComboBoxEntry<br style="color: rgb(0, 0, 102);">
+&nbsp;*/<br style="color: rgb(0, 0, 102);">
+      <br>
+class
+ComboBoxEntry : public
+Gtk::ComboBoxEntryText<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; ComboBoxEntry();<br>
+};<br>
+      <br>
+/*&nbsp; Window<br style="color: rgb(0, 0, 102);">
+&nbsp;*/<br style="color: rgb(0, 0, 102);">
+      <br>
+class Window : public Gtk::Window, protected Gtk::WidgetSignals<br>
+{<br>
+&nbsp;&nbsp;&nbsp; ComboBoxEntry *combobox;<br>
+&nbsp;&nbsp;&nbsp; <br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; virtual bool
+on_delete_event(const
+Gdk::EventAny&amp; event);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; Window();<br>
+&nbsp;&nbsp;&nbsp; virtual
+~Window();<br>
+};</code></div>
+      <br>
+and the source file is &lt;comboboxentry.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "comboboxentry.hh"<br
+ style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/box.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;iostream&gt;<br>
+      <br>
+ComboBoxEntry::ComboBoxEntry()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_text_column(0);<br>
+&nbsp;&nbsp;&nbsp; for (int i = 0; i &lt; 6; i++)<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; String s = String::format("Item
+Number %i", i);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+append(s);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp; set_active(3);<br>
+}<br>
+      <br>
+Window::Window()<br>
+: Gtk::WidgetSignals(this)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("ComboBoxEntry
+Example");&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; set_border_width(10);<br>
+&nbsp;&nbsp;&nbsp; Gtk::VBox *vbox = new Gtk::VBox;<br>
+&nbsp;&nbsp;&nbsp; add(*vbox);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // A
+Gtk::ComboBoxEntryText widget<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; combobox = new
+ComboBoxEntry;<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;add(*combobox);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;show_all();<br>
+}<br>
+      <br>
+Window::~Window()<br>
+{<br>
+}<br>
+      <br>
+bool <br>
+Window::on_delete_event(const
+Gdk::EventAny&amp;)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; std::cout &lt;&lt; "You entered: " &lt;&lt;
+combobox-&gt;get_text() &lt;&lt; std::endl;<br>
+&nbsp;&nbsp;&nbsp; return false;<br>
+}<br>
+      <br>
+int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace
+Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Window window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp;&nbsp; window.show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return
+0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling ComboBoxEntry<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for ComboBoxEntry in the
+&lt;examples/howto/combobox&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/combobox&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for ComboBoxEntry, add the following lines to a
+new text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+comboboxentry: comboboxentry.cc comboboxentry.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) comboboxentry.cc -o comboboxentry $(CFLAGS)
+`pkg-config xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o comboboxentry</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 237px; height: 90px;" alt=""
+ src="../../images/comboboxentry.png"><br>
+      </div>
+      <br>
+Clicking on the combo box down arrow will pop up a list of
+strings to choose from. The selected string is editable and can be
+retrieved when the combo box is destroyed.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="combobox.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

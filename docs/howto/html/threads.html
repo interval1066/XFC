@@ -1,0 +1,762 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Multi-Threaded Programming" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Clas<span
+ style="font-weight: bold; font-family: Helvetica,Arial,sans-serif; color: rgb(21, 67, 116);">ses</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"></span> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Multi-Threaded Programming</h1>
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a class="mhl" href="threads.html#TP01">Overview</a><br>
+        </li>
+        <li><a class="mhl" href="threads.html#TP02">Initializing GTK+
+in
+thread-safe
+mode.</a></li>
+        <li><a class="mhl" href="threads.html#TP03">A minimal threaded
+XFC
+application.</a></li>
+        <li><a class="mhl" href="threads.html#TP04">Creating a thread.</a></li>
+        <li><a class="mhl" href="threads.html#TP05">Joining threads.</a></li>
+        <li><a class="mhl" href="threads.html#TP06">Mutexes.</a></li>
+        <li><a class="mhl" href="threads.html#TP07">Conditions.</a></li>
+        <li><a class="mhl" href="threads.html#example">Thread Example.</a></li>
+        <li><a class="mhl" href="threads.html#TP08">Thread Pitfalls.</a></li>
+        <li><a class="mhl" href="threads.html#TP09">References and
+further reading</a><br>
+        </li>
+      </ol>
+      <br>
+      <h2><a name="TP01"></a>Overview</h2>
+Most programmers are used to writing
+single-threaded
+programs&nbsp;- that is, programs that only execute one path through
+their
+code at a time. Multi-threaded programs may have several threads
+running
+through different code paths simultaneously.&nbsp; One of the
+advantages of multi-threaded programming is that it's considerably
+cheaper to switch
+between two threads in a single process than to switch between two
+processes. Another advantage is that threads can often improve the
+performance of a program without incurring significant overhead to
+implement. Be warned though, writing multi-threaded programs requires
+careful thought. There is the potential to introduce subtle timing
+faults, or faults caused by the unintentional sharing of variables.
+Also, debugging a multi-threaded program is much harder than a
+single-threaded one .<br>
+      <br>
+To understand threads just think of several processes running at once.
+Imagine that all these processes have access to the same set of global
+variables and function calls. Each of these processes would represent a
+thread of execution and is thus called a thread. The important
+differentiation is that each thread doesn't have to wait for any other
+thread to proceed. All the threads can proceed simultaneously. Unlike
+processes, all threads of
+one process share the same memory. This is good, as it provides easy
+communication between the involved threads via this shared memory, and
+it is bad, because strange things might happen, when the program is not
+carefully designed. <br>
+      <br>
+The main benefit of multi-threading a graphical user interface is
+increased responsiveness to user requests. One of the more frustrating
+aspects of both programming and using applications with graphical user
+interfaces is dealing with operations that take an indeterminate amount
+of time. Using threads in such an application provides at minimum a
+more responsive interface and perhaps one that permits more work to
+occur by allowing the user to queue possible multiple long-running
+requests. <br>
+      <br>
+Thread operations include thread creation, termination, synchronization
+(joins, blocking), scheduling, data management and process interaction.
+A thread does not maintain a list of created threads, nor does it know
+the thread that created it. All threads within a process share the
+following: <br>
+      <div style="text-align: left;"> </div>
+      <ul style="text-align: left;">
+        <li>The same address space</li>
+        <li>Process instructions </li>
+        <li>Most data </li>
+        <li>open files (descriptors) </li>
+        <li>signals and signal handlers </li>
+        <li>current working directory </li>
+        <li>User and group id </li>
+      </ul>
+      <div style="text-align: left;"></div>
+Through GLib encapsulation XFC
+provides a portable means for writing
+multi-threaded software. It provides mutexes to protect access to
+portions of memory
+(G::Mutex, G::StaticMutex, G::StaticRecMutex and G::StaticRWLock), a
+condition object for condition variables that allow threads to be
+synchronized (G::Condition) and finally thread-private data objects
+that every thread has a private instance of
+(G::Private, G::StaticPrivate). Last, but definitely not least,there is
+the thread object itself to portably create and manage threads
+(G::Thread). <br>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <h2><a name="TP02"></a>Initializing GTK+ in thread-safe
+mode</h2>
+The first thing that must be done when writing a multi-threaded program
+is to initialize GTK+ in thread-safe mode. This is done by calling the
+'Main::' namespace function:<br>
+      <br>
+      <div class="fbox"><code>void threads_init(GThreadFunctions
+*vtable = 0);</code></div>
+      <br>
+This is a convenience function that initializes the GLib thread
+system and initializes GDK so that it can be used with multiple
+threads. There are two parts to the code that this function executes.
+First, the GLib thread system is initialized:<br>
+      <br>
+      <div class="fbox"><code>if (!g_thread_supported())<br>
+&nbsp;&nbsp;&nbsp; g_thread_init(vtable);</code><br>
+      </div>
+      <br>
+If g_thread_init() is called twice, the second time
+it will abort. To make sure this doesn't happen, g::thread::supported()
+is checked first. It returns false if the GLib thread
+system has not yet been initialized, and true if it has.<br>
+      <br>
+Second, GDK is initialized so that it can be used in multi-threaded
+applications:<br>
+      <br>
+      <div class="fbox"><code>gdk_threads_init();</code><br>
+      </div>
+      <br>
+Main::threads::init() should only be called once in
+a threaded GTK+ program, and must be called before executing any other
+GTK+ or GDK
+functions. Most of the
+time you can just pass null for the 'vtable' argument. You should only
+call this method with a non-null argument if you really know what you
+are doing. Do not call threads_init() directly or indirectly as a
+callback and make sure no mutexes are locked when you make the call.
+After calling threads_init(), either the thread system is initialized
+or the
+program will abort if no thread system is available in GLib (that is,
+G_THREADS_IMPL_NONE is defined).<br>
+      <br>
+GTK+ is "thread aware" but
+not thread safe, so XFC provides a global lock controlled by
+Gdk::Mutex::lock() and Gdk::Mutex::unlock() which protects all use of
+GTK+. That is, only one thread can use GTK+ at any given time. After
+calling threads_init() you should call
+Gdk::Mutex::lock() and Gdk::Mutex::unlock() to lock and unlock critical
+sections of code. <br>
+      <br>
+GLib is completely thread safe because
+it automatically locks all internal data structures as needed. This
+does
+not mean that two threads can simultaneously access the same data, but
+they can access two different instances of the data simultaneously. For
+performance reasons, individual data structure instances are not
+automatically
+locked, so if
+two different threads need to access the same data, the application is
+responsible for locking itself. <br>
+      <br>
+Idles, timeouts, and input signals are executed outside of the main
+GTK+ lock. So, if you need to call GTK+ inside of such a callback slot,
+you must surround the callback with a Gdk::Mutex::lock() and
+Gdk::Mutex::unlock() pair (all other signals are executed within the
+main GTK+ lock). In particular, this means, if you
+are writing widgets that might be used in threaded programs, you must
+surround timeouts and idle functions in this manner. As always, you
+must also surround any calls to GTK+ not made within a signal handler
+with a Gdk::Mutex::lock() and Gdk::Mutex::unlock() pair. <br>
+      <br>
+Before calling Gdk::Mutex::unlock() from a thread other than your main
+thread, you probably want to call Gdk::flush() to send all pending
+commands to the windowing system. (The reason you don't need to do this
+from the main thread is that GDK always automatically flushes pending
+commands when it runs out of incoming events to process and has to
+sleep while waiting for more events.) <br>
+      <br>
+      <h2><a name="TP03"></a>A minimal threaded XFC application</h2>
+A minimal main function for a threaded application looks like this:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br
+ style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/window.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/glib/thread.hh&gt;<br style="color: rgb(51, 51, 255);">
+      <br>
+using namespace Xfc;<br>
+      <br>
+class Window : public Gtk::Window<br>
+{<br style="color: rgb(102, 0, 0);">
+public:<br>
+&nbsp;&nbsp;&nbsp; Window();<br>
+&nbsp;&nbsp;&nbsp; virtual
+~Window();<br>
+};<br>
+      <br>
+Window::Window()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("Basic Window");<br>
+&nbsp;&nbsp;&nbsp; show();<br>
+}<br>
+      <br>
+Window::~Window()<br>
+{<br>
+}<br>
+      <br>
+int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace
+Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; threads_init();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Window window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gdk::Mutex::lock();<br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; Gdk::Mutex::unlock();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; return
+0;<br>
+}</code> <br>
+      </div>
+      <br>
+      <div style="text-align: left;">This example doesn't do much but
+it
+does show you how to correctly
+initialize GTK+ in thread-safe mode, and how to lock the main loop
+(that is, run()). <br>
+      </div>
+      <br>
+      <h2><a name="TP04"></a>Creating a thread</h2>
+Creating a thread in XFC is easy
+because unlike other C++ thread
+implementations, your not required to derive a new class or override
+any virtual functions. Instead G::Thread provides a static
+function-call that lets you create threads on-the-fly, in any
+constructor or function body.<br>
+      <br>
+To create a new thread, call one of the following methods:<br>
+      <br>
+      <div class="fbox"><code>static Thread* create(const
+ThreadSlot&amp; slot, bool joinable, G::Error *error = 0);<br>
+      <br>
+static Thread* create(const ThreadSlot&amp; slot, unsigned long
+stack_size, bool joinable, bool bound, G::Error *error = 0);</code><br>
+      </div>
+      <br>
+Both methods create a thread with the default priority, but the second
+method lets you specify a stack size. Usually you would use the first
+create method. <br>
+      <br>
+The ThreadSlot argument is a typedef that declares the
+function signature of the callback (or entry point) to execute in the
+new
+thread:<br>
+      <br>
+      <div class="fbox"><code>typedef sigc::slot&lt;void&gt; ThreadSlot;</code></div>
+      <br>
+The thread slot can be a member or non-member function and has the form:<br>
+      <br>
+      <div class="fbox"><code>void function();</code></div>
+      <br>
+      <div style="text-align: justify;">The 'joinable' argument sets
+whether the new thread should be
+joinable or not. A join is performed when you want to wait for a thread
+to finish. A thread calling routine may launch multiple threads then
+wait for them to finish to get the results. <br>
+      <br>
+The 'stack_size' and bound arguments are seldom used
+and best left to those who know what they're doing. The stack_size
+specifies a stack size for the new thread and bound sets
+whether the new thread should be bound to a system thread. The G::Error
+argument is optional and is only set when the create() method returns
+null. <br>
+      <br>
+      </div>
+To create a new thread and check for an error you could do something
+like this:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;iostream&gt;<br>
+      <br>
+G::Thread *thread = G::Thread::create(slot(this,
+&amp;SomeClass::thread_method), true);<br>
+if (!thread)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; std::cout &lt;&lt; "Thread creation failed" &lt;&lt;
+std::endl;<br>
+}</code> </div>
+      <br>
+      <h2><a name="TP05"></a>Joining threads</h2>
+Joining is one way to accomplish synchronization between
+threads. Two other ways, mutexes and condition variables will be
+discussed later. <br>
+      <br>
+To join a thread, you call the following method:<br>
+      <br>
+      <div class="fbox"><code>void G::Thread::join();</code></div>
+      <br>
+      <div style="text-align: justify;">The join() method blocks the
+calling
+thread until the specified thread
+terminates. As a recommendation, if a thread requires joining it must
+be explicitly created as joinable. If you know in advance that a thread
+will never need to join with another thread, consider creating it in a
+detached state (joinable = false). <br>
+      </div>
+      <br>
+To wait for a thread's completion you would do something like this:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;iostream&gt;<br>
+      <br>
+G::Thread *thread = G::Thread::create(sigc::mem_fun(this,
+&amp;SomeClass::thread_method), true);<br>
+if (!thread)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; std::cout &lt;&lt; "Thread creation failed" &lt;&lt;
+std::endl;<br>
+}<br>
+      <br>
+std::cout &lt;&lt; "Waiting for the thread to finish..." &lt;&lt;
+std::endl;<br>
+thread-&gt;join();<br>
+std::cout &lt;&lt; "Thread joined!" &lt;&lt; std::endl;</code> </div>
+      <br>
+      <h2><a name="TP06"></a>Mutexes</h2>
+Mutex is an abbreviation for "mutual
+exclusion". Mutex variables are
+one of the primary means of implementing thread synchronization and for
+protecting shared data when multiple writes can occur. A mutex variable
+acts like a 'lock' protecting access to a shared data resource. The
+basic concept of a mutex as used in XFC is that only one thread can
+lock (or own) a mutex variable at any given time. Thus, even if several
+threads try to lock a mutex only one thread will be successful. No
+other thread can own that mutex until the owning thread unlocks that
+mutex. This ensures that threads take turn in accessing protected data.
+To prevent data corruption it is important to make sure that every
+thread that needs to use a mutex does so.<br>
+      <br>
+There are two groups of mutexes. The first group includes G::Mutex,
+G::RecMutex and G::RWLock. These mutexes are used when you want to
+dynamically create a mutex on the heap or on the stack. G::Mutex is the
+standard mutex and the one
+from this group that you will use the most. G::RecMutex is a recursive
+mutex that can be locked by the same thread multiple times, but before
+it can be locked by other threads it must be unlocked the same number
+of times. G::RWLock is a mutex that implements two types of locks, a
+read-only lock and a write-lock. A read-write lock has a higher
+overhead than the other mutexes. <br>
+      <br>
+The second group of mutexes are analogous to the first but must be
+created at compiled time (statically), which is sometimes convenient.
+The names of
+these mutexes are prefix with static and include
+G::StaticMutex, G::StaticRecMutex and G::StaticRWLock. These mutexes
+can be initialized in file scope in an anonymous namespace like this:<br>
+      <br>
+      <div class="fbox"><code>G::StaticMutex
+mutex = XFC_STATIC_MUTEX_INIT;<br>
+      <br>
+G::StaticRecMutex rec_mutex = XFC_STATIC_REC_MUTEX_INIT;<br>
+      <br>
+G::StaticRWLock rw_lock = XFC_STATIC_RW_LOCK_INIT;</code> </div>
+      <br>
+The three methods used with mutexes
+are lock(), trylock() and unlock().
+The trylock() and unlock() methods are the same for all mutexes. The
+lock() method for some mutexes is different because you can optionally
+specify
+an argument. For example, the lock() method for G::RecMutex and
+G::StaticRecMutex looks like this:<br>
+      <br>
+      <div class="fbox"><code>void lock(unsigned int depth = 1);</code></div>
+      <br>
+      <div style="text-align: justify;">The 'depth' argument is for
+convenience. It lets you specify at
+lock time the depth, or number of unlocks that must be performed to
+completely unlock a recursive mutex. You should consult the XFC
+reference documentation or have a look at the header file
+&lt;xfc/glib/mutex.hh&gt;
+for more details.<samp></samp><br>
+      <samp></samp></div>
+      <samp><br>
+      </samp>
+      <h2><a name="TP07"></a>Conditions</h2>
+The condition variable mechanism
+allows threads to suspend execution
+and relinquish the processor until some condition is true. A condition
+variable must always be associated with a mutex to avoid a race
+condition created by one thread preparing to wait and another thread
+which may signal the condition before the first thread actually waits
+on it, resulting in a deadlock. The thread will be perpetually waiting
+for a signal that is never sent. Any mutex can be used, there is no
+explicit link between the mutex and the condition variable. <br>
+      <div style="text-align: justify;"><br>
+      </div>
+The following is an example of using G::Condition to block a thread
+until a condition is satisfied:<br>
+      <br>
+      <div class="fbox"><code>G::Condition
+*data_cond; // Initialized somewhere else.<br>
+G::Mutex *data_mutex; // Initialized somewhere else.<br>
+void *current_data =
+0;<br>
+      <br>
+void push_data(void *data)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; data_mutex-&gt;lock();<br>
+&nbsp;&nbsp;&nbsp; current_data = data;<br>
+&nbsp;&nbsp;&nbsp; data_cond-&gt;signal();<br>
+&nbsp;&nbsp;&nbsp; data_mutex-&gt;unlock();<br>
+}<br>
+      <br>
+void* pop_data()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; data_mutex-&gt;lock();<br>
+&nbsp;&nbsp;&nbsp; while
+(!current_data)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; data_cond-&gt;wait(*data_mutex);<br>
+&nbsp;&nbsp;&nbsp; void
+*data = current_data;<br>
+&nbsp;&nbsp;&nbsp; current_data = 0;<br>
+&nbsp;&nbsp;&nbsp; data_mutex-&gt;unlock();<br>
+&nbsp;&nbsp;&nbsp; return
+data;<br>
+}</code> </div>
+      <br>
+      <h2><a name="example"></a>Thread Example</h2>
+The following thread example is a C++
+translation of the GTK+ thread
+example in the GTK+ FAQ sheet. It's a simple GUI application that
+displays a window whose only widget is a label. <br>
+      <br>
+The header file for the Thread example is &lt;thread.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/label.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class Window : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp; &nbsp;static volatile int yes_or_no;<br>
+&nbsp;&nbsp; &nbsp;Gtk::Label *label;<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp; &nbsp;void on_argument(int what);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp; &nbsp;Window();<br>
+&nbsp;&nbsp; &nbsp;virtual ~Window();<br>
+};</code></div>
+      <br>
+and the source file <em></em> is &lt;thread.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "thread.hh"<br>
+#include &lt;xfc/glib/rand.hh&gt;<br>
+#include &lt;xfc/glib/thread.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+namespace {<br>
+      <br>
+G::StaticMutex mutex = XFC_STATIC_MUTEX_INIT;<br>
+const int YES_IT_IS = 1;<br>
+const int NO_IT_IS_NOT = 0;<br>
+      <br>
+} // namespace<br>
+      <br>
+volatile int Window::yes_or_no = YES_IT_IS;<br>
+      <br>
+Window::Window()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_title("Thread Example");<br>
+&nbsp;&nbsp; &nbsp;set_border_width(10);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// create a label<br>
+&nbsp;&nbsp; &nbsp;label = new Gtk::Label("And now for something
+completely different ...");<br>
+&nbsp;&nbsp; &nbsp;add(*label);<br>
+&nbsp;&nbsp; &nbsp;label-&gt;show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// init random number generator<br>
+&nbsp;&nbsp; &nbsp;G::random_set_seed((unsigned int)time(0));<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// create the threads<br>
+&nbsp;&nbsp; &nbsp;G::Thread *thread =
+G::Thread::create(sigc::bind(sigc::mem_fun(this,
+&amp;Window::on_argument), YES_IT_IS), false);<br>
+&nbsp;&nbsp; &nbsp;thread =
+G::Thread::create(sigc::bind(sigc::mem_fun(this,
+&amp;Window::on_argument), NO_IT_IS_NOT), false);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;show();<br>
+}<br>
+      <br>
+Window::~Window()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+Window::on_argument(int what)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;bool say_something;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;for (;;)<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;// sleep for&nbsp; while<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;G::usleep((G::random_int() /
+(RAND_MAX / 3) + 1) * (G_USEC_PER_SEC / 2));<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;// lock the yes_or_no_variable<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;mutex.lock();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;// do we have to say something?<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;say_something = (yes_or_no !=
+what);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if (say_something)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;// set the
+variable<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;yes_or_no =
+what;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;// unlock the yes_or_no variable<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;mutex.unlock();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if (say_something)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;// lock the
+GTK thread<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;Gdk::Mutex::lock();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;// set the
+label text<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if(what ==
+YES_IT_IS)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;label-&gt;set_text("Oh yes, it is!");<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;else<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;label-&gt;set_text("Oh no, it isn't!");<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;// unlock the
+GTK thread<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;Gdk::flush();<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;Gdk::Mutex::unlock();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;}<br>
+}<br>
+      <br>
+int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace Main;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// init thread support<br>
+&nbsp;&nbsp; &nbsp;threads_init();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// init GTK+<br>
+&nbsp;&nbsp; &nbsp;init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// create a window<br>
+&nbsp;&nbsp;&nbsp; &nbsp;Window window;<br>
+&nbsp;&nbsp;
+&nbsp;window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// enter the main loop<br>
+&nbsp;&nbsp; &nbsp;Gdk::Mutex::lock();<br>
+&nbsp;&nbsp; &nbsp;run();<br>
+&nbsp;&nbsp; &nbsp;Gdk::Mutex::unlock();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;return 0;<br>
+}</code><br>
+      </div>
+      <br>
+      <h2>Compiling Thread<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Thread in the
+&lt;examples/howto/thread&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/thread&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Thread, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+thread: thread.cc thread.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) thread.cc -o thread $(CFLAGS) `pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o thread</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When you compile and run this program,
+a window is appears with a label that displays the text "And now for
+something completely
+different ...". The program then creates two threads that argue with
+each
+other, one thread setting the label text to "Oh yes, it is!",<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 312px; height: 82px;" alt=""
+ src="../../images/thread1.png"><br>
+      </div>
+      <br>
+      <br>
+and the other thread setting the label
+text to "Oh no, it
+isn't!".<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 312px; height: 82px;" alt=""
+ src="../../images/thread2.png"><br>
+      </div>
+      <br>
+Between calls to the thread slot
+on_argument() each thread sleeps for a
+random amount of time. When a thread is woken up it resets the label
+text if the current text was set by the other thread. And so
+the two threads argue with each other, over and over again, resetting
+the label text. There are also several small non-GUI threaded test
+programs in the libXFCcore
+&lt;tests/thread&gt;
+subdirectory.<br>
+      <br>
+      <h2><a name="TP08"></a>Thread Pitfalls<strong></strong></h2>
+      <span style="font-weight: bold;">Race conditions</span>.
+While the code may appear on the
+screen in the order you wish the code to execute, threads are scheduled
+by the operating system and are executed at random. It cannot be
+assumed that threads are executed in the order they are created. They
+may also execute at different speeds. When threads are executing
+(racing to complete) they may give unexpected results (a race
+condition).
+Mutexes and joins must be utilized to achieve a predictable execution
+order and outcome. <br>
+      <br>
+      <span style="font-weight: bold;">Thread safe code</span>.
+The threaded routines must call functions which are "thread safe". This
+means that there are no static or global variables which other threads
+may clobber or read assuming single threaded operation. If static or
+global variables are used then mutexes must be applied or the functions
+must be re-written to avoid the use of these variables. In C/C++, local
+variables are dynamically allocated on the stack. Therefore, any
+function that does not use static data or other shared resources is
+thread-safe. Thread-unsafe functions may be used by only one thread at
+a time in a program and the uniqueness of the thread must be ensured.
+Many non-reentrant functions return a pointer to static data. This can
+be avoided by returning dynamically allocated data or using
+caller-provided storage. An example of a non-thread safe function is
+strtok which is also not re-entrant. The "thread safe" version is the
+re-entrant version strtok_r. <br>
+      <br>
+      <span style="font-weight: bold;">Mutex Deadlock</span>. This
+condition occurs when a mutex is
+applied but then not "unlocked". This causes program execution to halt
+indefinitely. It can also be caused by poor application of mutexes or
+joins. Be careful when applying two or more mutexes to a section of
+code. If the first G::Mutex::lock() is applied and the second
+G::Mutex::lock() fails due to another thread applying a mutex, the
+first mutex may eventually lock all other threads from accessing data
+including the thread which holds the second mutex. The threads may wait
+indefinitely for the resource to become free causing a deadlock. It is
+best to test by calling G::Mutex::trylock() and if failure occurs, free
+the resources and stall before retrying.<br>
+      <br>
+      <h2><a name="TP09"></a>References
+and further reading</h2>
+      <ul>
+        <li>Beginning Linux Programming. Richard Stones and Neil
+Matthew.Wrox
+Press Ltd.</li>
+        <li>Posix Threads Programming. <a
+ href="http://www.llnl.gov/computing/tutorials/workshops/workshop/pthreads/MAIN.html">http://www.llnl.gov/computing/tutorials/workshops/workshop/pthreads/MAIN.html</a><br>
+        </li>
+        <li>GTK and PThreads. <a
+ href="http://www.humanfactor.com/gpk/gtk-and-pthreads.html">http://www.humanfactor.com/gpk/gtk-and-pthreads.html</a><br>
+        </li>
+        <li>Threads in C++. <a
+ href="http://www.linuxselfhelp.com/HOWTO/C++Programming-HOWTO-18.html">http://www.linuxselfhelp.com/HOWTO/C++Programming-HOWTO-18.html</a><br>
+        </li>
+        <li>Portable Thread Synchronization Using C++. <a
+ href="http://world.std.com/%7Ejimf/papers/c++sync/c++sync.html">http://world.std.com/~jimf/papers/c++sync/c++sync.html</a><br>
+        </li>
+        <li>Answers to frequently asked questions for
+comp.programming.threads. <a
+ href="http://www.serpentine.com/%7Ebos/threads-faq/">http://www.serpentine.com/~bos/threads-faq/</a></li>
+      </ul>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="threads.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

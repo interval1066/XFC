@@ -1,0 +1,778 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="The Main Loop" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"></span> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>The Main Event Loop<br>
+      </h1>
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a class="mhl" href="mainloop.html#ML01">The GLIb Main Loop</a></li>
+        <li><a class="mhl" href="mainloop.html#ML02">Main Contexts</a></li>
+        <li><a class="mhl" href="mainloop.html#ML03">Event Sources</a></li>
+        <li><a class="mhl" href="mainloop.html#ML04">Timeout Sources</a></li>
+        <li><a class="mhl" href="mainloop.html#ML05">The Timeout Signal</a><br>
+        </li>
+        <li><a class="mhl" href="mainloop.html#ML06">Idle Sources</a></li>
+        <li><a class="mhl" href="mainloop.html#ML07">The Idle Signal</a></li>
+        <li><a class="mhl" href="mainloop.html#ML08">Monitoring IO</a></li>
+        <li><a class="mhl" href="mainloop.html#ML09">The IO Signal</a></li>
+        <li><a class="mhl" href="mainloop.html#ML10">The GTK Main Loop</a></li>
+        <li><a class="mhl" href="mainloop.html#ML11">Key Snooper
+Functions</a></li>
+        <li><a class="mhl" href="mainloop.html#ML12">The Quit Signal</a></li>
+        <li><a class="mhl" href="mainloop.html#ML13">Example Main
+Functions</a><br>
+        </li>
+      </ol>
+      <br>
+      <h2><a name="ML01"></a>The GLib Main Loop</h2>
+The GLib main event loop is a low-level generic abstraction that
+manages all the available sources of events for GLib and GTK+
+applications. These events can come from any number of different types
+of sources such as file descriptors (plain files, pipes or sockets) and
+timeouts.&nbsp; New sources can be added using G::Source::attach().
+GLib allows multiple independent sets of sources to be handled in
+different
+threads, each source is associated with a G::MainContext. A main
+context
+can only be running in a single thread, but sources can be added to it
+and removed from it, from other threads. <br>
+      <br>
+Each event source is assigned a priority. The default priority,
+G::PRIORITY_DEFAULT, has a value of 0. Values less than 0 denote higher
+priorities.
+Values greater than 0 denote lower priorities. Events from high
+priority sources are always processed before events from lower priority
+sources. Idle functions can also be added, and assigned a priority.
+These will be run whenever no events with a higher priority are ready
+to be processed. <br>
+      <br>
+A G::MainLoop represents a single invocation of GLib main event loop
+and can be
+created with one of the following constructors:<br>
+      <br>
+      <div class="fbox"><code>MainLoop();<br>
+      <br>
+MainLoop(G::MainContext&amp; context);</code><br>
+      </div>
+      <br>
+The first constructor creates a main loop using the default
+G::MainContext. The second constructor creates a main loop using the
+specified G::MainContext. <br>
+      <br>
+After adding the initial event sources, run() is called to run the
+event
+loop:<br>
+      <br>
+      <div class="fbox"><code>void run();</code></div>
+      <br>
+Once run() is invoked the main loop will iterate until quit() is called:<br>
+      <br>
+      <div class="fbox"><code>void quit();</code></div>
+      <br>
+While the main loop is running, it continuously checks for new events
+from each of the event sources and dispatches them. If one of the
+events from one of the sources leads to a call to quit() to exit the
+main loop, run() returns. <br>
+      <br>
+It is possible to create new instances of G::MainLoop recursively. This
+is often used in GTK+ applications when showing modal dialog boxes.
+Note that event sources are associated with a particular
+G::MainContext,
+and will be checked and dispatched for all main loops associated with
+that context. <br>
+      <br>
+One of the unusual features of the GLib main loop functionality is that
+new types of event source can be created and used in addition to the
+built-in types of event source. A new source type is created by
+deriving
+it from G::CustomSource, but for most purposes the built-in event
+sources
+should suffice: G::ChildWatchSource, G::TimeoutSource, G::IdleSource
+and G::IOSource.<br>
+      <br>
+      <h2><a name="ML02"></a>Main Contexts</h2>
+A G::MainContext is an object that represents a set of event sources to
+be processed in a main loop. Different main contexts must be used for
+different threads but sources can be added to a main context from any
+thread.<br>
+      <br>
+A main context is created with the following constructor:<br>
+      <br>
+      <div class="fbox"><code>MainContext();</code></div>
+      <br>
+Applications that need only one context can use the default main
+context instead, by calling the following function:<br>
+      <br>
+      <div class="fbox"><code>Pointer&lt;MainContext&gt; get_default();</code><br>
+      </div>
+      <br>
+A single iteration of a main context can be run by calling:<br>
+      <br>
+      <div class="fbox"><code>bool iteration(bool may_block);</code><br>
+      </div>
+      <br>
+If 'may_block' is set to true and no event sources are ready to be
+processed, the context will wait for a source to become ready,
+dispatching the highest priority events sources that are ready.
+iteration() will return true if any events were dispatched.<br>
+      <br>
+If you need more control over exactly how the details of the main event
+loop work, for instance, when integrating G::MainLoop with an
+external main loop, you can call the component methods of iteration()
+directly. These methods are prepare(), query(), check() and dispatch(),
+and they must be called in that sequence. The sequence can be stopped
+at any
+time, and you can return to prepare(), but you must never skip a step
+or call one of the methods twice (except for query()). Whenever
+prepare() is invoked, any pending sources are cleared, and checking
+starts again from scratch.<br>
+      <br>
+      <h2><a name="ML03"></a>Event Sources</h2>
+A G::Source object corresponds to a single source of input to be
+processed by the main loop. GLib provides several built-in source
+types, represented by the following XFC classes: ChildWatchSource,
+TimeoutSource, IdleSource and IOSource. In most cases these built-in
+source types should be adequate. When they aren't, or when you need
+something more powerful, you can create a custom event source by
+subclassing G::CustomSource. <br>
+      <br>
+When a source is created it isn't associated with any main context but
+must be explicitly attached to a context by calling the G::Source
+attach method:<br>
+      <br>
+      <div class="fbox"><code>unsigned int attach(MainContext *context
+= 0);</code><br>
+      </div>
+      <br>
+If 'context' is null the source is attached to the default main
+context; otherwise it's attached to the specified main context. The
+return value is an integer that identifies the source within the
+context. <br>
+      <br>
+If a source is attached to a specific main context,
+G::Source::is_attached() returns true:<br>
+      <br>
+      <div class="fbox"><code>bool is_attached(G::MainContext&amp;
+context) const;</code><br>
+      </div>
+      <br>
+Event sources processed in the main loop are dispatched according to
+their priority, which can be set and retrieved with the following two
+methods respectively:<br>
+      <br>
+      <div class="fbox"><code>void set_priority(int priority);<br>
+      <br>
+int get_priority() const;</code><br>
+      </div>
+      <br>
+The 'priority' can be one of the following values:<br>
+      <ul>
+        <li>PRIORITY_HIGH - use this for high priority event sources;
+It is not used within GLib or GTK+ (value -100).</li>
+        <li>PRIORITY_DEFAULT - use this for default priority event
+sources; In GLib this priority is used when adding timeout functions
+(value 0).</li>
+        <li>PRIORITY_HIGH_IDLE - use this for high priority idle
+functions (value 100); </li>
+        <li>PRIORITY_DEFAULT_IDLE - use this for default priority idle
+functions; In GLib this priority is used when adding idle functions
+(value 200).</li>
+        <li>PRIORITY_LOW - use this for very low priority background
+tasks; It is not used within GLib or GTK+ (value 300).</li>
+      </ul>
+Negative values have a higher priority than positive ones, with the
+most negative value having the highest the priority and the most
+positive value having the lowest priority. While the main loop is being
+run, a source will be dispatched if it is
+ready to be dispatched and no sources with a higher priority are ready
+to be dispatched.<br>
+      <br>
+Note, GTK+ uses PRIORITY_HIGH_IDLE + 10 for window resizes and
+PRIORITY_HIGH_IDLE + 20 for window redraws, to ensure that any pending
+resizes are processed before any pending redraws, so that widgets are
+not redrawn twice unnecessarily; you will interfere with GTK+ if you
+use a priority above PRIORITY_HIGH_IDLE + 10 (that is,
+GTK_PRIORITY_RESIZE).<br>
+      <br>
+Event sources can be called recursively, that is, while being
+dispatched a source wont be blocked until the dispatch returns, but
+instead will be processed normally. You can set and retrieve the
+'can_recurse' property with the following two methods respectively:<br>
+      <br>
+      <div class="fbox"><code>void set_can_recurse(bool can_recurse);<br>
+      <br>
+bool get_can_recurse() const;</code><br>
+      </div>
+      <br>
+As well as calling ref() and unref() on a source, sources can be
+explicitly destroyed with the following method:<br>
+      <br>
+      <div class="fbox"><code>void destroy();</code></div>
+      <br>
+Calling destroy() removes a source from its main context, if any, and
+marks it as destroyed. After calling this method the source cannot be
+subsequently added to another context.<br>
+      <br>
+      <h2><a name="ML04"></a>Timeout Sources</h2>
+Adding a timeout source to a G::MainContext is a convenient way
+to
+you register a slot to be called at regular intervals, with a
+given
+priority. Once connected, the slot is called repeatedly until its
+function
+returns false, at
+which point the timeout is automatically destroyed and will not be
+called again. The first
+call to the slot will be at the end of the first interval.<br>
+      <br>
+A timeout source can be created with one of the following constructors:<br>
+      <br>
+      <div class="fbox"><code>TimeoutSource(unsigned int interval);<br>
+      <br>
+TimeoutSource(const SourceSlot&amp; slot, unsigned int interval);</code><br>
+      </div>
+      <br>
+The both constructors create a timeout source that can be associated
+with any main context. The SlotType is a callback slot of type
+sigc::slot&lt;bool&gt;. The 'interval' is the time between calls to the
+callback slot, in milliseconds. G::Source::attach() must be called to
+attach the source to a context. <br>
+&nbsp;&nbsp;&nbsp; <br>
+If you do not pass a slot to the timeout source constructor, you can
+connect a callback slot later by calling:<br>
+      <br>
+      <div class="fbox"><code>sigc::connection connect(const
+SourceSlot&amp; slot);&nbsp;&nbsp;</code>&nbsp; <br>
+      </div>
+      <br>
+      <h2><a name="ML05"></a>The Timeout Signal</h2>
+For convenience, XFC provides a timeout signal that lets you connect a
+callback slot to the default main context, without having to create a
+timeout source.&nbsp; The timeout signal is declared in the G::
+namespace like this:<br>
+      <br>
+      <div class="fbox"><code>class TimeoutSignal : public
+sigc::trackable<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; typedef sigc::slot&lt;bool&gt; SlotType;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; sigc::connection connect(const SlotType&amp; slot,
+unsigned int interval, int priority = PRIORITY_DEFAULT_IDLE);<br>
+};<br>
+      <br>
+extern TimeoutSignal timeout_signal;</code><br>
+      </div>
+      <br>
+The interval argument passed to connect() is the time in milliseconds
+that is to elapse
+between each call. Your slot will be called every 'interval'
+milliseconds until its function returns false, at which point the
+timeout
+connection is destroyed and will not be called again. The connect
+method returns a sigc::connection class. Unlike widget
+signals, you must keep a copy of this connection and specifically call
+sigc::connection::disconnect() when the timeout is no longer required.<br>
+&nbsp; <br>
+Function slots that connect to the timeout_signal have the following
+prototype:<br>
+      <br>
+      <div class="fbox"><code>bool MyClass::signal_handler();</code><br>
+      </div>
+      <br>
+The code to set up a timeout connection should look something like
+this. In your class interface include a sigc::connection and a timeout
+signal
+handler.<br>
+      <br>
+      <div class="fbox"><code>class MyClass : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp;&nbsp; sigc::connection timeout_connection;<br>
+&nbsp;<br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; bool on_timeout();<br>
+&nbsp;<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; MyClass();<br>
+&nbsp;&nbsp;&nbsp; ~MyClass();<br>
+};</code></div>
+      <br>
+then in your class implementation connect your signal handler to the
+timeout signal in the constructor and disconnect it in the
+destructor :<br>
+      <br>
+      <div class="fbox"><code>MyClass::MyClass()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; ...<br>
+&nbsp;&nbsp;&nbsp; timeout_connection =
+G::timeout_signal.connect(sigc::mem_fun(this,
+&amp;MyClass::on_timeout), 150);<br>
+}<br>
+&nbsp;<br>
+MyClass::~MyClass()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; timeout_connection.disconnect();<br>
+}<br>
+&nbsp;<br>
+bool <br>
+MyClass::on_timeout()<br>
+&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp; // put your code here. <br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp; // return true to continue calling this
+method; return false to end the timeout.<br>
+&nbsp;&nbsp;&nbsp;&nbsp; return true;<br>
+&nbsp;}</code></div>
+      <br>
+Note that timeout functions may be delayed,
+due to the processing of other event sources, so they should not be
+relied on
+for precise timing. After each call to your timeout slot, the time of
+the next
+timeout is recalculated based on the current time and the given
+interval (it does
+not try to 'catch up' time lost in delays).<br>
+      <br>
+      <h2><a name="ML06"></a>Idle Sources</h2>
+What if you have a method which you want called when nothing else is
+happening? That's what an IdleSource does. It's a source that is called
+whenever there are no higher priority events pending.<br>
+      <br>
+An idle source can be created with one of the following constructors:<br>
+      <br>
+      <div class="fbox"><code>IdleSource();<br>
+      <br>
+IdleSource(const SourceSlot&amp; slot);</code><br>
+      </div>
+&nbsp;<br>
+Both constructors create an idle source that can be associated with any
+main context. The SlotType is a callback slot of type
+sigc::slot&lt;bool&gt;. G::Source::attach() must be called to attach
+the new source to a context. <br>
+      <br>
+If you do not pass a slot to the idle source constructor, you can
+connect a callback slot later by calling:<br>
+      <br>
+      <div class="fbox"><code>sigc::connection connect(const
+SourceSlot&amp; slot);<br>
+      </code></div>
+      <code><br>
+      </code>Once connected, the slot will continue to be called until
+it returns false, at which point it is automatically removed from the
+list of event sources and will not be called again.<br>
+      <br>
+      <h2><a name="ML07"></a>The Idle Signal</h2>
+      <div style="text-align: left;">For convenience, XFC provides an
+idle signal that lets you connect a
+callback slot to the default main context, without having to create an
+idle source. The idle signal is declared in the G::
+namespace like this:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>class IdleSignal : public sigc::trackable<br>
+{<br>
+public:<br>
+&nbsp;&nbsp; &nbsp;typedef sigc::slot&lt;bool&gt; SlotType;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;sigc::connection connect(const SlotType&amp; slot,
+int priority = PRIORITY_DEFAULT_IDLE);<br>
+};<br>
+      <br>
+extern IdleSignal idle_signal;</code><br>
+      </div>
+      <br>
+The SlotType is a callback slot of type
+sigc::slot&lt;bool&gt;. The connect
+method returns a sigc::connection class. Unlike widget
+signals, you must keep a copy of this connection and specifically call
+sigc::connection::disconnect() when idle processing is no longer
+required. If a connected slot returns false it is automatically removed
+from the list of event sources and will not be called again.<br>
+      <br>
+Function slots that connect to the idle_signal have the following
+prototype:<br>
+      <br>
+      <div class="fbox"><code>bool MyClass::signal_handler();</code><br>
+      </div>
+      <br>
+If your using a different context, for example, inside a thread, you
+should use an IdleSource object instead. <br>
+      <br>
+      <h2><a name="ML08"></a>Monitoring IO</h2>
+IOSource is an event source that's dispatched when a specific condition
+is met for the given file descriptor channel. For example, if the
+condition
+is G::IO_IN, the source will be dispatched when there's data available
+for reading. <br>
+      <br>
+An io source can be created with one of the following constructors:<br>
+      <br>
+      <div class="fbox"><code>IOSource(G::IOChannel&amp; channel,
+G::IOConditionField condition);<br>
+      <br>
+IOSource(G::IOChannel&amp; channel, G::IOConditionField condition,
+const IOSlot&amp; slot);</code><br>
+      </div>
+      <br>
+Both constructors create an io source that can be associated with any
+main context. The IOSlot is a callback slot of type sigc::slot&lt;bool,
+IOConditionField&gt;. The 'condition' can be one or more of the
+following values from the
+G::IOCondition enum:<br>
+      <ul>
+        <li>IO_IN - there is data to read.</li>
+        <li>IO_OUT - data can be written (without blocking).</li>
+        <li>IO_PRI - there is urgent data to read.</li>
+        <li>IO_ERR - an error condition.</li>
+        <li>IO_HUP - hung up (the connection has been broken, usually
+for pipes and sockets).</li>
+        <li>IO_NVAL - invalid request. The file descriptor is not open.</li>
+      </ul>
+G::Source::attach() must be called to attach the new source to a
+context. If you do not pass a slot to the IOSource constructor, you can
+connect a callback slot later by calling:<br>
+      <br>
+      <div class="fbox"><code>sigc::connection connect(const
+IOSlot&amp; slot);<br>
+      </code></div>
+      <code><br>
+      </code>Once connected, the slot will be called whenever the
+requested condition on the G::IOChannel is satisfied. If the slot
+returns false it is automatically removed from the list
+of event sources and will not be called again.<br>
+      <br>
+      <h2><a name="ML09"></a>The IO Signal</h2>
+For convenience, XFC provides an io signal that lets you connect a
+callback slot to the default main context, without having to create a
+IOSource.&nbsp; The io signal is declared in the G::
+namespace like this:<br>
+      <br>
+      <div class="fbox"><code>class IOSignal : public sigc::trackable<br>
+{<br>
+public:<br>
+&nbsp;&nbsp; &nbsp;typedef sigc::slot&lt;bool, IOConditionField&gt;
+SlotType;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;sigc::connection connect(G::IOChannel&amp; channel,
+G::IOConditionField condition, const SlotType&amp; slot, int priority);<br>
+};<br>
+      <br>
+extern IOSignal io_signal;</code><br>
+      </div>
+      <br>
+The SlotType is a callback slot of type sigc::slot&lt;bool,
+IOConditionField&gt;. The 'condition' is the condition to watch for and
+the 'priority' is the priority of the io source. The connect
+method returns a sigc::connection class. Unlike widget
+signals, you must keep a copy of this connection and specifically call
+sigc::connection::disconnect() when channel monitoring is no longer
+required. If a connected slot returns false it is automatically removed
+from the list of event sources and will not be called again.<br>
+      <br>
+Function slots that connect to the io_signal have the following
+prototype:<br>
+      <br>
+      <div class="fbox"><code>bool MyClass::signal_handler(G::</code><code>IOConditionField</code><code>);</code><br>
+      </div>
+      <br>
+If your using a different context, for example, inside a thread, you
+should use an IOSource object instead. <br>
+      <br>
+      <h2><a name="ML10"></a>The GTK Main Loop</h2>
+The GTK+ main event loop is primarily implemented by GLib, which has a
+generic
+main loop abstraction. GTK+ attaches the GLib main loop to GDK's X
+server connection, and
+presents a convenient interface to the user. In XFC, the main loop and
+its related functions are declared in the 'Main::' namespace.<br>
+      <br>
+Before using GTK+, you need to initialize it; initialization connects
+to the window system display, and parses some standard command line
+arguments from argc and argv. <br>
+      <br>
+      <div class="fbox"><code>void init(int *argc, char ***argv);<br>
+      <br>
+bool init_check(int *argc, char ***argv);<br>
+      </code></div>
+      <br>
+The init() functions initialize everything needed to operate the GTK+
+toolkit. You should call init() before using any other XFC methods in
+your GUI applications. If errors occur, init() will exit your
+application. To avoid this, you can use init_check() which allows you
+to recover from a failed GTK+
+initialization. init_check() does the same work as init() except that
+it does not terminate the application if the GUI can't be initialized.
+Instead it returns false on failure. This way your application can fall
+back to some other means of communication with the user - for example a
+command line interface.<br>
+      <br>
+You can register a callback slot to be called when the main loop is
+started:<br>
+      <br>
+      <div class="fbox"><code>void init_add(const
+sigc::slot&lt;bool&gt;&amp; callback);</code></div>
+      <br>
+Once invoked, the callback slot is removed from the list of slots to
+call, and is not called again.<br>
+      <br>
+Before you use a thread related method, you must call this next method
+to initialize the thread system:<br>
+      <br>
+      <div class="fbox"><code>void threads_init(GThreadFunctions
+*vtable = 0);</code></div>
+      <br>
+The 'vtable' argument is a function table of type GThreadFunctions,
+that provides the entry points for the thread system to use. Most of
+the time the default functions are appropriate so you can just set
+vtable to null. Main::threads_init() is a convenience function that
+calls both G::Thread::init() and gdk_threads_init(). G::Thread::init()
+initializes the GLib thread system and
+gdk_threads_init() initializes GDK so that it can be used with multiple
+threads. After calling threads_init() you can call Gdk::Mutex::lock()
+and Gdk::Mutex::unlock() to lock and unlock critical sections of code. <br>
+      <br>
+To start an application you must&nbsp; call run(), which runs the GTK+
+main loop until quit() is called:<br>
+      <br>
+      <div class="fbox"><code>void run();<br>
+      <br>
+void quit();</code><br>
+      </div>
+      <br>
+You can nest calls to run(). In that case quit() will make the
+innermost invocation of the main loop return. All instances of the main
+loop are functionally identical; they are all
+watching the same connection to the X server and working from the same
+event queue. Main loop instances are used to block, halting a
+function's flow of control until some conditions are met. All GTK+
+programs use this technique to keep main() from exiting while the
+application is running. The Gtk::Dialog::run() method uses a recursive
+main loop, so it doesn't return until the
+user clicks a dialog button. <br>
+      <br>
+Sometimes you want to process a few events, without handing the flow of
+control to main(). You can perform a single iteration of the main
+loop by calling:<br>
+      <br>
+      <div class="fbox"><code>bool iterate(bool blocking = true);</code></div>
+      <br>
+Set 'blocking' to true if you want to block if no events are pending.
+True is returned if quit() has been called for the innermost main loop.
+      <br>
+      <br>
+A call to iterate() might process a single
+event, for example; it depends on what tasks are pending. You can check
+whether any events need to be processed by calling the events_pending()
+predicate. <br>
+      <br>
+      <div class="fbox"><code>bool events_pending();</code></div>
+      <br>
+Together, iterate() and pending()&nbsp; allow you
+to temporarily return control to GTK+, so the GUI can "catch up." For
+example, during a long computation, you will want to display a progress
+bar; you must allow the GTK+ main loop to run periodically, so GTK+ can
+redraw the progress bar. Use this code:<br>
+      <br>
+      <div class="fbox"><code>// computation going on<br>
+      <br>
+while (events_pending())<br>
+&nbsp;&nbsp;&nbsp;&nbsp; iterate();<br>
+      <br>
+// computation continued<br>
+      </code></div>
+&nbsp;<br>
+      <div align="justify">
+      <div style="text-align: left;">When the user is doing nothing,
+GTK+ sits in the main loop and waits
+for input. If the user performs some action - say, a mouse click - then
+the main loop "wakes up" and delivers an event to GTK+. GTK+ forwards
+the event to one or more widgets. When widgets receive an event, they
+frequently emit one or more
+signals. Signals notify your program that 'something interesting
+happened' by invoking the callback slots you've connected to the
+signal. When your slot functions are invoked, you would typically take
+some action -
+for example, when an Open button is clicked you might display a
+FileChooserDialog. After a callback finishes, GTK+ will return to
+the main loop and await more user input. <br>
+      <br>
+      <h2><a name="ML11"></a>Key Snooper Functions</h2>
+Key snooper functions are called on all key events before delivering
+them normally, so they can be used to implement custom key event
+handling. The key_snooper_signal is declared in the Main:: namespace
+like this:<br>
+      <br>
+      <div class="fbox"><code>class KeySnooperSignal : public
+sigc::trackable<br>
+{<br>
+&nbsp;&nbsp; &nbsp;std::vector&lt;Connection*&gt; connection_list;<br>
+      <br>
+public:<br>
+&nbsp;&nbsp; &nbsp;typedef sigc::slot&lt;bool, Gtk::Widget&amp;, const
+Gdk::EventKey&amp;&gt; SlotType;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;~KeySnooperSignal();<br>
+&nbsp;<br>
+&nbsp;&nbsp; &nbsp;sigc::connection connect(const SlotType&amp; slot);<br>
+};<br>
+      <br>
+extern KeySnooperSignal key_snooper_signal;<br>
+      </code> </div>
+      <code><br>
+      </code> The SlotType is a callback slot of type
+sigc::slot&lt;bool, Gtk::Widget&amp;, const
+Gdk::EventKey&amp;&gt;. The connection method returns a
+sigc::connection class. Unlike widget
+signals, you must keep a copy of this connection and specifically call
+sigc::connection::disconnect() when you no longer wish to snoop key
+events.&nbsp; <br>
+      <br>
+Functions connected to the key_snooper_signal have
+the following prototype: <br>
+      <br>
+      <div class="fbox"><code>bool
+MyClass::signal_handler(Gtk::Widget&amp; widget, const
+Gdk::EventKey&amp; event);</code></div>
+      <br>
+The 'widget' argument is the widget to which the event will be
+delivered.
+The 'event' argument is the key event. It is the snooper's
+responsibility
+to pass the key event on to the widget, but care must be taken not to
+pass it twice. Return true to stop further snooping. Return false
+to continue.<br>
+&nbsp;<br>
+      <h2><a name="ML12"></a>The Quit Signal</h2>
+You can connect a function to the 'quit_signal' to be called when an
+instance of the main loop is left. The quit_signal is declared in the
+Main:: namespace
+like this:<br>
+      <br>
+      <div class="fbox"><code>class QuitSignal : public sigc::trackable<br>
+{<br>
+public:<br>
+&nbsp;&nbsp; &nbsp;typedef sigc::slot&lt;bool&gt; SlotType;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;sigc::connection connect(const SlotType&amp; slot,
+unsigned int main_level = 0);<br>
+};<br>
+      <br>
+extern QuitSignal quit_signal;</code><br>
+      </div>
+      <br>
+The SlotType is a callback slot of type sigc::slot&lt;bool&gt; and
+'main_level' is the level at which the termination slot shall be called.<code><span
+ style="font-family: sans-serif;"> </span></code>The connection method
+returns a sigc::connection class. You can keep a copy of this
+connection and specifically call sigc::connection::disconnect().<br>
+      <br>
+      <h2><a name="ML13"></a>Example Main Functions</h2>
+The main function is the entry point for a C/C++ application. In XFC
+the main function is responsible for initializing the GTK+ toolkit and
+running the main&nbsp; loop. For most uses your main function wont need
+to do much more than this.<br>
+      <br>
+For single threaded applications your main function should look like
+this:<br>
+      <br>
+      <div class="fbox"><code>int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+      <br>
+      </code><code>&nbsp;&nbsp; &nbsp;// init GTK+<br>
+      </code><code>&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+      </code><code>&nbsp;&nbsp; &nbsp;// create a window<br>
+      </code><code>&nbsp;&nbsp;&nbsp; Window window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp;&nbsp; window.show()<br>
+      <br>
+      </code><code>&nbsp;&nbsp; &nbsp;// enter the main loop<br>
+      </code><code>&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return 0;<br>
+}</code><br>
+      </div>
+      <br>
+and for multi-threaded applications it should look something like this:<br>
+      <br>
+      <div class="fbox"><code>int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace Main;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// init thread support<br>
+&nbsp;&nbsp; &nbsp;threads_init();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// init GTK+<br>
+&nbsp;&nbsp; &nbsp;init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// create a window<br>
+&nbsp;&nbsp;&nbsp; Window window;<br>
+&nbsp;&nbsp;
+&nbsp;window.sig_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+      </code><code>&nbsp;&nbsp;&nbsp; window.show()<br>
+      </code><br>
+      <code>&nbsp;&nbsp; &nbsp;// enter the main loop<br>
+&nbsp;&nbsp; &nbsp;Gdk::Mutex::lock();<br>
+&nbsp;&nbsp; &nbsp;run();<br>
+&nbsp;&nbsp; &nbsp;Gdk::Mutex::unlock();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;return 0;<br>
+}<br>
+      </code></div>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="mainloop.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

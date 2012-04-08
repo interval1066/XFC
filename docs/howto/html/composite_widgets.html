@@ -1,0 +1,396 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+  <meta content="Widgets: Writing a Composite Widget" name="description">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe"><span
+ style="font-weight: bold; font-family: Helvetica,Arial,sans-serif; color: rgb(17, 55, 95);">Xfce
+Foundation Classes</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1"><span class="qindexH">&nbsp;&laquo; </span><a
+ class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"></span></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Writing a Composite Widget</h1>
+      <br>
+One type of widget that you may be interested in creating is a
+composite widget
+that is merely an aggregate of other XFC widgets. This type of widget
+is does nothing that couldn't be done without creating new widgets, but
+it does provide a convenient way of packaging user interface elements
+for
+reuse. The FontSelection and ColorSelection widgets in the standard
+distribution are examples of this type of widget.<br>
+      <br>
+The example widget that we'll create here is the Tictactoe
+widget, a 3x3 array of toggle buttons which triggers a signal when all
+three buttons in a row, column, or on one of the diagonals are
+depressed. The parent class for a composite widget is typically the
+container
+class that will hold all of the elements of the composite widget. For
+example, the parent of the FontSelection widget is the Dialog class.
+Since our buttons will be arranged in a 3x3 array, it might seem
+natural to make our parent class the Table class. Unfortunately, this
+turns out not to work that well because when tables are created they
+need to know the number of rows and columns, so we'll derive the widget
+from VBox
+instead and pack a table inside the VBox. <br>
+&nbsp;<br>
+Each widget class has a header file which declares the object and its
+members. A couple of features are worth pointing out. To prevent
+multiple inclusions at compile time, we wrap the entire header file in
+an inclusion guard:<br>
+      <br>
+      <div class="fbox"><code>#ifndef TICTACTOE_HH<br>
+#define TICTACTOE_HH<br>
+.<br>
+.<br>
+#endif // TICTACTOE_HH </code><br>
+      </div>
+      <br>
+&nbsp;The header file for the Tictactoe class is &lt;tictactoe.hh&gt;:<br>
+&nbsp;<br>
+      <div class="fbox"><code>#ifndef TICTACTOE_HH<br>
+#define TICTACTOE_HH<br>
+      <br>
+#ifndef XFC_GTK_BOX_HH<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+#endif<br>
+      <br>
+namespace Xfc {<br>
+      <br>
+namespace Gtk {<br>
+class ToggleButton;<br>
+}<br>
+      <br>
+} // namespace Xfc<br>
+      <br>
+/*&nbsp; Tictactoe<br>
+&nbsp;*/<br>
+      <br>
+class Tictactoe : public Xfc::Gtk::VBox<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Tictactoe(const Tictactoe&amp;);<br>
+&nbsp;&nbsp;&nbsp; Tictactoe&amp; operator=(const Tictactoe&amp;);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Xfc::Gtk::ToggleButton *buttons[3][3];<br>
+      <br>
+&nbsp;&nbsp;&nbsp; void on_toggle(Xfc::Gtk::ToggleButton *button);<br>
+      <br>
+public:<br>
+// Constructors<br>
+&nbsp;&nbsp;&nbsp; Tictactoe();<br>
+&nbsp;&nbsp;&nbsp; virtual ~Tictactoe();<br>
+&nbsp;&nbsp;&nbsp; <br>
+// Methods<br>
+&nbsp;&nbsp;&nbsp; void clear();<br>
+      <br>
+// Signals<br>
+&nbsp;&nbsp;&nbsp; sigc::signal&lt;void&gt; tictactoe_signal;<br>
+};<br>
+      <br>
+#endif // TICTACTOE_HH</code><br>
+      </div>
+      <br>
+The Tictactoe class declares a two dimensional&nbsp; array of
+ToggleButtons pointers called 'buttons' and an&nbsp; on_toggle() signal
+handler that is called each time a button's active state is toggled.
+The handler is a common signal handler that takes a ToggleButton
+pointer as its only argument. The clear() method resets the state of
+all toggle buttons to inactive, thus restarting the game. The
+'tictactoe_signal' is a libsigc++ signal that gets emitted whenever a
+winning combination of buttons is toggled.<br>
+      <br>
+The source file for the Tictactoe class is &lt;tictactoe.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "tictactoe.hh"<br>
+#include &lt;xfc/gtk/table.hh&gt;<br>
+#include &lt;xfc/gtk/togglebutton.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+/*&nbsp; Tictactoe<br>
+&nbsp;*/<br>
+      <br>
+Tictactoe::Tictactoe()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;Gtk::Table *table = new Gtk::Table(3, 3, true);<br>
+&nbsp;&nbsp; &nbsp;add(*table);<br>
+&nbsp;&nbsp; &nbsp;table-&gt;show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;for (int i = 0; i &lt; 3; i++)<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;for (int j = 0; j &lt; 3; j++)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;buttons[i][j]
+= new Gtk::ToggleButton;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;table-&gt;attach(*buttons[i][j], i, i + 1, j, j + 1);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;buttons[i][j]-&gt;signal_toggled().connect(sigc::bind(sigc::mem_fun(this,
+&amp;Tictactoe::on_toggle), buttons[i][j]));<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;buttons[i][j]-&gt;set_size_request(20, 20);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;buttons[i][j]-&gt;show();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;}<br>
+}<br>
+      <br>
+Tictactoe::~Tictactoe()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+Tictactoe::clear()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;for (int i = 0; i &lt; 3; i++)<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;for (int j = 0; j &lt; 3; j++)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;buttons[i][j]-&gt;set_active(false);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;}<br>
+}<br>
+      <br>
+void<br>
+Tictactoe::on_toggle(Gtk::ToggleButton *button)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;static int rwins[8][3] = { { 0, 0, 0 }, { 1, 1, 1 },
+{ 2, 2, 2 }, { 0, 1, 2 },<br>
+&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{ 0, 1, 2 }, { 0, 1, 2 }, { 0, 1, 2 }, { 0, 1, 2 } };<br>
+      <br>
+&nbsp;&nbsp; &nbsp;static int cwins[8][3] = { { 0, 1, 2 }, { 0, 1, 2 },
+{ 0, 1, 2 }, { 0, 0, 0 }, <br>
+&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+{ 1, 1, 1 }, { 2, 2, 2 }, { 0, 1, 2 }, { 2, 1, 0 } };<br>
+      <br>
+&nbsp;&nbsp; &nbsp;bool success, found;<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;for (int k = 0; k &lt; 8; k++)<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;success = true;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;found = false;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;for (int i = 0; i &lt; 3; i++)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;success &amp;=
+buttons[rwins[k][i]][cwins[k][i]]-&gt;get_active();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;found |=
+buttons[rwins[k][i]][cwins[k][i]] == button;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if (success &amp;&amp; found)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;tictactoe_signal.emit();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;break;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;}<br>
+}</code><br>
+      </div>
+      <br>
+In the Tictactoe constructor a 3x3 table is added to the vertical box.
+Then nine ToggleButtons are created and pointers to them added to
+the 'buttons' array. Each button's "toggled" signal is
+connected to the on_toggle() signal handler and the button's size is
+set to (20, 20). You will notice that <a href="signal_system.html#SS03">sigc::bind()</a>
+is used to bind each button's "toggled" signal to the on_toggle()
+signal handler. The clear() method is straight forward; it loops over
+each button
+setting its state to inactive.&nbsp; Inside
+on_toggle() two arrays specifying the winning
+combinations are defined. Each time the handler is called it loops over
+all the buttons in the array, checking each button's active state. If a
+winning
+combination of buttons is found to have been toggled the
+'tictactoe_signal' is
+emitted. <br>
+      <br>
+When implementing your own libsigc++ signals, they need to be
+explicitly
+emitted. For example, you can emit the tictactoe_signal either by
+calling emit(), as above, or by calling the signal's function operator,
+like this:<br>
+      <br>
+      <div class="fbox">tictactoe_signal();</div>
+      <br>
+The source file for the application that will test the Tictactoe widget
+is &lt;ttt_test.cc&gt;:<br>
+&nbsp;<br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+#include &lt;iostream&gt;<br>
+#include "tictactoe.hh"<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class TictactoeTest : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp; &nbsp;Tictactoe *ttt;<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp; &nbsp;void on_win();<br>
+      <br>
+public:<br>
+&nbsp;&nbsp; &nbsp;TictactoeTest();<br>
+&nbsp;&nbsp; &nbsp;virtual ~TictactoeTest();<br>
+};<br>
+      <br>
+TictactoeTest::TictactoeTest()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_title("Tictactoe");<br>
+&nbsp;&nbsp; &nbsp;set_border_width(10);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;ttt = new Tictactoe;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;add(*ttt);<br>
+&nbsp;&nbsp; &nbsp;ttt-&gt;tictactoe_signal.connect(sigc::mem_fun(this,
+&amp;TictactoeTest::on_win));<br>
+&nbsp;&nbsp; &nbsp;ttt-&gt;show();<br>
+}<br>
+      <br>
+TictactoeTest::~TictactoeTest()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+TictactoeTest::on_win()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace std;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;cout &lt;&lt; "Yay, you won!" &lt;&lt; endl;<br>
+&nbsp;&nbsp; &nbsp;ttt-&gt;clear();<br>
+}<br>
+      <br>
+XFC_MAIN(TictactoeTest)</code><br>
+      </div>
+      <br>
+This program is fairly simple. The constructor creates a new Tictactoe
+widget and adds to the main window. Remember windows are bin widgets
+and can only contain one widget. The widget's 'tictactoe_signal'
+is connected to the on_win() signal handler which prints a
+congratulatory
+message to stdout (usually a console window).<br>
+      <br>
+      <h2>Compiling Tictactoe<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Tictactoe in the
+&lt;examples/howto/tictactoe&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/tictactoe&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Tictactoe, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+ttt_test: tictactoe.o ttt_test.o<br>
+&nbsp;&nbsp;&nbsp; $(CC) ttt_test.o tictactoe.o -o ttt_test `pkg-config
+--libs xfcui-X.X`<br>
+      <br>
+ttt_test.o: ttt_test.cc tictactoe.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) -c ttt_test.cc -o ttt_test.o $(CFLAGS)
+`pkg-config xfcui-X.X --cflags`<br>
+      <br>
+tictactoe.o: tictactoe.cc tictactoe.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) -c tictactoe.cc -o tictactoe.o $(CFLAGS)
+`pkg-config xfcui-X.X --cflags`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o ttt_test</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When you
+compile and run this program you will see the following window appear
+displaying the Tictactoe widget:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 169px; height: 177px;" alt=""
+ src="../../images/tictactoe.png"><br>
+      </div>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+The XFC_MAIN macro is a convenience macro that writes a simple main
+function, its only argument is the name of the main window class. The
+macro is defined in &lt;xfc/main.hh&gt; as:<br>
+      <br>
+      <div class="fbox"><code>#define XFC_MAIN(MainWidget)\<br>
+&nbsp;&nbsp;&nbsp; int main (int argc, char *argv[])\<br>
+&nbsp;&nbsp;&nbsp; {\<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; Xfc::Main::init(&amp;argc,
+&amp;argv);\<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; MainWidget main_widget;\<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
+main_widget.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));\<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; main_widget.show();\<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; Xfc::Main::run();\<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; return 0;\<br>
+&nbsp;&nbsp;&nbsp; }</code></div>
+      <br>
+Most main functions in C++ are simple because all the
+creation work for the main window is done inside its constructor, not
+the main function.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="composite_widgets.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

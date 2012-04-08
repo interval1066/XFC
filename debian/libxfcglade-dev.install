@@ -1,0 +1,4 @@
+debian/tmp/usr/include/xfce4/xfc/xfcglade.hh
+debian/tmp/usr/include/xfce4/xfc/glade/*.hh
+debian/tmp/usr/include/xfce4/xfc/glade/inline/*.inl
+debian/tmp/usr/lib/pkgconfig/xfcglade-*.pc

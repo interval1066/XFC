@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Programming Guidelines" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="text-align: center; height: 25px;"
+ class="darkbluestripe"><span
+ style="color: rgb(255, 255, 192); font-weight: bold; font-family: Helvetica,Arial,sans-serif;"></span><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe">&nbsp;&laquo; <a
+ class="qindexH" href="../../index.html">Main Page</a><span
+ class="qindexH"></span> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Programming
+Guidelines</h1>
+      <h3>Table of Contents</h3>
+      <ol start="1">
+        <li><a class="mhl" href="guidelines.html#PG01">Coding
+Conventions</a></li>
+        <li><a class="mhl" href="guidelines.html#PG02">References and
+Pointers</a></li>
+        <li><a class="mhl" href="guidelines.html#PG03">Function
+parameters and
+return values</a><br>
+        </li>
+      </ol>
+      <dl>
+      </dl>
+      <div align="justify"><br>
+      <h2><a name="PG01"></a>Coding
+Conventions</h2>
+      <div style="text-align: left;">XFC uses the GNU <a
+ href="http://gcc.gnu.org/onlinedocs/libstdc++/17_intro/C++STYLE">C++
+coding
+style</a>, except for the following conventions:<span
+ style="color: rgb(0, 55, 85); text-decoration: underline;"></span><br>
+      <ul>
+        <li><span style="font-weight: bold;">Function and variable
+names </span>are in lower case with
+words separated by an underscore.</li>
+        <li><span style="font-weight: bold;">Private member variable
+names </span>have a trailing
+underscore when a naming conflict arises with a function variable.</li>
+        <li><span style="font-weight: bold;">Member function names </span>use
+the GTK+ function name
+but without the library prefix or struct type,
+e.g. get_window() instead of gtk_widget_get_window().</li>
+        <li><span style="font-weight: bold;">XFC data types </span>are
+named with each word capitalized, as
+in RadioMenuItem, ScrolledWindow and Widget.</li>
+        <li><span style="font-weight: bold;">C++ data types</span> such
+as int, unsigned int and char are
+used instead of their corresponding GLib typedefs, gint, guint and
+gchar.</li>
+        <li><span style="font-weight: bold;">Dereference operator</span>
+          <span style="font-weight: bold;">(*)</span> is associated
+with the
+variable name not the type name, i.e. (Widget&nbsp; *widget) instead of
+(Widget*&nbsp; widget).</li>
+        <li><span style="font-weight: bold;">Namespace and template
+indentation </span>is kept to a
+minimum to preserve horizontal space in header files.</li>
+      </ul>
+      <ul style="list-style-type: square; color: rgb(0, 0, 0);">
+      </ul>
+      <br>
+      <h2><a name="PG02"></a>References
+and Pointers</h2>
+There are two ways to pass an
+argument to
+a function, call-by-value and call-by-reference. Call-by-value copies
+an
+argument into the function parameter; modifying the parameter will have
+no affect on the argument. This is the default in both C and C++.
+Call-by-reference copies the address of an argument into the function
+parameter, not the argument; any modifications made to the parameter
+will affect the argument. In C you call-by-reference when you pass a
+pointer as an argument to a function. In C++ there are two ways to
+call-by-reference; you can either pass a pointer or a reference as an
+argument to a function. If it helps, you can think of a reference as
+behaving like a constant
+pointer but using a different
+notation
+and with several restrictions. A reference is declared by preceding the
+parameter name with the &amp; operator, as in Gtk::Widget&amp; widget.
+In contrast to pointers, XFC associates the &amp;
+with the type name not the variable name. <br
+ style="color: rgb(0, 0, 0);">
+      <br style="color: rgb(0, 0, 0);">
+The restrictions on the use
+references are:<br style="color: rgb(0, 0, 0);">
+      <ul>
+        <li>You must initialize a reference, either at its point of
+declaration or in a constructor's initializer list if it is a class
+member.</li>
+        <li>No operator operates on a reference.&nbsp; Operators
+operate on the object the reference refers to.</li>
+        <li>You cannot reference a reference.</li>
+        <li>You cannot create arrays of references.</li>
+        <li>You cannot create a pointer to a reference.</li>
+        <li>References are not allowed on bit fields.</li>
+        <li>You don't use the &amp; operator when passing an
+object as a reference.</li>
+        <li>You don't use the dereference (*) operator when using
+a reference. You use a reference as if it were the object being
+referred to.</li>
+        <ul style="list-style-type: square; color: rgb(0, 0, 0);">
+        </ul>
+      </ul>
+      <br>
+      <h2><a name="PG03"></a>Function
+parameters and return values</h2>
+References and pointers are an integral
+part of C++ and XFC uses them frequently for specifying function
+parameters and return values. A non-copyable object is passed as a
+pointer if
+null is a valid value for the call-by-reference function parameter. If
+null is not a valid value the object is passed by reference. Copyable
+values such as built-in types, strings and vectors
+are passed as a const reference and returned by value. <br>
+      <br>
+Signal classes are the only exception to this rule; their constructors
+take a
+pointer which cannot not be null. A
+reference is not used because it would conflict with the object
+class copy constructor.<br>
+      </div>
+      <div style="text-align: left;"><br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC Development Team<br>
+            </font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="guidelines.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,9 @@
+AM_CXXFLAGS = @CXXFLAGS@ @XFC_CORE_CFLAGS@
+
+INCLUDES = \
+ -I$(top_builddir)/libXFCcore
+
+LIBS = \
+ $(top_builddir)/libXFCcore/xfc/libXFCcore-$(XFC_API_VERSION).la
+
+include $(top_srcdir)/examples/Makefile.fragment

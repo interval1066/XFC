@@ -1,0 +1,380 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Labels" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Labels</h1>
+      <br>
+Labels are used a lot in XFC, and are relatively
+simple. A label displays a small amount of text. As the name implies,
+most labels are used to label another widget such as a Button or a
+MenuItem. Labels are 'no window' widgets so they do not receive widget
+signals. If you need to catch signals, or do clipping, place it inside
+a Gtk::EventBox widget.<br>
+      <br>
+To create a new label, use one of the following constructors:<br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <div class="fbox"><code>Label();<br>
+      <br>
+Label(const
+String&amp; str, bool use_underline = false); </code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">The first constructor creates an
+empty
+label. The
+second constructor creates a label that displays the specified
+character
+string<em></em>. If 'use_underline' is true the string is
+parsed
+for an underscore preceding the mnemonic character. <br>
+      </div>
+      <div style="text-align: left;"> <br>
+After construction you can change the label's text by calling one of
+the following methods:<br>
+      <br>
+      <div class="fbox"><code>void
+set_text(const String&amp; str);<br>
+&nbsp;<br>
+void set_text_with_mnemonic(const String&amp; str);</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">The sole argument to both is the
+new string
+to display.
+The second method, set_text_with_mnemonic(), parses the string for the
+mnemonic character (i.e. the character that is preceded by an
+underscore). The
+space needed for the new string will be automatically adjusted if
+needed. You can produce multi-line labels by putting line breaks in the
+label string.<br>
+      </div>
+      <div style="text-align: left;"> <br>
+To retrieve the current string use:<br>
+      <br>
+      <div class="fbox"><code>String
+get_text() const;</code></div>
+      <br>
+The label text can be justified using:<br>
+      <br>
+      <div class="fbox"><code>void
+set_justify(Gtk::Justification jtype);</code></div>
+      <br>
+The 'jtype' argument can be one of the values from the
+Gtk::Justification enum:
+      <ul style="list-style-type: square;">
+        <li>JUSTIFY_LEFT</li>
+        <li>JUSTIFY_RIGHT</li>
+        <li>JUSTIFY_CENTER (the default)</li>
+        <li>JUSTIFY_FILL</li>
+      </ul>
+The label widget is also capable of line wrapping the text
+automatically. This can be activated using:<br>
+      <br>
+      <div class="fbox"><code>void
+set_line_wrap(bool wrap);</code></div>
+      <br>
+The 'wrap' argument takes a true or false value.<br>
+      <br>
+If you want your label underlined, then you can set a pattern on the
+label:<br>
+      <br>
+      <div class="fbox"><code>void
+set_pattern(const String&amp; pattern);</code></div>
+      <br>
+      <div style="text-align: left;">The 'pattern' argument indicates
+how the
+underlining
+should look. It consists of a string of underscore and space
+characters.
+An underscore indicates that the corresponding character in the label
+should be underlined. For example, the string "__ __" would underline
+the first two characters and eight and ninth characters.<strong> </strong>If
+you simply want to have an underlined accelerator
+(mnemonic) in your label, you should use set_text_with_mnemonic(),
+not
+set_pattern().<br>
+      </div>
+      <br>
+      <h2><a name="example"></a>Label
+Example</h2>
+This short example illustrates the use of labels. It makes use of the <a
+ href="frames.html">Frame</a> widget to demonstrate each
+label's style. In XFC, label texts can contain markup for font and
+other text
+attribute changes, and labels may be selectable (for copy-and-paste).
+These advanced features won't be explained here but are covered in the
+Gtk::Label API reference.<br>
+      <br>
+The header file for Label is &lt;label.hh&gt;<br>
+      <br>
+      <div class="fbox"><code>#include
+&lt;xfc/main.hh&gt;<br style="color: rgb(0, 102, 0);">
+#include
+&lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace
+Xfc;<br>
+      <br>
+class
+LabelWindow : public
+Gtk::Window<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; LabelWindow();<br>
+&nbsp;&nbsp;&nbsp; ~LabelWindow();<br>
+};</code></div>
+      <br>
+and the source file is &lt;label.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include
+"label.hh"<br style="color: rgb(0, 102, 0);">
+#include &lt;xfc/gtk/box.hh&gt;<br style="color: rgb(0, 102, 0);">
+#include
+&lt;xfc/gtk/frame.hh&gt;<br style="color: rgb(0, 102, 0);">
+#include
+&lt;xfc/gtk/label.hh&gt;<br>
+      <br>
+LabelWindow::LabelWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("Label");<br>
+&nbsp;&nbsp;&nbsp; Gtk::VBox *vbox = new
+Gtk::VBox(false, 5);<br>
+&nbsp;&nbsp;&nbsp; Gtk::HBox *hbox = new
+Gtk::HBox(false, 5);<br>
+&nbsp;&nbsp;&nbsp; add(*hbox);<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*vbox, false,false);<br>
+&nbsp;&nbsp;&nbsp; set_border_width(5);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::Frame *frame = new
+Gtk::Frame("Normal Label");<br>
+&nbsp;&nbsp;&nbsp; Gtk::Label *label = new
+Gtk::Label("This is a Normal label");<br>
+&nbsp;&nbsp;&nbsp; frame-&gt;add(*label);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*frame, false,false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; frame = new
+Gtk::Frame("Multi-line Label");<br>
+&nbsp;&nbsp;&nbsp; label = new
+Gtk::Label("This is a Multi-line label.\nSecond line\nThird line");<br>
+&nbsp;&nbsp;&nbsp; frame-&gt;add(*label);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*frame, false,false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; frame = new
+Gtk::Frame("Left Justified Label");<br>
+&nbsp;&nbsp;&nbsp; label = new
+Gtk::Label("This is a Left-Justified\n Multi-line label.\nThird line");<br>
+&nbsp;&nbsp;&nbsp; label-&gt;set_justify(Gtk::JUSTIFY_LEFT);<br>
+&nbsp;&nbsp;&nbsp; frame-&gt;add(*label);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*frame, false,false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; frame = new
+Gtk::Frame("Right Justified Label");<br>
+&nbsp;&nbsp;&nbsp; label = new
+Gtk::Label("This is a Right-Justified\nMulti-line label.\nFourth line,
+(j/k)");<br>
+&nbsp;&nbsp;&nbsp; label-&gt;set_justify(Gtk::JUSTIFY_RIGHT);<br>
+&nbsp;&nbsp;&nbsp; frame-&gt;add(*label);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*frame, false,false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; vbox = new Gtk::VBox(false, 5);<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*vbox, false,false);<br>
+&nbsp;&nbsp;&nbsp; frame = new
+Gtk::Frame("Line wrapped label");<br>
+&nbsp;&nbsp;&nbsp; label = new
+Gtk::Label("This is an example of a line-wrapped label. It should not
+be
+taking up the "\<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"entire&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /*
+big space to test spacing */&nbsp; width allocated to it, "\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+"but automatically wraps the words to fit. The time has come, for all
+good men, "\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+"to come to the aid of their party. The sixth sheik's six sheep's
+sick.\n"\<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"&nbsp;&nbsp;&nbsp;&nbsp; It supports multiple paragraphs
+correctly,&nbsp; and&nbsp;&nbsp;
+correctly&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+adds "\<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+many&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; extra&nbsp;
+spaces. ");<br>
+&nbsp;&nbsp;&nbsp; label-&gt;set_line_wrap(true);<br>
+&nbsp;&nbsp;&nbsp; frame-&gt;add(*label);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*frame, false,false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; frame = new
+Gtk::Frame("Filled, wrapped label");<br>
+&nbsp;&nbsp;&nbsp; label = new
+Gtk::Label("This is an example of a line-wrapped, filled label. " \<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"It should be taking "\<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"up the
+entire&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+width allocated to it.&nbsp; " \<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"Here is a sentence to prove "\<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"my point.&nbsp; Here is another sentence. "\<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"Here comes the sun, do de do de do.\n"\<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"&nbsp;&nbsp;&nbsp; This is a new paragraph.\n"\<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"&nbsp;&nbsp;&nbsp; This is another newer, longer, better " \<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"paragraph.&nbsp; It is coming to an end, "\<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"unfortunately.");<br>
+&nbsp;&nbsp;&nbsp; label-&gt;set_justify(Gtk::JUSTIFY_FILL);<br>
+&nbsp;&nbsp;&nbsp; label-&gt;set_line_wrap(true);<br>
+&nbsp;&nbsp;&nbsp; frame-&gt;add(*label);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*frame, false,false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; frame = new
+Gtk::Frame("Underlined label");<br>
+&nbsp;&nbsp;&nbsp; label = new
+Gtk::Label("This label is underlined!\n"<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"This one is underlined in quite a funky fashion");<br>
+&nbsp;&nbsp;&nbsp; label-&gt;set_justify(Gtk::JUSTIFY_LEFT);<br>
+&nbsp;&nbsp;&nbsp; label-&gt;set_pattern("_________________________ _
+_________ _ ______&nbsp;&nbsp;&nbsp;&nbsp; __ _______ ___");<br>
+&nbsp;&nbsp;&nbsp; frame-&gt;add(*label);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*frame, false,false);<br>
+&nbsp;&nbsp;&nbsp; show_all();<br>
+}<br>
+      <br>
+LabelWindow::~LabelWindow()<br>
+{<br>
+}<br>
+      <br>
+int main (int
+argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; LabelWindow window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return 0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling Label<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Label in the
+&lt;examples/howto/label&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/label&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Label, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+label: label.cc label.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) label.cc -o label $(CFLAGS) `pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o label</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 554px; height: 391px;" alt=""
+ src="../../images/label.png"><br>
+      <div style="text-align: left;"><br>
+      </div>
+      </div>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="label.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

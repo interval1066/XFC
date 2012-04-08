@@ -1,0 +1,331 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: ToolItems" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Tool
+Items</h1>
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a class="mhl" href="toolitems.html#TI01">Tool Buttons</a></li>
+        <li><a class="mhl" href="toolitems.html#TI02">Toggle Tool
+Buttons</a></li>
+        <li><a class="mhl" href="toolitems.html#TI03">Radio Tool Buttons</a></li>
+        <li><a class="mhl" href="toolitems.html#TI04">Separator Tool
+Items</a></li>
+      </ol>
+      <br>
+Tool items are widgets that can appear on a toolbar. There are three
+types of tool items that contain buttons: ToolButton, ToggleToolButton
+and RadioToolButton. A separator tool item can used
+to separate items in a toolbar. <br>
+      <br>
+To create a tool item that contains a widget other than a button use
+the following constructor and then call Gtk::Container::add() to add a
+child widget to the tool item. <br>
+      <br>
+      <div class="fbox"><code>ToolItem();<br>
+&nbsp;&nbsp;&nbsp; <br>
+ToolItem(Gtk::Widget&amp; widget);</code></div>
+      <br>
+The first constructor creates an empty tool item. The second
+constructor creates a tool item that contains the specified widget.<br>
+      <br>
+The homogeneous property of a tool item can be set or retrieved using
+the
+following methods respectively:<br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <div class="fbox"><code>void set_homogeneous(bool homogeneous);<br>
+      <br>
+bool
+get_homogeneous() const;</code></div>
+      <br>
+      </div>
+If 'homogeneous' is set to true the tool item will be allocated the
+same
+size as other homogeneous items in the toolbar, which is usually the
+size of
+the largest item. The default value is false.<br>
+      <div style="text-align: left;"> <br>
+The expand property of a tool item can be set or retrieved using the
+following methods respectively:<br>
+      <br>
+      <div class="fbox"><code>void set_expand(bool expand);<br>
+      <br>
+bool
+get_expand() const;</code></div>
+      <br>
+      </div>
+If 'expand' is set to true the tool item is allocated extra space when
+there is more room in the toolbar than needed for the items. The
+default value is false.<br>
+      <div style="text-align: left;"> <br>
+A tooltip can be set on a tool item with this method:<br>
+      <br>
+      <div class="fbox"><code>void set_tooltip(Tooltips&amp;
+tooltips, const
+String&amp; tip_text, const
+String&amp; tip_private = 0);</code></div>
+      <br>
+The 'tooltips' argument is the tooltips object to use. The 'tip_text'
+argument is the text to use as tooltip text for the tool item. The
+'tip_private' argument is a text string that might be useful if a user
+gets stuck. Usually it can just be ignored.<br>
+      <br>
+A tool item's horizontal and vertical visibility can be set or
+retrieved with the following four methods respectively:<br>
+&nbsp; <br>
+      <div class="fbox"><code>void set_visible_horizontal(bool
+visible_horizontal);<br>
+      <br>
+bool
+get_visible_horizontal() const;<br>
+&nbsp;&nbsp; <br>
+void
+set_visible_vertical(bool
+visible_vertical);<br>
+      <br>
+bool
+get_visible_vertical() const;</code></div>
+      <br>
+If 'visible_horizontal' is true the tool item is visible when the
+toolbar is docked horizontally. If 'visible_vertical' is true the tool
+item is visible when the toolbar is docked vertically. By default,
+visible_horizontal and visible_vertical are both true.<br>
+      <br>
+A tool item's is_important property can be set or retrieved with the
+following
+methods respectively:<br>
+      <br>
+      <div class="fbox"><code>void set_is_important(bool is_important);<br>
+      <br>
+bool
+get_is_important() const;</code></div>
+      <br>
+A tool button uses this property to decide whether to show or hide its
+label when the toolbar style is Gtk::TOOLBAR_BOTH_HORIZ. The result is
+that only tool items with 'is_important' set to true will have labels.<br>
+      <br>
+      <h2><a name="TI01"></a>Tool
+Buttons</h2>
+A ToolButton is a tool item that contains a button. The tool button can
+display a custom icon widget, a custom label widget or a stock item.
+You can create a ToolButton with one of the following constructors:<br>
+      <br>
+      <div class="fbox"><code> ToolButton();<br>
+      <br>
+ToolButton(Widget&amp; icon_widget);<br>
+&nbsp;&nbsp; <br>
+ToolButton(const
+String&amp; label, bool
+use_underline = false);<br>
+&nbsp;&nbsp; <br>
+ToolButton(Widget&amp; icon_widget, const String&amp; label, bool
+use_underline = false);<br>
+&nbsp;&nbsp;&nbsp;&nbsp; <br>
+ToolButton(const
+StockId&amp; stock_id);</code></div>
+      <br>
+The first constructor creates an empty tool button. The second
+constructor creates a tool button that uses 'icon_widget' as its icon.
+The third constructor creates a tool button that uses 'label' as the
+label. The fourth constructor creates a tool button that uses
+'icon_widget' as its icon and 'label' as the label. If 'use_underline'
+is true the label text is parsed for a underscore preceding the
+mnemonic character. The last constructor creates a tool button using
+the icon and label of the stock item specified by 'stock_id'.<br>
+      <br>
+The label of a ToolButton is determined by the properties
+'label_widget', 'label', and 'stock_id'. If 'label_widget' is not null,
+then that widget is used as the label. Otherwise, if <br>
+'label' is not null, that string is used as the label. Otherwise, if
+'stock_id' is not null, the label is determined by the stock item.
+Otherwise, the button does not have a label. <br>
+      <br>
+The icon of a ToolButton is determined by the properties 'icon_widget'
+and 'stock_id'. If 'icon_widget' is not null, then that widget is used
+as the icon. Otherwise, if 'stock_id' is not null, the icon is
+determined by the stock item. Otherwise, the button does not have an
+icon. <br>
+      <br>
+You can set or retrieve the label widget, or label, with the following
+four methods respectively:<br>
+      <br>
+      <div class="fbox"><code>void set_label_widget(Widget
+*label_widget);<br>
+      <br>
+Widget* get_label_widget() const;<br>
+      <br>
+void set_label(const
+String&amp; label, bool
+use_underline = false);<br>
+      <br>
+String get_label() const;</code></div>
+      <br>
+You can set or retrieve the icon widget with the following methods
+respectively:<br>
+      <br>
+      <div class="fbox"><code>void set_icon_widget(Widget
+*icon_widget);<br>
+      <br>
+Widget* get_icon_widget() const;</code></div>
+      <br>
+You can set or retrieve the stock item with the following methods
+respectively:<br>
+      <br>
+      <div class="fbox"><code>void set_stock_id(const StockId&amp;
+stock_id);<br>
+      <br>
+String get_stock_id() const;</code></div>
+      <br>
+As a convenience, the following method can be used to set the icon
+widget and label. This is equivalent to calling set_icon_widget() and
+set_label() separately.<br>
+      <br>
+      <div class="fbox"><code>void set_contents(Widget&amp;
+icon_widget, const
+String&amp; label, bool
+use_underline = false);</code></div>
+      <br>
+      <h2><a name="TI02"></a>Toggle
+Tool Buttons</h2>
+A ToggleToolButton is a tool item that contains a toggle button.&nbsp;
+You can create a ToggleButton with the following constructors:<br>
+&nbsp; <br>
+      <div class="fbox"><code>ToggleToolButton();<br>
+      <br>
+ToggleToolButton(const
+StockId&amp; stock_id);</code></div>
+      <br>
+The first constructor creates an empty toggle tool button. The second
+constructor creates a toggle tool button containing the image and text
+of the stock item specified by 'stock_id'.<br>
+      <br>
+You can set or retrieve the 'active' state of a toggle tool button with
+the
+following methods respectively:<br>
+      <br>
+      <div class="fbox"><code>void set_active(bool is_active);<br>
+      <br>
+bool
+get_active() const;</code></div>
+      <br>
+      <h2><a name="TI03"></a>Radio
+Tool Buttons</h2>
+A RadioToolButton is a tool item that contains a radio button, that is,
+a button that is part of a group of toggle buttons where only one
+button can be active at a time. You can create a RadioToolButton with
+the following constructors:<br>
+      <br>
+      <div class="fbox"><code> RadioToolButton();<br>
+      <br>
+RadioToolButton(const
+RadioToolButton *group);<br>
+&nbsp;&nbsp; <br>
+RadioToolButton(const
+RadioToolButton *group, const
+StockId&amp; stock_id);</code></div>
+      <br>
+The first constructor creates&nbsp; an empty radio tool button that is
+the first member in a new group. The second constructor creates and
+empty radio tool button that is a member of an existing group. The last
+constructor creates a radio tool button that is a member of an existing
+group and contains the icon and label of the stock item specified by
+'stock_id'.<br>
+      <br>
+If the 'group' argument is null a new group will be created for the
+radio tool button. This should be the case for the first radio tool
+button
+created in a group. Then for subsequent radio tool buttons you create,
+pass a
+pointer to the previous radio tool button. This allows a chain of
+radio tool buttons to be established. <br>
+      <br>
+You can set or retrieve the group a RadioToolButton belongs to with the
+following methods:<br>
+      <br>
+      <div class="fbox"><code>void set_group(Group *group);<br>
+      <br>
+Group* get_group() const;</code> </div>
+      <br>
+The 'group' argument in these methods is a typedef for GSList.<br>
+      <br>
+      <h2><a name="TI04"></a>Separator
+Tool Items</h2>
+A SeparatorToolItem is a tool item that separates groups of other tool
+items. Depending on the theme, a SeparatorToolItem will often look like
+a vertical line on horizontally docked toolbars. You can create a new
+SeparatorToolItem with the following constructor:<br>
+      <br>
+      <div class="fbox">SeparatorToolItem();</div>
+      <br>
+You can set or retrieve an item's 'draw' property which determines
+whether the separator is drawn as a vertical line or a blank:<br>
+      <br>
+      <div class="fbox"><code>void set_draw(bool draw);<br>
+      <br>
+bool get_draw() const;</code></div>
+      <br>
+If a separator tool item's expand property is true and its draw
+property is false, the separator will act as a 'spring' that forces
+other items to the end of the toolbar. <br>
+      <br>
+For an example that uses tool items see the <a
+ href="toolbar.html#example">Toolbar</a> example.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="toolitems.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

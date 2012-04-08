@@ -1,0 +1,212 @@
+XFC: Xfce Foundation classes
+Copyright (C) 2004-2005, The XFC Development Team.
+
+This is the unstable development release version 4.3.1 that will
+eventually become the stable release series 4.4.x. Although only
+a development release, you should find XFC 4.3.1 quite stable.
+
+
+1. What is XFC?
+===============
+The Xfce Foundation Classes (XFC) is a set of well integrated C++ classes
+for developing Xfce applications on UNIX-like operating systems such as
+Linux. 
+
+XFC combines the power of GTK+ and the power of C++ into a state-of-the-art
+application development framework for the Xfce Desktop Environment. XFC 
+judiciously uses C++ language features to avoid layering on too much extra
+C++ complexity. Its API is easy to understand and use, and should feel 
+immediately familiar to most GTK+ programmers. 
+
+The Xfce Foundation Classes is part of the Xfce project, and like Xfce its
+lightweight, fast and easy to use. XFC is divided into two main libraries:
+libXFCcore and libXFCui. A libglade support library, libXFCglade, is included
+and will be automatically compiled and installed if libglade is found on your
+system. A fourth library is planned (libXFCde) that will provide C++ wrappers
+the GTK+ objects implemented in the Xfce libraries. libXFCde should become 
+available some time in the next few months, once Xfce 4.4 development progresses.
+
+
+2. What is libXFCcore?
+======================
+The libXFCcore library wraps the GLib object system and selected objects
+from the GLib utility library. Essentially, it provides a low level object
+system that can be used to build other libraries; libXFCui depends on this
+library. libXFCcore uses the libsigc++ 2.0 callback library to implement a
+typesafe system of signals and slots that makes using native GObject signals
+or creating your own signals very easy. libXFCcore includes a standard 
+string compatible UTF-8 string class, automatic memory management and 
+several convenient base classes.
+
+
+3. What is libXFCui?
+====================
+The libXFCui library is a user interface toolkit that can be used to develop
+GTK+ applications in C++. It provides more than 420 classes that wrap most 
+of the objects found in the ATK, GDK, Gdk-Pixbuf, GTK and Pango libraries.
+libXFCui is built on the libXFCcore library so you don't need to include 
+this library in your application; libXFCui will do that for you. libXFCui
+includes is a C++ version of the GTK+ widget demonstration program, a full
+set of simple example programs and several test applications.
+
+
+4. What is libXFCglade?
+=======================
+Glade is a popular GUI builder for GNOME and GTK+ applications. It allows 
+the user to visually create their application's user interface and save it
+in a XML description file (.glade). libglade is a C library that loads Glade
+description files at runtime, parses them, and generates the appropriate
+widgets. 
+
+The libXFCglade library is a C++ binding for libglade. It provides the 
+user with a convenient way to use a Glade generated interface in a XFC 
+application. And because there is less C++ code to write it makes XFC
+application development easier and faster. 
+
+
+5. Why program in C++?
+======================
+Over the years application programming has become more complex. Today, C++
+is a better way the manage that complexity because it provides you with a
+variety of programming designs, both object-oriented and conventional, that
+let you develop high-quality applications easily. Properly used, C++ code 
+is easily maintainable, is extensible, and can be performance and memory
+efficient.
+ 
+
+6. Minimum Requirements for XFC 4.3.1.
+======================================
+
+ - gcc-3.3.2 C++ compiler
+ - glib-2.6.0
+ - gthread-2.6.0
+ - atk-1.9.0
+ - gtk+-2.6.0
+ - pango-1.8.0
+ - pkg-config-0.14
+ - libsigc++-2.0.6
+ - libglade-2.4.0 (optional)
+ - doxygen 1.3.2 or higher (for documentation)
+ 
+XFC requires the GCC compiler version 3.3.2 or greater because libsigc++ 2.0
+and XFC use C++ language features not supported by the earlier compilers.
+
+For Glade support, libglade 2.4.0 or higher must be installed on your system.
+If libglade is not found libXFCglade will not be compiled and installed.  
+
+
+7. Installation.
+================
+First, if you downloaded the SVN version of XFC:
+ 
+run:	./autogen.sh
+
+If you have GLib/GTK+ or pkg-config-0.14 installed in a non-standard
+directory you will have to edit autogen.sh first and add your local 
+aclocal directory as an include option after aclocal. For example,
+
+aclocal -I $HOME/share/aclocal
+
+Next, if you downloaded the tarball version of XFC, or have already 
+run "./autogen.sh" then,
+
+run:	./configure
+	make
+	make install
+
+Don't forget to specify "--prefix=directory" with configure if you
+want to install XFC in some directory other than /usr/local.
+
+By default, configure builds libXFCcore and libXFcui with debugging and
+compiler symbols so you can debug your applications during development.
+If you want to build XFC without debugging symbols, run configure with
+the following option,
+
+run:	./configure --disable-debug
+
+Alternativley, you can install XFC with all debugging symbols stripped
+out by calling,
+
+run:	make install-strip
+
+This will install a much smaller and faster library but you wont be able
+to debug your programs properly.
+
+If you want to build the API reference you will need to have Doxygen
+1.3.2 or higher installed; run configure with the following option,
+
+run:	./configure --enable-docs
+
+
+8. Documentation.
+=================
+XFC comes with excellent documentation, including a FAQ sheet, numerous
+HOWTOs with examples, an API reference manual and a tutorial. The easiest
+way to access the XFC documentation is through the main index page 
+<docs/index.html>. 
+
+The FAQ sheet that answers some common questions about GTK+ and XFC can be
+found in the <docs/faq> subdirectory. 
+
+There is a large collection of HOWTOs in the <docs/howto> subdirectory
+that covers everything from general information and library structure to
+individual widget programming. Each widget HOWTO first discusses any widget 
+basics and then works through a widget example. The HOWTOs are linked to
+the API reference manual so widget examples can be easily accessed from
+there. The source code for all the HOWTO examples can be found in the
+<examples/howto> suddirectory 
+
+A complete API reference manual can be found in the <docs/reference> 
+subdirectory. This manual is compiled by Doxygen from special comments
+in the XFC header files. Every typedef, enum and class has been 
+documented, including all public and protected member functions and 
+signals. If you downloaded the SVN version of XFC the API reference 
+will be compiled by Doxygen the first time you run the make utility.
+
+There is a good tutorial in the <docs/tutorial> subdirectory that targets
+both new and experienced GTK+ programmers. The tutorial takes you through
+the process building a real application, called 'XfcApp', which you can 
+then use as the starting point for your own projects. The tutorial covers
+two important topics essential for new programmers: building a GNU autotools
+project and adding international language support. The source code for the
+tutorial examples can be found in the <examples/tutorial> subdirectory. 
+
+
+9. Example Programs.
+====================
+The <examples> directory contains all the example applications for the XFC
+library. 
+
+The <examples/core> subdirectory contains several libXFCcore test programs 
+that show you how to use the G::IOChannel, G::MainLoop and G::SpawnAsync
+API.
+ 
+The <examples/core/threads> subdirectory contains several threaded test
+programs including a threadpool example. Although simple, these programs
+cover some important thread basics.
+
+The <examples/howto> subdirectory contains the example applications that 
+the widget HOWTOs work through. The source code is well documented so you
+can follow it with or without reading the associated HOWTO. 
+
+The <examples/ui> subdirectory contains several test programs that show you
+how to use the new ComboBox, EntryCompletion and FileChooser widgets added
+to GTK 2.4. There are also three test programs that show you how to use the
+new action-based menus and toolbars.
+
+The <examples/glade> subdirectory contains four simple example programs
+that show you how easy it is to use Glade generated interfaces in your
+XFC applications.  
+
+
+10. Contact.
+-----------
+If you take the time to try the Xfce Foundation Classes you will discover
+an easy and exciting new way the program your GTK+ applications in C++. 
+If you find any bugs, or need any help programming with XFC let us know at 
+<xfc-dev@xfce.org>. This list is a members only mailing list so you must 
+subscribe. More information can be found online at <http://xfc.xfce.org>.
+
+
+Empowering the GTK+ programmer,
+The XFC Development Team.

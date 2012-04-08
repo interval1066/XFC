@@ -1,0 +1,318 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Scrolled Windows" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Scrolled
+Windows</h1>
+      <br>
+      <div style="text-align: left;">Scrolled windows are used to
+create a scrollable area with another
+widget inside it. You may insert any type of widget into a scrolled
+window, and it will be accessible regardless of the size by using the
+scrollbars.<br>
+      </div>
+      <br>
+The following constructors can be used to create a new scrolled window.<br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <div class="fbox"><code>ScrolledWindow();<br>
+      <br>
+ScrolledWindow(Gtk::Adjustment *hadjustment, Gtk::Adjustment
+*vadjustment);</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">The 'hadjustment' argument is the
+adjustment for the
+horizontal direction, and the 'vadjustment' argument the
+adjustment for the vertical direction. Unless you specifically need to
+create your own Adjustments you should use the first constructor which
+forces the scrolled window to create it's own Adjustments.<br>
+      </div>
+      <div style="text-align: left;"> <br>
+You can set and get the adjustments after the scrolled window has been
+created using the following four methods:<br>
+      <br>
+      <div class="fbox"><code>void
+set_hadjustment(Gtk::Adjustment *hadjustment);<br>
+      <br>
+void
+set_vadjustment(Gtk::Adjustment
+*vadjustment);<br>
+      <br>
+Gtk::Adjustment* get_hadjustment() const;<br>
+      <br>
+Gtk::Adjustment* get_vadjustment() const;</code></div>
+      <br>
+      </div>
+You can set the scrollbar policy with the following method:<br>
+      <div style="text-align: left;"> <samp><br>
+      </samp>
+      <div class="fbox"><code>void
+set_policy(Gtk::PolicyType hscrollbar_policy, Gtk::PolicyType
+vscrollbar_policy);</code></div>
+      <br>
+The first argument sets the policy for the horizontal scrollbar, and
+the second the policy for the vertical scrollbar. The policy may be one
+of values from the Gtk::PolicyType enum:<br>
+      <ul>
+        <li>GTK_POLICY_AUTOMATIC - automatically decide whether you
+need the
+scrollbar.</li>
+        <li>GTK_POLICY_ALWAYS - always leave the scrollbar there.</li>
+        <li>GTK_POLICY_NEVER - the scrollbar is never present.</li>
+      </ul>
+You place your widget into the scrolled window using the following
+method:<br>
+      <br>
+      <div class="fbox"><code>void
+add_with_viewport(Gtk::Widget&amp; child);</code></div>
+      <br>
+      <h2><a name="example"></a>ScrolledWindow Example</h2>
+Here is a simple example that packs a table with 100 toggle buttons
+into a scrolled window. I've only commented the parts of source code
+that may be
+new
+to you.<br>
+      <br>
+      <div align="left">The header file for the ScrolledWindow example
+&lt;scrolledwindow.hh&gt;:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/dialog.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class ScrolledWindow : public Gtk::Dialog<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; ScrolledWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual
+~ScrolledWindow();<br>
+};</code></div>
+      <br>
+and the source file is scrolledwindow.cc:<br>
+      <br>
+      <div class="fbox"><code>#include "scrolledwindow.hh"<br>
+#include &lt;xfc/gtk/buttonbox.hh&gt;<br>
+#include &lt;xfc/gtk/scrolledwindow.hh&gt;<br>
+#include &lt;xfc/gtk/table.hh&gt;<br>
+#include &lt;xfc/gtk/togglebutton.hh&gt;<br>
+      <br>
+ScrolledWindow::ScrolledWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("ScrolledWindow example");<br>
+&nbsp;&nbsp;&nbsp; set_border_width(0);<br>
+&nbsp;&nbsp;&nbsp; set_size_request(300, 300);<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; // Create a new
+scrolled
+window.<br>
+&nbsp;&nbsp;&nbsp; Gtk::ScrolledWindow
+*scrolled_window = new
+Gtk::ScrolledWindow;<br>
+&nbsp;&nbsp;&nbsp; scrolled_window-&gt;set_border_width(10);<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; // The policy is
+one of
+Gtk::POLICY AUTOMATIC, or Gtk::POLICY_ALWAYS. Gtk::POLICY_AUTOMATIC
+will <br>
+&nbsp;&nbsp;&nbsp; // automatically decide whether you need scrollbars,
+whereas Gtk::POLICY_ALWAYS will always leave<br>
+&nbsp;&nbsp;&nbsp; // the scrollbars there.&nbsp; The first one is the
+horizontal scrollbar, the second, the vertical.<br>
+&nbsp;&nbsp;&nbsp;
+scrolled_window-&gt;set_policy(Gtk::POLICY_AUTOMATIC,
+Gtk::POLICY_ALWAYS);<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; // The dialog
+window is
+created with a vbox (client_area) packed into it.&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;
+client_area()-&gt;pack_start(*scrolled_window);<br>
+&nbsp;&nbsp;&nbsp; scrolled_window-&gt;show();<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; // Create a table
+of 10
+by 10 squares.<br>
+&nbsp;&nbsp;&nbsp; Gtk::Table *table = new Gtk::Table(10, 10);<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; // Set the spacing
+to 10
+on x and 10 on y<br>
+&nbsp;&nbsp;&nbsp; table-&gt;set_row_spacings(10);<br>
+&nbsp;&nbsp;&nbsp; table-&gt;set_col_spacings(10);<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; // Pack the table into the
+scrolled window<br>
+&nbsp;&nbsp;&nbsp;
+scrolled_window-&gt;add_with_viewport(*table);<br>
+&nbsp;&nbsp;&nbsp; table-&gt;show();<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; // This simply
+creates a
+grid of toggle buttons on the table to demonstrate the scrolled window.<br>
+&nbsp;&nbsp;&nbsp; for
+(int i = 0; i &lt; 10; i++)<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; for
+(int j = 0; j &lt; 10; j++) <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+String text = String::format("button (%d,%d)\n", i, j);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+Gtk::ToggleButton *button = new
+Gtk::ToggleButton(text);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+table-&gt;attach(*button, i, i + 1, j, j + 1);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+button-&gt;show();<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp; }<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Add a "close"
+button
+to the bottom of the dialog<br>
+&nbsp;&nbsp;&nbsp; Gtk::Button *button = new Gtk::Button("close");<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;ScrolledWindow::dispose));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // This makes it
+so the
+button is the default.<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;set_flags(Gtk::CAN_DEFAULT);<br>
+&nbsp;&nbsp;&nbsp; action_area()-&gt;pack_start(*button);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // This grabs this
+button to be the default button. Simply hitting the "Enter" key will
+activate this button.<br>
+&nbsp;&nbsp;&nbsp; button-&gt;grab_default();<br>
+&nbsp;&nbsp;&nbsp; button-&gt;show();<br>
+}<br>
+      <br>
+ScrolledWindow::~ScrolledWindow()<br>
+{<br>
+}<br>
+      <br>
+int main (int
+argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; ScrolledWindow window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp;&nbsp; window.show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return 0;<br>
+}</code></div>
+      <br>
+      <div style="text-align: center;">
+      <div style="text-align: left;">
+      <h2>Compiling ScrolledWindow<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for ScrolledWindow in the
+&lt;examples/howto/scrolledwindow&gt; source directory along with a Makefile.
+If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/scrolledwindow&gt; subdirectory.
+In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for ScrolledWindow, add the following lines to a
+new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+scrolledwindow: scrolledwindow.cc scrolledwindow.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) scrolledwindow.cc -o scrolledwindow $(CFLAGS)
+`pkg-config xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o scrolledwindow</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      </div>
+      <br>
+      <img style="width: 343px; height: 361px;" alt=""
+ src="../../images/scrolledwindow.png"><br>
+      </div>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="scrolledwindows.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

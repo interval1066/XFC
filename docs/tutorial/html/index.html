@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="0" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="white-space: nowrap; width: 50%;">&nbsp;&laquo;&nbsp;
+            <a class="qindexH" href="../../index.html">Main Page</a><span
+ class="qindexH"></span><a class="qindexH" href="../../index.html"> </a><span
+ class="qindexH"></span><span style="text-decoration: underline;"> </span><span
+ class="qindexH"></span> </td>
+            <td
+ style="white-space: nowrap; text-align: right; width: 50px;"><a
+ href="pretend"><span class="qindexF"></span><span class="qindexF"></span></a><a
+ class="qindexH" href="chapter01.html">Basic XFC Application</a>
+&raquo; <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>GTK+ Programming in C++ with XFC<br>
+      </h1>
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a class="mhl" href="chapter01.html">Basic XFC Application</a></li>
+        <li><a class="mhl" href="chapter02.html">Hello World<br>
+          </a></li>
+        <li><a class="mhl" href="chapter03.html">Hello Buttons<br>
+          </a></li>
+        <li><a class="mhl" href="chapter04.html">Adding
+a menubar and toolbar</a></li>
+        <li><a class="mhl" href="chapter05.html">Writing
+a composite statusbar</a></li>
+        <li><a class="mhl" href="chapter06.html">Adding
+a statusbar</a></li>
+        <li><a class="mhl" href="chapter07.html">Adding
+a client area and context
+menu</a></li>
+        <li><a class="mhl" href="chapter08.html">Building
+a GNU autotools project</a></li>
+        <li><a class="mhl" href="chapter09.html">Adding International
+Support<br>
+          </a></li>
+      </ol>
+      <br>
+      <h2>Overview</h2>
+      <div align="justify">
+      <div style="text-align: left;">GTK+ programming in C++ is more
+efficient and more powerful than
+progamming in C, and with the Xfce Foundation Classes (XFC)
+it's a lot easier
+and much more fun. By combining&nbsp; the power of <a
+ href="http://www.gtk.org">GTK+</a> and the power
+of C++, XFC provides the programmer with a well integrated
+set of C++ classes that wraps most of the functionality found in the
+GTK+ libraries. XFC is divided into two main libraries: libXFCcore and
+libXFCui, but other add-on libraries planned, such as libXFCde which
+will provide a C++ interface for the Xfce core libraries.<br>
+      <br>
+The libXFCcore library wraps the GLib object system and selected
+objects
+from the GLIb utility library. Essentially, it provides a low level
+object system that can be used to build other libraries; libXFCui
+depends
+on this library. libXFCcore uses the new libsigc++
+2.0 callback library to implement a typesafe system of signals and
+slots that makes using native GObject signals or creating your own
+signals very easy. There is a standard string compatible UTF-8 string
+class, reference documentation and several test programs.<br>
+      <br>
+The libXFCui library is a state-of-the-art graphical user interface
+toolkit for developing GTK+ applications in C++. There are more than
+420 classes that wrap most of the objects found in the ATK, GDK,
+Gdk-Pixbuf, GTK and Pango libraries. Included is a full set of simple
+example programs, a C++ version of the GTK+ widget demonstration
+program, an extensive reference manual, several test programs and
+this tutorial.<br>
+      <br>
+      <span style="font-family: sans-serif;"></span>
+      <h2>Programming in C++</h2>
+      <span style="font-family: sans-serif;">Over the
+years application programming has become more complex. Today, C++ is a
+better way the manage that complexity because it provides you with a
+variety of programming designs, both object-oriented and conventional,
+that let you
+develop high-quality applications easily. Properly used, C++ code is
+easily
+maintainable, is extensible, and can be performance
+and memory efficient.</span><br style="font-family: sans-serif;">
+      <br style="font-family: sans-serif;">
+The <span style="font-family: sans-serif;">Xfce Foundation Classes</span>
+are a compact but comprehensive C++ wrapper around the GTK+ library.
+XFC
+judiciously uses C++ language features and does not layer on too much
+extra C++ complexity. Its API is easy to understand and use, and
+should feel immediately familiar to most GTK+ programmers. Throughout
+its development XFC has maintained a good balance between remaining
+faithful to GTK+ and remaining faithful to C++. Hence the catchphrase -
+      <em>"the power of gtk, the power of c++</em>". <br>
+      <br>
+      <h2>The XFC Tutorial</h2>
+Whether you're new to GTK+ or an experienced programmer, you should
+find
+the XFC tutorial beneficial and worthy of the small amount of time
+it will take to work through. On completion of this tutorial you will
+have
+covered the basics of GTK+ programming in C++ using the Xfce Foundation
+Classes. And for the
+benefit of new programmers, the tutorial will discuss several important
+GTK+ and GNU concepts along the way.<br>
+      <br>
+Rather than just working through the usual 'hello world' program, this
+tutorial also takes you through the process building a real
+application, called 'XfcApp', which you can use as a starting point for
+your own projects. The tutorial starts off in <a href="chapter01.html">chapter
+one</a> by creating a
+basic application that is nothing
+more than an empty main window. Then in chapters two and three, two
+simple applications are created: Hello World and Hello Buttons. These
+two applications serve to introduce you to important topics such as
+packing widgets, libsigc++ signals and slots, and virtual signal
+classes. <br>
+      <br>
+The interesting stuff really begins in chapter four. Starting with the
+XfcApp program from chapter one, successive
+chapters take you through the process of enhancing XfcApp, adding
+features such as an action-based menubar and toolbar, a composite
+statusbar that
+looks and behaves just like
+a GNOME appbar, and a
+client area that responds to mouse button events by displaying a pop up
+context menu. <br>
+      <br>
+The tutorial finishes off by covering two important topics that are
+essential
+for new programmers.
+Chapter eight takes
+you step-by-step through the process of turning XfcApp into a GNU
+compliant
+autotools project. Then chapter nine shows you how to add
+international support. If you already know
+how to build a GNU autotools project and how to add
+international support, you can skip these two chapters.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="index.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: AccelLabel" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>AccelLabel</h1>
+      <br>
+      <div align="justify">The AccelLabel widget is derived from Label
+and
+displays an accelerator key on the right side of the label text, e.g.
+'Ctl+S'. It is commonly used in menus to show the keyboard short-cuts
+for commands. You most probably wont have much use for an AccelLabel in
+your day to day programming but if you ever need a custom menu item you
+will.<br>
+      </div>
+      <br>
+You can create an AccelLabel by calling one of the following
+constructors:<br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify"><br>
+      <div class="fbox"><code>AccelLabel();<br>
+      <br>
+AccelLabel(const String&amp; str, bool
+use_underline = false);</code> </div>
+      <code></code><br>
+      <div align="justify">The first constructor creates an empty
+AccelLabel.
+The second constructor creates an AccelLabel that displays the
+specified
+character string<em></em>. If 'use_underline' is true the
+string
+is parsed for an underscore preceding the mnemonic character. <br>
+      </div>
+      <br>
+After construction you can change the label's text by calling one of
+the following Gtk::Label methods:<br>
+      <br>
+      <div class="fbox"><code>void
+set_text(const String&amp; str);<br>
+      <br>
+void set_text_with_mnemonic(const String&amp; str);</code> </div>
+      <br>
+      <div style="text-align: left;">
+      <div align="justify">The sole argument is the new string to
+display.
+The second method, set_text_with_mnemonic() parses the string for the
+mnemonic character (i.e. the character preceded by an underscore). The
+space needed for the new string will be automatically adjusted if
+needed. </div>
+      <br>
+The accelerator key to display is not set
+explicitly. Instead, the AccelLabel displays the accelerators which
+have
+been added to a particular widget. This widget is set by calling the
+following method:<br>
+      <br>
+      <div class="fbox"><code>void
+set_accel_widget(Gtk::Widget&amp; accel_widget);</code></div>
+      <br>
+      <div align="justify">For example, a MenuItem widget may have an
+accelerator added to emit the 'activate' signal when the 'Ctl+S' key
+combination is pressed. An AccelLabel is created and added to the
+MenuItem, and Gtk::AccelLabel::set_accel_widget() is called with the
+MenuItem as its argument. The AccelLabel will now display 'Ctl+S' after
+its label. Note that creating a MenuItem with a label (or one of the
+similar functions for CheckMenuItem and RadioMenuItem) automatically
+adds an AccelLabel to the MenuItem and calls
+Gtk::AccelLabel::set_accel_widget() to set it up for you. You probably
+wont have much use for an AccelLabel unless
+your are creating the menu item yourself.<br>
+      <br>
+An AccelLabel will only display accelerators which have
+Gtk::ACCEL_VISIBLE set (see Gtk::AccelFlags). An AccelLabel can display
+multiple accelerators and even signal names, though it is almost always
+used to display just one accelerator key.<br>
+      <br>
+If you have a window with a menu<em>,</em> to create a
+simple
+menu item with an accelerator key you would do something like the
+following:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>//
+Create a Gtk::AccelGroup and add it to the window.<br>
+Gtk::AccelGroup *accel_group = new
+Gtk::AccelGroup;<br>
+window-&gt;add_accel_group(accel_group);<br>
+      <br>
+// Create the menu item using the
+convenience function. <br>
+Gtk::MenuItem *save_item = new Gtk::MenuItem("Save");<br>
+save_item-&gt;show();<br>
+      <br>
+menu-&gt;append(*save_item);<br>
+      <br>
+// Now add the accelerator to the
+Gtk::MenuItem. <br>
+// Note Gtk::ACCEL_VISIBLE is the default and doesn't need to be
+specified. <br>
+save_item-&gt;add_accelerator("activate",
+*accel_group,
+Gtk::AccelKey(GDK_s, Gdk::CONTROL_MASK));</code> </div>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td class="qindexH" style="text-align: center;"><small><span
+ class="qindexF"><a class="ebox qindexF" href="accellabel.html">Top</a><br>
+            </span> </small></td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

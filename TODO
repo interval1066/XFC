@@ -1,0 +1,4 @@
+* Add printing from GTK+ 2.10++
+* Start wrapping Xfce4 desktop environment (libXFCde)
+* Start wrapping Xfce4panel (libXFCpanel)
+* Start wraaping Xfce4xconf

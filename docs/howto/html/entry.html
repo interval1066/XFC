@@ -1,0 +1,348 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Text Entries" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo;
+      <a class="qindexH" href="../../index.html">Main
+Page</a>
+| <a class="qindexH" href="index.html">Index</a></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Text
+Entries</h1>
+      <br>
+      <div style="text-align: left;">The
+Entry widget allows text
+to be
+typed and
+displayed in a single line text box. The text may be set with function
+calls that allow new text to replace, prepend or append the current
+contents of the Entry widget.<br>
+      </div>
+      <br>
+You can create a new Entry widget using one of the following
+constructors.<br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <div class="fbox"><code>Entry();<br>
+      <br>
+Entry(int
+max_length);</code></div>
+      <br>
+      </div>
+The 'max_length' argument sets the
+maximum
+length of the text that can be displayed. The next method alters the
+text which is currently within the Entry widget.<br>
+      <div style="text-align: left;">
+      <div align="justify"></div>
+      <br>
+      <div class="fbox"><code>void
+set_text(const String&amp; text);</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">The
+set_text() method sets the
+contents of the Entry widget, replacing the current contents. Note that
+the Entry widget implements the Gtk::Editable interface which contains
+more methods for
+manipulating the contents.<br>
+      </div>
+      <div style="text-align: left;">
+      <br>
+The contents of the entry can be retrieved by calling to the
+following method:<br>
+      <br>
+      <div class="fbox"><code>String
+get_text() const;</code></div>
+      <br>
+If you don't want the contents of the Entry widget to be changed by
+someone
+typing into it, you can set its editable state:<br>
+      <br>
+      <div class="fbox"><code>void
+set_editable(bool is_editable);</code></div>
+      <br>
+      <div style="text-align: left;">
+This method is inherited from
+Gtk::Editable
+and allows you to toggle the editable state of an entry widget by
+passing true or false for the
+'is_editable'
+argument.<br>
+      <br>
+If you are using an Entry widget where you don't want the text entered
+to be
+visible, for example when a password is being entered, you can use the
+following method, which also takes a bool flag:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>void
+set_visibility(bool visible);</code></div>
+      <br>
+      <div style="text-align: left;">A
+region of the text may be set as
+selected
+using the following method. This would most often be used after setting
+some default text in an Entry, making it easy for the user to remove it.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>void
+select_region(int start, int end);</code></div>
+      <br>
+      <div style="text-align: left;">If
+you want to intercept when the
+user has
+entered
+text, you can connect to the 'activate' or 'changed'
+signal. An activate signal is emitted when the user hits the enter key
+within the Entry widget. A changed signal is emitted when the text
+changes, e.g.,
+for
+every character entered or removed.<br>
+      </div>
+      <br>
+      <h2><a name="example"></a>Text
+Entry Example</h2>
+The following example displays a window with an Entry widget and the
+text 'hello world' highlighted. Checking and unchecking the editable
+checkbutton will toggle the editable state of the entry widget.
+Checking and unchecking the visible checkbutton will toggle the
+visibility state of the text in Entry widget. <br>
+      <br>
+The header file for XFC Entry is &lt;entry.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include
+&lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/entry.hh&gt;<br>
+#include &lt;xfc/gtk/checkbutton.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class EntryWindow : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Pointer&lt;Gtk::Entry&gt; entry;<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; void on_enter();<br>
+&nbsp;&nbsp;&nbsp; void
+on_entry_toggle_editable(Gtk::CheckButton *button);<br>
+&nbsp;&nbsp;&nbsp; void
+on_entry_toggle_visible(Gtk::CheckButton *button);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; EntryWindow();<br>
+&nbsp;&nbsp;&nbsp; ~EntryWindow();<br>
+};</code></div>
+      <br>
+and the source file is &lt;entry.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include
+"entry.hh"<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+#include &lt;xfc/gtk/stockid.hh&gt;<br>
+#include &lt;iostream&gt;<br>
+      <br>
+EntryWindow::EntryWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("XFC Entry");<br>
+&nbsp;&nbsp;&nbsp; set_size_request(200, 100);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::VBox *vbox = new
+Gtk::VBox;<br>
+&nbsp;&nbsp;&nbsp; add(*vbox);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; entry = new Gtk::Entry;<br>
+&nbsp;&nbsp;&nbsp; entry-&gt;set_max_length(50);<br>
+&nbsp;&nbsp;&nbsp;
+entry-&gt;signal_activate().connect(sigc::mem_fun(this,
+&amp;EntryWindow::on_enter));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; entry-&gt;set_text("hello");<br>
+&nbsp;&nbsp;&nbsp; int tmp_pos =
+entry-&gt;gtk_entry()-&gt;text_length;<br>
+&nbsp;&nbsp;&nbsp; entry-&gt;insert_text(" world",
+tmp_pos);<br>
+&nbsp;&nbsp;&nbsp; entry-&gt;select_region(0,
+entry-&gt;gtk_entry()-&gt;text_length);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*entry);<br>
+&nbsp;&nbsp;&nbsp; entry-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::HBox *hbox = new
+Gtk::HBox;<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;add(*hbox);<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::CheckButton *check = new
+Gtk::CheckButton("Editable");<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*check);<br>
+&nbsp;&nbsp;&nbsp;
+check-&gt;signal_toggled().connect(bind(sigc::mem_fun(this,
+&amp;EntryWindow::on_entry_toggle_editable), check));<br>
+&nbsp;&nbsp;&nbsp; check-&gt;set_active(true);<br>
+&nbsp;&nbsp;&nbsp; check-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; check = new
+Gtk::CheckButton("Visible");<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*check);<br>
+&nbsp;&nbsp;&nbsp;
+check-&gt;signal_toggled().connect(sigc::bind(sigc::mem_fun(this,
+&amp;EntryWindow::on_entry_toggle_visible), check));<br>
+&nbsp;&nbsp;&nbsp; check-&gt;set_active(true);<br>
+&nbsp;&nbsp;&nbsp; check-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::Button *button = new
+Gtk::Button(GTK_STOCK_CLOSE);<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;EntryWindow::dispose));<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*button);<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;set_flags(Gtk::CAN_DEFAULT);<br>
+&nbsp;&nbsp;&nbsp; button-&gt;grab_default();<br>
+&nbsp;&nbsp;&nbsp; button-&gt;show();<br>
+}<br>
+      <br>
+EntryWindow::~EntryWindow()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+EntryWindow::on_enter()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace std;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; String text = entry-&gt;get_text();<br>
+&nbsp;&nbsp;&nbsp; cout &lt;&lt; "Entry contents: "
+&lt;&lt;
+text.c_str() &lt;&lt; endl;<br>
+}<br>
+      <br>
+void<br>
+EntryWindow::on_entry_toggle_editable(Gtk::CheckButton *button)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;
+entry-&gt;set_editable(button-&gt;get_active());<br>
+}<br>
+      <br>
+void<br>
+EntryWindow::on_entry_toggle_visible(Gtk::CheckButton *button)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;
+entry-&gt;set_visibility(button-&gt;get_active());<br>
+}<br>
+      <br>
+int main(int
+argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; EntryWindow window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp;&nbsp; window.show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return 0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling Text Entry<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Text Entry in the
+&lt;examples/howto/entry&gt; source directory along with a Makefile.
+If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/entry&gt; subdirectory.
+In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Text Entry, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC
+= g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+entry: entry.cc entry.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) entry.cc -o entry $(CFLAGS)
+`pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o entry</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 224px; height: 145px;" alt=""
+ src="../../images/entry.png"><br>
+      </div>
+      <br>
+      <hr style="width: 100%; height: 1px;">
+      </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="entry.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

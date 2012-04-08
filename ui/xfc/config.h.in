@@ -1,0 +1,8 @@
+#ifndef XFC_CONFIG_H
+#define XFC_CONFIG_H
+
+#cmakedefine XFC_CAIRO
+#cmakedefine XFC_PANGO
+#cmakedefine XFC_SOURCEVIEW
+
+#endif

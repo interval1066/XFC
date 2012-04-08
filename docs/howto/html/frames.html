@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Frames" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Frames</h1>
+      <br>
+      <div style="text-align: left;">Frames can be used to enclose one
+or more
+widgets with a decorative box which can optionally be labeled. The
+position of the
+label and the style of the box can be altered to suit.<br>
+      </div>
+      <br>
+A Frame can be created with one of the following constructors:<br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <div class="fbox"><code>Frame(Gtk::ShadowType type =
+Gtk::SHADOW_ETCHED_IN);<br>
+      <br>
+Frame(const
+String&amp; label, Gtk::ShadowType type = Gtk::SHADOW_ETCHED_IN);</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">The first constructor creates a
+Frame with the
+specified ShadowType, which by default is SHADOW_ETCHED_IN. The second
+constructor additionally lets you specify a label for the frame. The
+label is by default placed in the upper left hand corner of the frame. <br>
+      </div>
+      <div style="text-align: left;">
+      <div style="text-align: left;"> <br>
+The text of the label can be set or changed using this next method:<br>
+      </div>
+      <samp><br>
+      </samp>
+      <div class="fbox"><code>void
+set_label(const String&amp; label);</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">A label widget can be added later
+by either
+calling the set_label() method, in which case a label widget is created
+for
+you, or by specifically calling the next method followed by a call to
+set_label() to set the label text.<br>
+      </div>
+      <div style="text-align: left;"> <br>
+      <div class="fbox"><code>void
+set_label_widget(Widget&amp; label_widget);</code></div>
+      <br>
+The position of the label can be changed using this method:<br>
+      <br>
+      <div class="fbox"><code>void
+set_label_align(float xalign, float yalign);</code></div>
+      <br>
+The 'xalign' and 'yalign'
+arguments
+take values between 0.0 and 1.0. xalign indicates the
+position
+of the label along the top horizontal of the frame. yalign
+indicates the vertical position with respect to the top horizontal of
+the frame - either above (0.0), below (1.0) or somewhere over it. The
+default value of xalign is 0.0 which places the label at the left hand
+end of the frame. The default value of yalign is 0.5 which places the
+middle of the label over the top horizontal of the frame.<br>
+      <div style="text-align: left;"> <br>
+The next function alters the style of the box that is used to outline
+the frame.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>void
+set_shadow_type(Gtk::ShadowType type);</code></div>
+      <br>
+The 'type' argument can take one of the following values from
+the Gtk::ShadowType enum:<br>
+      <ul style="list-style-type: square;">
+        <li>SHADOW_NONE</li>
+        <li>SHADOW_IN</li>
+        <li>SHADOW_OUT</li>
+        <li>SHADOW_ETCHED_IN (the default)</li>
+        <li>SHADOW_ETCHED_OUT</li>
+      </ul>
+      <br>
+      <h2><a name="example"></a>Frame
+Example</h2>
+The following code example illustrates the use of the Frame widget. It
+creates a simple window that contains a frame with a label aligned to
+the left side on the top edge.<br>
+      <br>
+      <div align="left">The header file for the Frame example is
+&lt;frame.hh&gt;:<br>
+      </div>
+      <br>
+      <div class="fbox">#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class FrameWindow : public Gtk::Window<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; FrameWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual ~FrameWindow();<br>
+};</div>
+      <br>
+and the source file is &lt;frame.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "frame.hh"<br>
+#include &lt;xfc/gtk/frame.hh&gt;<br>
+      <br>
+FrameWindow::FrameWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("Frame Example");<br>
+&nbsp;&nbsp;&nbsp; set_size_request(300, 300);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Sets the border
+width
+of the window.<br>
+&nbsp;&nbsp;&nbsp; set_border_width(10);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create a Frame<br>
+&nbsp;&nbsp;&nbsp; Gtk::Frame *frame = new Gtk::Frame;<br>
+&nbsp;&nbsp;&nbsp; add(*frame);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Set the frame's label<br>
+&nbsp;&nbsp;&nbsp; frame-&gt;set_label(" Gtk::Frame
+Widget");<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Align the label
+at
+the right of the frame<br>
+&nbsp;&nbsp;&nbsp; frame-&gt;set_label_align(1.0,
+0.0);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Set the style
+of the
+frame<br>
+&nbsp;&nbsp;&nbsp;
+frame-&gt;set_shadow_type(Gtk::SHADOW_ETCHED_OUT);<br>
+&nbsp;&nbsp;&nbsp; frame-&gt;show();<br>
+}<br>
+      <br>
+FrameWindow::~FrameWindow()<br>
+{<br>
+}<br>
+      <br>
+XFC_MAIN(FrameWindow)</code></div>
+      <br>
+      <h2>Compiling Frame<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Frame in the
+&lt;examples/howto/frame&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/frame&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Frame, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+frame: frame.cc frame.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) frame.cc -o frame $(CFLAGS) `pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o frame</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 324px; height: 345px;" alt=""
+ src="../../images/frame.png"><br>
+      </div>
+      <br>
+The XFC_MAIN macro is a convenience macro that writes a simple main
+function, its only argument is the name of the main window class. The
+macro is defined in &lt;xfc/main.hh&gt; as:<br>
+      <br>
+      <div class="fbox"><code>#define
+XFC_MAIN(MainWidget)\<br>
+&nbsp;&nbsp;&nbsp; int main (int argc, char *argv[])\<br>
+&nbsp;&nbsp;&nbsp; {\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Xfc::Main::init(&amp;argc,
+&amp;argv);\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; MainWidget main_widget;\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+main_widget.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; main_widget.show();\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Xfc::Main::run();\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return 0;\<br>
+&nbsp;&nbsp;&nbsp; }</code></div>
+      <br>
+Most main functions in C++ are simple because all the
+creation work for the main window is done inside its constructor, not
+the main function.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="frames.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

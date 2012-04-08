@@ -1,0 +1,259 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Images" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Images</h1>
+      <div align="justify"><br>
+      <div style="text-align: left;">The Image widget displays an
+image. Various kinds
+of objects can be displayed as an image; most typically, you would load
+a Gdk::Pixbuf ("pixel buffer") from a file, and then display that.
+There's a convenience constructor to do this: <br>
+      </div>
+      </div>
+      <div style="text-align: left;"><span
+ style="color: rgb(0, 55, 85);"></span> </div>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <div class="fbox"><code>Image(const String&amp; filename);</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">This creates a new Image
+displaying the file 'filename'.
+If the file isn't found or can't be loaded, the resulting Image will
+display a 'broken image' icon. This constructor always creates a valid
+Image widget. If the file contains an animation, the image will contain
+an animation.
+If you need to detect failures to load the file, use Gdk::PixbufLoader
+to load the file yourself, then create the Image from the pixbuf.<br>
+      </div>
+      <br>
+      <div style="text-align: left;"> Alternatively, you can construct
+an empty image:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>Image();</code></div>
+      <br>
+and then call the following set() method the set the image :<br>
+      <samp></samp><br>
+      <div class="fbox"><code>void
+set(const String&amp; filename);</code></div>
+      <br>
+      <div style="text-align: left;">Image is derived from Gtk::Misc,
+which implies
+that you can align it (center, left, right) and add padding to it,
+using
+Gtk::Misc methods. Image is a 'no window' widget (has no Gdk::Window of
+its own),
+so by default does not receive events. If you want to receive events on
+the image, such as button clicks, place the image inside an <a
+ href="eventbox.html">EventBox</a>, then connect to the event signals
+on the event box. <br>
+      </div>
+      <div style="text-align: left;"><br>
+      </div>
+      <div style="text-align: left;">There are 7 other Image
+constructors, each with a corresponding set
+method so we'll look at them together.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>Image(Gdk::Pixbuf *pixbuf);<br>
+      <br>
+void set(Gdk::Pixbuf
+*pixbuf);</code></div>
+      <br>
+      <div style="text-align: left;">The above constructor and set()
+method creates a
+new Image displaying pixbuf. The Image does not assume a reference to
+the pixbuf; you still need to unref it if you own a reference. Image
+will
+add its own reference rather than adopting yours. Note that the Image
+created will not react to state changes. Should you want that, you
+should use a Gtk::IconSet.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>Image(Gtk::IconSet
+*icon_set, Gtk::IconSize size) ;<br>
+      <br>
+void set(Gtk::IconSet
+*icon_set,
+Gtk::IconSize size);</code></div>
+      <br>
+      <div align="justify">
+      <div style="text-align: left;">The above constructor and set()
+method creates an
+Image displaying an icon set. The image 'size' can be one of
+the
+following values from the Gtk::IconSize enum:<br>
+      </div>
+      <ul style="list-style-type: square;">
+        <li>ICON_SIZE_MENU</li>
+        <li>ICON_SIZE_SMALL_TOOLBAR</li>
+        <li>ICON_SIZE_LARGE_TOOLBAR</li>
+        <li>ICON_SIZE_BUTTON</li>
+        <li>ICON_SIZE_DND</li>
+        <li>ICON_SIZE_DIALOG</li>
+      </ul>
+      <div style="text-align: left;">Usually it's better to create a
+Gtk::IconFactory, put your icon sets in
+the icon factory, add the icon factory to the list of default factories
+with Gtk::IconFactory::add_default(), and then use the stock image
+constructor or stock set() method. This will allow themes to override
+the icon you ship with your application. The Image does not assume a
+reference to the icon set; you still need
+to unref it if you own a reference. Image will add its own reference
+rather than adopting yours.<br>
+      </div>
+      </div>
+      <br>
+      <div class="fbox"><code>Image(const StockId&amp; stock_id,
+Gtk::IconSize size);<br>
+      <br>
+void set(const StockId&amp; stock_id,
+Gtk::IconSize size);</code></div>
+      <br>
+      <div style="text-align: left;">The above constructor and set()
+method creates an
+Image displaying a stock icon. Sample stock id's are
+Gtk::StockId::OPEN, Gtk::StockId::EXIT etc, and are defined in
+&lt;xfc/gtk/stockid.hh&gt;. If the stock icon id isn't known, a "broken
+image" icon will be displayed instead. You can register your own stock
+icon id's, see the Gtk::IconFactory&nbsp; add() and add_default()
+methods.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>Image(Gdk::Pixmap
+*pixmap, Gdk::Bitmap *mask);<br>
+      <br>
+void set(Gdk::Pixmap *pixmap,
+Gdk::Bitmap *mask);</code></div>
+      <br>
+      <div style="text-align: left;">The above constructor and set()
+method
+creates an
+Image widget displaying a pixmap with a mask. The Image does not assume
+a reference to the pixmap or mask; you still need to unref them if you
+own references. Image will add its own reference rather than adopting
+yours.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>Image(Gdk::Image *image,
+Gdk::Bitmap *mask);<br>
+      <br>
+void set(Gdk::Image *image,
+Gdk::Bitmap *mask);</code></div>
+      <br>
+      <div style="text-align: left;">The above constructor and set()
+method
+creates an
+Image widget displaying a image with a mask. A Gdk::Image is a
+client-side image buffer in the pixel format of the current display.
+The
+Image does not assume a reference to the image or mask; you still need
+to unref them if you own references. Image will add its own reference
+rather than adopting yours.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>Image(Gdk::PixbufAnimation&amp;
+animation);<br>
+      <br>
+void set(Gdk::PixbufAnimation&amp;
+animation);</code></div>
+      <br>
+      <div style="text-align: left;">The above constructor and set()
+method
+creates an
+Image displaying the given animation. The Image does not assume a
+reference to the animation; you still need to unref it if you own
+references. Image will add its own reference rather than adopting yours.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>Image(const char **xpm_data);</code></div>
+      <br>
+      <div style="text-align: left;">The above convenience constructor
+creates a
+new
+pixbuf by parsing XPM data in memory. This data is commonly the result
+of including an XPM file into a program's source. It then calls the
+pixbuf set() method above to create the image.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>Gtk::ImageType
+get_storage_type() const;</code></div>
+      <br>
+      <div style="text-align: left;">The get_storage_type() method
+returns the image
+storage type and can be one of the following values from the
+Gtk::ImageType enum:<br>
+      </div>
+      </div>
+      <ul>
+        <li>IMAGE_EMPTY</li>
+        <li>IMAGE_PIXMAP</li>
+        <li>IMAGE_IMAGE</li>
+        <li>IMAGE_PIXBUF</li>
+        <li>IMAGE_STOCK</li>
+        <li>IMAGE_ICON_SET</li>
+        <li>IMAGE_ANIMATION</li>
+      </ul>
+      <div align="justify">
+      <div style="text-align: left;"> For a good example on how to load
+and display images see the
+image demo
+source file &lt;demos/xfc-demo/image.cc&gt;.<br>
+      </div>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="images.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

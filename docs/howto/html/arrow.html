@@ -1,0 +1,290 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Arrows" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Arrows</h1>
+      <br>
+The Arrow widget draws an arrowhead, facing in a
+number of possible directions and having a number of possible styles.
+It
+can be very useful when placed on a button in many applications. The
+Arrow widget is a 'no window' widget and emits no signals.<br>
+      <div style="text-align: left;"> <br>
+To create a new arrow, use one of the following constructors:<br>
+      </div>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div style="" align="justify"> <br>
+      <div class="fbox"><code>Arrow();<br>
+      <br>
+Arrow(Gtk::ArrowType arrow_type, Gtk::ShadowType shadow_type);</code> </div>
+      <br>
+The 'arrow_type' argument can be one of the values from the
+Gtk::ArrowType enum:<br>
+      <ul>
+        <li>ARROW_UP</li>
+        <li>ARROW_DOWN</li>
+        <li>ARROW_LEFT</li>
+        <li>ARROW_RIGHT</li>
+      </ul>
+The 'shadow_type' argument can be one of the values from
+the
+Gtk::ShadowType enum:<br>
+      <ul>
+        <li>SHADOW_IN</li>
+        <li>SHADOW_OUT (the default)</li>
+        <li>SHADOW_ETCHED_IN</li>
+        <li>SHADOW_ETCHED_OUT</li>
+      </ul>
+      <div style="text-align: left;">The first constructor creates a
+default arrow
+widget with an arrow type of ARROW_RIGHT and a shadow type of
+SHADOW_OUT.
+The second constructor creates an arrow widget with the specified
+'arrow_type'
+and 'shadow_type'<em>.</em><br>
+      <em></em></div>
+      <br>
+You can set the arrow type with this method:<br>
+      <br>
+      <div class="fbox"><code>void
+set(Gtk::ArrowType arrow_type, Gtk::ShadowType shadow_type);</code></div>
+      <br>
+      <div style="text-align: left;">
+      <h2><a name="example"></a>Arrow
+Buttons Example</h2>
+The Arrow Buttons example creates a small window containing four arrow
+buttons. Each button displays an arrow pointing in one of the four
+cardinal directions up, down, left and right. <br>
+      <br>
+The&nbsp; header file for Arrow Buttons is &lt;arrow.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/arrow.hh&gt;<br>
+#include &lt;xfc/gtk/button.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+// ArrowButton<br>
+      <br>
+class ArrowButton : public Gtk::Button<br>
+{<br>
+&nbsp;&nbsp;&nbsp; ArrowButton(const
+ArrowButton&amp;);<br>
+&nbsp;&nbsp;&nbsp; ArrowButton&amp; operator=(const
+ArrowButton&amp;);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; ArrowButton(Gtk::ArrowType arrow_type,
+Gtk::ShadowType shadow_type);<br>
+&nbsp;&nbsp;&nbsp; virtual ~ArrowButton();<br>
+};<br>
+      <br>
+// ArrowWindow<br>
+      <br>
+class ArrowWindow : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp;&nbsp; ArrowWindow(const
+ArrowWindow&amp;);<br>
+&nbsp;&nbsp;&nbsp; ArrowWindow&amp; operator=(const
+ArrowWindow&amp;);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; ArrowWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual ~ArrowWindow();<br>
+};</code> </div>
+      <br>
+and the source file is &lt;arrow.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "arrow.hh"<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+      <br>
+// ArrowButton<br>
+      <br>
+ArrowButton::ArrowButton(Gtk::ArrowType arrow_type,
+Gtk::ShadowType shadow_type)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; // Create an Arrow
+widget with the specified parameters and pack it into the button.<br>
+&nbsp;&nbsp;&nbsp; Gtk::Arrow *arrow = new Gtk::Arrow(arrow_type,
+shadow_type);<br>
+&nbsp;&nbsp;&nbsp; add(*arrow);<br>
+}<br>
+      <br>
+ArrowButton::~ArrowButton()<br>
+{<br>
+}<br>
+      <br>
+// ArrowWindow<br>
+      <br>
+ArrowWindow::ArrowWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("Arrow Buttons");<br>
+&nbsp;&nbsp;&nbsp; set_border_width(10);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create a box to
+hold
+the arrows/buttons<br>
+      </code><code>&nbsp;&nbsp;&nbsp; </code><code>Gtk::HBox *hbox =
+new
+Gtk::HBox;<br>
+      </code><code>&nbsp;&nbsp;&nbsp; </code><code>
+hbox-&gt;set_border_width(2);<br>
+      </code><code>&nbsp;&nbsp;&nbsp; </code><code>add(*hbox);<br>
+      <br>
+      </code><code>&nbsp;&nbsp;&nbsp; </code><code></code><code>
+// Pack and show
+all the
+widgets.<br>
+      </code><code>&nbsp;&nbsp;&nbsp; </code><code></code><code>
+ArrowButton *button = new ArrowButton(Gtk::ARROW_UP,
+Gtk::SHADOW_IN);<br>
+      </code><code>&nbsp;&nbsp;&nbsp; </code><code></code><code>
+hbox-&gt;pack_start(*button, false, false, 3);<br>
+      <br>
+      </code><code>&nbsp;&nbsp;&nbsp; </code><code></code><code>
+button = new
+ArrowButton(Gtk::ARROW_DOWN, Gtk::SHADOW_OUT);<br>
+      </code><code>&nbsp;&nbsp;&nbsp; </code><code></code><code>
+hbox-&gt;pack_start(*button, false, false, 3);<br>
+      <br>
+      </code><code>&nbsp;&nbsp;&nbsp; </code><code></code><code>
+button = new
+ArrowButton(Gtk::ARROW_LEFT, Gtk::SHADOW_ETCHED_IN);<br>
+      </code><code>&nbsp;&nbsp;&nbsp; </code><code></code><code>
+hbox-&gt;pack_start(*button, false, false, 3);<br>
+      <br>
+      </code><code>&nbsp;&nbsp;&nbsp; </code><code></code><code>
+button = new
+ArrowButton(Gtk::ARROW_RIGHT, Gtk::SHADOW_ETCHED_OUT);<br>
+      </code><code>&nbsp;&nbsp;&nbsp; </code><code></code><code>
+hbox-&gt;pack_start(*button, false, false, 3);<br>
+      </code><code>&nbsp;&nbsp;&nbsp; </code><code></code><code>
+hbox-&gt;show_all();<br>
+}<br>
+      <br>
+ArrowWindow::~ArrowWindow()<br>
+{<br>
+}<br>
+      <br>
+// Convenience macro for a simple
+main
+function<br>
+      <br>
+XFC_MAIN(ArrowWindow)</code> </div>
+      <br>
+      <h2>Compiling Arrow Buttons<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Arrow Buttons in the
+&lt;examples/howto/arrow&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/arrow&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Arrow Buttons, add the following lines to a
+new text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+arrow: arrow.cc arrow.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) arrow.cc -o arrow $(CFLAGS) `pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o arrow</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 164px; height: 90px;" alt="" src="../../images/arrow.png"><br>
+      </div>
+      <br>
+The XFC_MAIN macro is a convenience macro that writes a simple main
+function, its only argument is the name of the main window class. The
+macro is defined in &lt;xfc/main.hh&gt; as:<br>
+      <br>
+      <div class="fbox"><code>#define XFC_MAIN(MainWidget)\<br>
+&nbsp;&nbsp;&nbsp; int main (int argc, char *argv[])\<br>
+&nbsp;&nbsp;&nbsp; {\<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; Xfc::Main::init(&amp;argc,
+&amp;argv);\<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; MainWidget main_widget;\<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;
+main_widget.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));\<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; main_widget.show();\<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; Xfc::Main::run();\<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; return 0;\<br>
+&nbsp;&nbsp;&nbsp; }</code></div>
+      <br>
+Most main functions in C++ are simple because all the
+creation work for the main window is done inside its constructor, not
+the main function.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="arrow.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

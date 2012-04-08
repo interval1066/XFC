@@ -1,0 +1,328 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Button Boxes" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a></td>
+    </tr>
+    <tr class="fbox ebox" style="font-family: sans-serif;">
+      <td colspan="1" rowspan="1"><br>
+      <h1>Button
+Boxes</h1>
+      <br>
+Button Boxes are a convenient way to quickly layout a group of buttons.
+They come in both horizontal and vertical flavours. You create a new
+ButtonBox with one of the following constructors, which create a
+horizontal or vertical box, respectively:<br>
+      <br>
+      <div class="fbox"><code>HButtonBox(Gtk::ButtonBoxStyle
+layout = Gtk::BUTTONBOX_DEFAULT_STYLE, int
+spacing = default_spacing);<br>
+      <br>
+VButtonBox(Gtk::ButtonBoxStyle layout = Gtk::BUTTONBOX_DEFAULT_STYLE,
+int
+spacing = default_spacing);</code> </div>
+      <br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">The 'layout' argument sets the method used
+to spread the buttons in a
+button box. It can be one of the values from the Gtk::ButtonBoxStyle
+enum:<br>
+      <div style="text-align: left;">
+      <ul style="list-style-type: square;">
+        <li>BUTTONBOX_DEFAULT_STYLE
+- default packing.</li>
+        <li>BUTTONBOX_SPREAD -
+buttons are evenly spread across the
+ButtonBox.</li>
+        <li>BUTTONBOX_EDGE -
+buttons are placed at the edges of the
+ButtonBox.</li>
+        <li>BUTTONBOX_START -
+buttons are grouped towards the start of
+box,
+(on the left for a HBox, or the top for a VBox).</li>
+        <li>BUTTONBOX_END -
+buttons are grouped towards the end of a
+box, (on
+the right for a HBox, or the bottom for a VBox).</li>
+      </ul>
+The 'spacing' argument specifies the number of pixels to put between
+the
+buttons in the button box. The 'default_spacing' is defined as
+-1
+and implies zero pixels. The spacing can be set or retrieved using
+the inherited Gtk::Box::set_spacing() and Gtk::Box::get_spacing()
+methods.<br>
+      <br>
+      <div class="fbox"><code>void
+set_spacing(int
+spacing);<br>
+      <br>
+int
+get_spacing() const;</code> </div>
+      <br>
+The Button Box layout can be set or retrieved using the following
+methods, respectively.<br>
+      <br>
+      <div class="fbox"><code>void
+set_layout(Gtk::ButtonBoxStyle
+layout_style);<br>
+      <br>
+Gtk::ButtonBoxStyle get_layout() const;</code> </div>
+      <br>
+Buttons are added to a Button Box using the usual method,
+Gtk::Container::add():<br>
+      </div>
+      <div style="text-align: left;"> <br>
+      <div class="fbox"><code>buttonbox-&gt;add(*button);</code></div>
+      <br>
+      <h2><a name="example"></a>Button
+Box Example</h2>
+Here's an example that illustrates all the different layout settings
+for Button Boxes.<br>
+      <br>
+The header file for the Button Box example is
+&lt;buttonbox.h&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include
+&lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/button.hh&gt;<br>
+#include &lt;xfc/gtk/buttonbox.hh&gt;<br>
+#include &lt;xfc/gtk/frame.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using
+namespace Xfc;<br>
+      <br>
+class
+ButtonBoxFrame : public
+Gtk::Frame<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; ButtonBoxFrame(bool
+horizontal, const
+char *title, int
+spacing, Gtk::ButtonBoxStyle layout);<br>
+&nbsp;&nbsp;&nbsp; virtual
+~ButtonBoxFrame();<br>
+};<br>
+      <br>
+class
+ButtonBoxWindow : public
+Gtk::Window<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; ButtonBoxWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual
+~ButtonBoxWindow();<br>
+};</code> </div>
+      <br>
+and the source file is &lt;buttonbox.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "buttonbox.hh"<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+#include &lt;xfc/gtk/stockid.hh&gt;<br>
+      <br>
+// ButtonBoxFrame<br>
+      <br>
+ButtonBoxFrame::ButtonBoxFrame(bool horizontal, const char *title, int
+spacing, Gtk::ButtonBoxStyle layout)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_label(title);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::ButtonBox *bbox;<br>
+&nbsp;&nbsp;&nbsp; if (horizontal)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; bbox = new Gtk::HButtonBox;<br>
+&nbsp;&nbsp;&nbsp; else<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; bbox = new Gtk::VButtonBox;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; bbox-&gt;set_border_width(5);<br>
+&nbsp;&nbsp;&nbsp; add(*bbox);<br>
+&nbsp;&nbsp;&nbsp; bbox-&gt;set_layout(layout);<br>
+&nbsp;&nbsp;&nbsp; bbox-&gt;set_spacing(spacing);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::Button *button = new
+Gtk::Button(Gtk::StockId::OK);<br>
+&nbsp;&nbsp;&nbsp; bbox-&gt;add(*button);<br>
+&nbsp; <br>
+&nbsp;&nbsp;&nbsp; button = new Gtk::Button(Gtk::StockId::CANCEL);<br>
+&nbsp;&nbsp;&nbsp; bbox-&gt;add(*button);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; button = new Gtk::Button(Gtk::StockId::HELP);<br>
+&nbsp;&nbsp;&nbsp; bbox-&gt;add(*button);<br>
+}<br>
+      <br>
+ButtonBoxFrame::~ButtonBoxFrame()<br>
+{<br>
+}<br>
+      <br>
+// ButtonBoxWindow<br>
+      <br>
+ButtonBoxWindow::ButtonBoxWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("Button Boxes");<br>
+&nbsp;&nbsp;&nbsp; set_border_width(10);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::VBox *main_vbox = new Gtk::VBox;<br>
+&nbsp;&nbsp;&nbsp; add(*main_vbox);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Horizontal Button Boxes<br>
+&nbsp;&nbsp;&nbsp; Gtk::Frame *frame = new Gtk::Frame("Horizontal
+Button Boxes");<br>
+&nbsp;&nbsp;&nbsp; main_vbox-&gt;pack_start(*frame, true, true, 10);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::Box *box = new Gtk::VBox;<br>
+&nbsp;&nbsp;&nbsp; box-&gt;set_border_width(10);<br>
+&nbsp;&nbsp;&nbsp; frame-&gt;add(*box);<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; ButtonBoxFrame *button_box_frame = new
+ButtonBoxFrame(true, "Spread (spacing 40)", 40, Gtk::BUTTONBOX_SPREAD);<br>
+&nbsp;&nbsp;&nbsp; box-&gt;pack_start(*button_box_frame);<br>
+&nbsp;&nbsp;&nbsp; button_box_frame = new ButtonBoxFrame(true, "Edge
+(spacing 30)", 30, Gtk::BUTTONBOX_EDGE);<br>
+&nbsp;&nbsp;&nbsp; box-&gt;pack_start(*button_box_frame, true, true, 5);<br>
+&nbsp;&nbsp;&nbsp; button_box_frame = new ButtonBoxFrame(true, "Start
+(spacing 20)", 20, Gtk::BUTTONBOX_START);<br>
+&nbsp;&nbsp;&nbsp; box-&gt;pack_start(*button_box_frame, true, true, 5);<br>
+&nbsp;&nbsp;&nbsp; button_box_frame = new ButtonBoxFrame(true, "End
+(spacing 10)", 10, Gtk::BUTTONBOX_END);<br>
+&nbsp;&nbsp;&nbsp; box-&gt;pack_start(*button_box_frame, true, true, 5);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Vertical Button Boxes<br>
+&nbsp;&nbsp;&nbsp; frame = new Gtk::Frame("Vertical Button Boxes");<br>
+&nbsp;&nbsp;&nbsp; main_vbox-&gt;pack_start(*frame, true, true, 10);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; box = new Gtk::HBox;<br>
+&nbsp;&nbsp;&nbsp; box-&gt;set_border_width(10);<br>
+&nbsp;&nbsp;&nbsp; frame-&gt;add(*box);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; button_box_frame = new ButtonBoxFrame(false, "Spread
+(spacing 5)", 5, Gtk::BUTTONBOX_SPREAD);<br>
+&nbsp;&nbsp;&nbsp; box-&gt;pack_start(*button_box_frame);<br>
+&nbsp;&nbsp;&nbsp; button_box_frame = new ButtonBoxFrame(false, "Edge
+(spacing 30)", 30, Gtk::BUTTONBOX_EDGE);<br>
+&nbsp;&nbsp;&nbsp; box-&gt;pack_start(*button_box_frame, true, true, 5);<br>
+&nbsp;&nbsp;&nbsp; button_box_frame = new ButtonBoxFrame(false, "Start
+(spacing 20)", 20, Gtk::BUTTONBOX_START);<br>
+&nbsp;&nbsp;&nbsp; box-&gt;pack_start(*button_box_frame, true, true, 5);<br>
+&nbsp;&nbsp;&nbsp; button_box_frame = new ButtonBoxFrame(false, "End
+(spacing 20)", 20, Gtk::BUTTONBOX_END);<br>
+&nbsp;&nbsp;&nbsp; box-&gt;pack_start(*button_box_frame, true, true, 5);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; show_all();<br>
+}<br>
+      <br>
+ButtonBoxWindow::~ButtonBoxWindow()<br>
+{<br>
+}<br>
+      <br>
+int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; ButtonBoxWindow window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return 0;<br>
+}<br>
+      </code> </div>
+      <br>
+      <div style="text-align: center;">
+      <div style="text-align: left;">
+      <h2>Compiling Button Box<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Button Box in the
+&lt;examples/howto/buttonbox&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/buttonbox&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Button Box, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+buttonbox: buttonbox.cc buttonbox.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) buttonbox.cc -o buttonbox $(CFLAGS)
+`pkg-config xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o buttonbox</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      </div>
+      <div style="text-align: left;"><br>
+      </div>
+      <img style="width: 543px; height: 605px;" alt=""
+ src="../../images/buttonbox.png"><br>
+      </div>
+      <br>
+This window displays several vertical and horizontal button boxes, each
+using a different layout style.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="buttonboxes.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,668 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Getting Started with XFC" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"> <br>
+      <h1>Getting Started with XFC</h1>
+      <span style="text-decoration: underline;"><span
+ style="font-weight: bold;"></span></span>
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a class="mhl" href="getting_started.html#GS01">Overview</a></li>
+        <li><a class="mhl" href="getting_started.html#GS02">License</a></li>
+        <li><a class="mhl" href="getting_started.html#GS03">Installation</a></li>
+        <li><a class="mhl" href="getting_started.html#GS04">Documentation</a><br>
+        </li>
+        <li><a class="mhl" href="getting_started.html#GS05">The
+XFC Tutorial</a></li>
+        <li><a class="mhl" href="getting_started.html#GS06">Examples
+and Test
+Programs</a><br>
+        </li>
+        <li><a class="mhl" href="getting_started.html#GS07">Header
+Files</a></li>
+        <li><a class="mhl" href="getting_started.html#GS08">Virtual
+Signal Classes</a></li>
+        <li><a class="mhl" href="getting_started.html#GS09">Compiling
+an XFC
+application</a></li>
+      </ol>
+      <ul>
+      </ul>
+      <div align="justify"> <br>
+      <h2><a name="GS01"></a>Overview<span style="color: rgb(0, 0, 0);"></span></h2>
+      <div style="text-align: left;">GTK+
+programming in C++ is more
+efficient and more powerful than
+programming in C, and with the Xfce Foundation Classes (XFC) it's
+easier
+and a lot more fun. By combining&nbsp; the power of GTK+ and the
+power
+of C++, XFC provides the programmer with a well
+integrated
+set of C++ classes that wrap most of the functionality found in the
+GTK+ libraries. The Xfce Foundation Classes is divided into two main
+libraries: libXFCcore and
+libXFCui, but other add-on libraries planned, such as libXFCde which
+will provide a C++ interface for the Xfce core libraries.<br>
+      <br>
+The libXFCcore library wraps the GLib object system and selected
+objects
+from the GLIb utility library. Essentially, it provides a low level
+object system that can be used to build other libraries; libXFCui
+depends
+on this library. libXFCcore uses the new libsigc++
+2.0 callback library to implement a typesafe system of signals and
+slots that makes using native GObject signals or creating your own very
+easy. There is a standard string compatible UTF-8 string
+class, a complete reference manual and several test programs.<br>
+      <br>
+The libXFCui library is a state-of-the-art graphical user interface
+toolkit for developing GTK+ applications in C++. There are more than
+420 classes that wrap most of the objects found in the ATK, GDK,
+Gdk-Pixbuf, GTK and Pango libraries. Included is a C++ version of the
+GTK+ widget demonstration
+program, a full set of simple
+example programs, several test applications, an extensive reference
+manual
+and a tutorial.<br>
+      </div>
+      <br>
+      <h2><a name="GS02"></a>License<span style="color: rgb(0, 0, 0);"></span><span
+ style="color: rgb(0, 0, 0);"></span></h2>
+      <div style="text-align: left;">The
+Xfce Foundation Classes is
+released under the GNU Lesser General
+Public License so it can be
+used to&nbsp;develop open software, free software, or even
+commercial non-free software without having to spend
+anything for licenses or royalties.<br>
+      </div>
+      <br>
+      <h2><a name="GS03"></a>Installation<span
+ style="color: rgb(0, 0, 0);"></span></h2>
+      <div style="text-align: left;">The
+first thing to do of course
+is
+download the XFC source code and install it. You can always get the
+latest version from <a href="http://xfc.xfce.org">http://xfc.xfce.org</a>.
+You can also view other sources of information online. XFC uses
+GNU autoconf for configuration, so once untar'd run configure with the
+--help argument to see a list of options. You should use the <a
+ href="http://gcc.gnu.org/">GNU
+compiler</a> version
+3.3.2 (or higher) to compile XFC. <br>
+      </div>
+      <br>
+The libXFCcore library has the following dependancies:<br>
+      </div>
+      <ul>
+        <li>GLib+ 2.6.0
+or higher</li>
+        <li>Libsigc++ 2.0.6 or
+higher</li>
+        <li>PkgConfig 0.14 or
+higher</li>
+      </ul>
+      <div align="justify">The
+libXFCui library depends on libXFCcore and
+the following:<br>
+      </div>
+      <ul>
+        <li>ATK 1.9.0 or
+higher</li>
+        <li>GTK+ 2.6.0 or higher</li>
+        <li>Pango 1.8.0 or higher</li>
+      </ul>
+      <div align="justify">
+      <div style="text-align: left;">Most
+Linux distributions include these packages. Just make
+sure that
+the development packages are also installed on your system. Once XFC is
+installed you will find a complete reference manual and a tutorial
+in the &lt;docs&gt; directory. If the API reference manual is
+missing
+for some reason,
+don't
+worry. It's
+very likely
+your Linux distribution comes with a program called Doxygen,
+which should be in your &lt;usr/bin&gt; directory. XFC will use
+Doxygen to
+compile the API reference manual from special comments in the header
+files, when you run make for the first time. </div>
+      <br>
+You can compile and install XFC with the following commands run in the
+top-level
+source directory:<br>
+      <br>
+      <div class="fbox"><code>$
+./configure
+--prefix=directory<br>
+$ make<br>
+$ make install</code></div>
+      <br>
+      <div style="text-align: left;">The
+'--prefix' argument takes the
+directory
+where you want XFC installed. If the directory is omitted XFC
+will install itself into the &lt;usr/local&gt;
+directory. By default, configure builds libXFCcore and libXFCui with
+debugging and compiler symbols so you can debug your applications
+during development. If you want libXFCcore and libXFCui built without
+debugging symbols, run configure with the following option:<br>
+      <br>
+      <div class="fbox"><code>./configure
+--disable-debug</code></div>
+      <br>
+Alternativley, you can install the libXFCcore and libXFCui libraries
+with
+all debugging symbols stripped out by calling:<br>
+      <br>
+      <div class="fbox"><code>make
+install-strip</code></div>
+      <br>
+The stripped libraries are much
+smaller, and faster: libXFCcore is just 220 kbytes and libXFCui is 2.3
+megabytes.<br>
+      </div>
+      <br>
+If you don't want to build the API reference, or if you don't have
+Doxygen installed, run configure with the following option:<br>
+      <br>
+      <div class="fbox"><code>./configure
+--disable-docs</code></div>
+      <br>
+Other configure options include: --disable-demos, --disable-examples
+and --disable-tests, which disable the implied feature so it wont
+get
+compiled.<br>
+      <br>
+      <h2><a name="GS04"></a>Documentation</h2>
+      <div style="text-align: left;">The
+Xfce Foundation Classes comes
+with extensive documentation that you
+can refer to when you need help. You will find all the documentation in
+the XFC &lt;docs&gt; directory. The documentation is
+divided
+into a FAQ sheet, numerous HOWTOs with examples, an API reference
+manual and a
+tutorial.<br>
+      <br>
+The &lt;docs/faq&gt; subdirectory has a FAQ sheet that answers
+several
+commonly asked questions about XFC generally, and about GTK+
+programming with
+XFC. The
+&lt;docs/howto&gt; subdirectory is a respository for a large
+number of
+HOWTOs that cover everything from general information and library
+structure to individual widget programming. The
+&lt;docs/reference&gt;
+subdirectory contains a complete API reference manual. This manual is
+compiled
+by <a href="http://www.stack.nl/%7Edimitri/doxygen/">Doxygen</a>
+from
+special comments in the XFC header files. Every typedef, enum and
+class is documented, including all public and protected member
+functions and signals. <br>
+      </div>
+      <br>
+      <h2><a name="GS05"></a>The
+XFC Tutorial<span style="color: rgb(0, 0, 0);"></span></h2>
+      <div style="text-align: left;">
+      <div style="text-align: left;">There
+is a good GTK+ programming tutorial in the
+&lt;docs/tutorial&gt;
+subdirectory.
+This tutorial was designed with new GTK+ programmers in mind, so if
+that's you,
+and you take the time to work through each chapter you should gain a
+clear understanding of the basics of GTK+ programming in C++ using XFC.
+If you are already
+familiar with GTK+ progamming in C you should still find the first
+seven chapters helpful because they take you through you the
+basics of XFC programming. </div>
+      <br>
+The tutorial starts off in chapter one by creating a basic application,
+XfcApp, which is nothing more than an empty main window. In chapters
+two and three, two simple applications are created: Hello World and
+Hello Buttons, which serve to introduce you to important topics such as
+packing widgets, libsigc++ signals and slots, and virtual signal
+classes. The concept of&nbsp; 'packing
+widgets' is especially important because it forms the basis of user
+interface design in GTK+. The interesting stuff really begins in
+chapter four. Starting with the XfcApp program from chapter one,
+successive chapters take you through the process of enhancing XfcApp,
+adding features such as an action-based menubar and toolbar, a
+composite statusbar that looks and behaves just like a GNOME appbar,
+and a client area that responds to mouse button events by displaying a
+pop up context menu. <br>
+&nbsp;<br>
+The tutorial finishes off by covering two important topics that are
+essential for new
+programmers. Chapter eight takes you
+step-by-step through the process of turning XfcApp into a GNU compliant
+autotools project. Then chapter nine shows you how to add international
+support. If you already know how to build a GNU autotools project and
+how to add international support, you can skip these two chapters.<br>
+      <br>
+      </div>
+      <h2><a name="GS06"></a>Examples
+and Test Programs<br>
+      </h2>
+      <div style="text-align: left;">Several
+sources of well documented example code are provided to help you get
+started with XFC programming. There is the widget demonstration program
+(xfc-demo) in the &lt;demos/xfc-demo&gt; subdirectory that uses
+many of
+the available widgets, including newer ones like EntryCompletion,
+Expander and UIManager. In the &lt;examples&gt; directory there
+are a
+lot
+of example programs. Each program focuses on the use
+of a particular widget group and has an associated widget HOWTO in the
+&lt;docs/howto&gt; subdirectory. In the &lt;tests&gt;
+directory there
+are
+several test programs that take you step-by-step through the process of
+using the
+latest GTK+ widgets, like action-based menus and toolbars, combo
+boxes and the new FileChooser widget. The &lt;tutorial&gt;
+directory
+contains the full source code for the examples used in the XFC tutorial.<br>
+      <br>
+      </div>
+      <h2 style="text-align: left;"><a name="GS07"></a>Header
+Files<span style="color: rgb(0, 0, 0);"></span></h2>
+      <div style="text-align: left;">
+      <div style="text-align: left;">The
+XFC header files are well set
+out and easy
+to read. Each header file wraps one GTK+ object along with any helper
+classes, enums and typedefs it needs. Any other header files&nbsp;
+included are
+wrapped in an include guard to prevent multiple inclusions when
+compiling. The header
+file of a derived class always includes the header file of its
+immediate base
+class. This means you only have to include the most derived header file
+to include all the header files in an object's inheritance path. For
+example, including &lt;xfc/gtk/dialog.hh&gt; also includes
+&lt;xfc/gtk/window.hh&gt;, &lt;xfc/gtk/bin.hh&gt;,
+&lt;xfc/gtk/container.hh&gt;
+and &lt;xfc/gtk/widget.hh&gt; so you wouldn't need to include
+these header files. <br>
+      </div>
+      <br>
+A typical header file has the following layout:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>#ifndef
+XFC_GTK_BUTTON_HH<br>
+#define XFC_GTK_BUTTON_HH<br>
+      <br>
+#ifndef XFC_GTK_BIN_HH<br>
+#include &lt;xfc/gtk/bin.hh&gt;<br>
+#endif<br>
+      <br>
+#ifndef __GTK_BUTTON_H__<br>
+#include &lt;gtk/gtkbutton.h&gt;<br>
+#endif<br>
+      <br>
+namespace
+Xfc {<br>
+      <br>
+namespace
+Gtk {<br>
+      <br>
+class
+Button : public
+Bin<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Button(const
+Button&amp;);<br>
+&nbsp;&nbsp;&nbsp; Button&amp; operator=(const
+Button&amp;);<br>
+      <br>
+protected:<br>
+//
+Constructors<br>
+&nbsp;&nbsp;&nbsp; explicit
+Button(GtkButton *button, bool
+owns_reference
+= false);<br>
+      <br>
+//
+Signals<br>
+&nbsp;&nbsp;&nbsp; typedef
+G::Signal0&lt;void&gt;
+ClickedSignalType;<br>
+&nbsp;&nbsp;&nbsp; typedef
+G::SignalProxy&lt;TypeInstance, ClickedSignalType&gt;
+ClickedSignalProxy;<br>
+&nbsp;&nbsp;&nbsp; static
+const
+ClickedSignalType clicked_signal;<br>
+      <br>
+public:<br>
+//
+Constructors<br>
+&nbsp;&nbsp;&nbsp; Button();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; virtual
+~Button();<br>
+      <br>
+//
+Accessors<br>
+&nbsp;&nbsp;&nbsp; GtkButton*
+gtk_button() const;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; operator
+GtkButton* () const;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; bool
+get_use_underline()const;<br>
+      <br>
+//
+Methods<br>
+&nbsp;&nbsp;&nbsp; void
+clicked();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; void
+set_use_underline(bool
+use_underline);<br>
+      <br>
+//
+Signal Proxies<br>
+&nbsp;&nbsp;&nbsp; const
+ClickedSignalProxy
+signal_clicked();<br>
+};<br>
+      <br>
+} //
+namespace Gtk<br>
+      <br>
+} //
+namespace Xfc<br>
+      <br>
+#endif
+// XFC_GTK_BUTTON_H</code> </div>
+      <samp></samp><br>
+      <div style="text-align: left;">
+      <div style="text-align: left;">This
+cut down version of
+&lt;xfc/gtk/button.hh&gt; should
+help you better understand the XFC header files. As you can see the
+class members have a specific organization. First all private
+members are declared, then any protected members, and last the public
+members. I find this layout helpful in understanding how an
+unfamiliar object works. <br>
+      </div>
+      <br>
+      <div style="text-align: left;">The
+copy constructor and
+assignment operator are declared private to
+prevent inadvertent copying. &nbsp;Most objects will have a
+protected
+constructor like Gtk::Button's. This constructor wraps a pointer to a
+new GtkButton object and sets its 'owns_reference' flag to false,
+telling XFC
+that initially the button is in an unowned floating state with a
+reference count of 1. Next any protected accessors and
+methods
+are declared and then any <a href="object_system.html">properties</a>
+and <a href="signal_system.html">signals</a>.
+The button class
+declares no properties. Gtk::Button has six protected signals but only
+one is shown here: the clicked_signal. You would not connect a function
+slot to a protected signal directly because it requires an object
+instance. If you did, you would do it like this:<br>
+      </div>
+      </div>
+      <br>
+      <div class="fbox"><code>clicked_signal.connect(this,
+sigc::mem_fun(this,
+&amp;MyButton::clicked_function));</code></div>
+      <samp></samp><br>
+      <div style="text-align: left;">Instead,
+you would use the
+signal's public proxy function,
+signal_clicked():<br>
+      </div>
+      <br>
+      <div class="fbox"><code>Gtk::Button
+*button = new
+Gtk::Button("Click Me");<br>
+button-&gt;signal_clicked().connect(</code><code>sigc::mem_fun</code><code>(this,
+&amp;MyWindow::clicked_function));</code> </div>
+      <samp></samp><br>
+      <div style="text-align: left;">As
+you possibly guessed, signal_clicked() is
+a convenience method that passes the
+button's 'this' pointer implicitly to the protected clicked_signal.<br>
+      <br>
+In the public section of the button class any constructors and
+the destructor are declared first, followed by any accessors, then any
+methods, and last any proxy property and proxy signal functions. Most
+classes
+have two public accessor functions similar to these:<br>
+      <samp></samp><br>
+      </div>
+      <div class="fbox"><code>GtkButton*
+gtk_button() const;<br>
+operator
+GtkButton* () const;</code> </div>
+      <br>
+      <div style="text-align: left;">The
+first function, gtk_button(),
+is an inline function that returns a pointer to the underlying
+GtkButton object. The last function is Gtk::Button's
+conversion operator. It does an implicit conversion from a
+Gtk::Button object to a GtkButton pointer safely, by testing for
+null. The proxy signal functions are declared last and are
+inline functions that return a temporary proxy object that makes the
+signal connection. <br>
+      </div>
+      <br>
+      <h2><a name="GS08"></a>Virtual
+Signal Classes<span style="color: rgb(0, 0, 0);"></span></h2>
+      <div style="text-align: left;">XFC
+does not declare virtual
+signal handlers in the widget classes.
+Instead, they are declared in a separate class hierarchy to minimize
+the overhead associated with implementing
+large numbers of virtual functions. If you want to override one or more
+virtual signal handlers for a widget class, your class must multiplely
+inherit
+from an appropriate signal handler class. <br>
+      <br>
+For example, if you wanted to override the "delete_event" signal
+handler you would declare your window class like this:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>#include
+&lt;xfc/gtk/window.hh&gt;<br style="color: rgb(0, 102, 0);">
+#include
+&lt;xfc/gtk/widgetsignals.hh&gt;<br>
+      <br>
+class
+MyWindow
+: public
+Gtk::Window, protected
+Gtk::WidgetSignals<br>
+{<br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; virtual
+bool
+on_delete_event(const
+Gdk::EventAny&amp; event);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; MyWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual
+~MyWindow();<br>
+};</code> </div>
+      <br>
+      <div style="text-align: left;">and
+you would define the window
+constructor like this:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>MyWindow::MyWindow<br>
+: Gtk::WidgetSignals(this)<br>
+{<br>
+}</code></div>
+      <br>
+      <div style="text-align: left;">Each
+widget that receives GTK+
+signals has a corresponding signal
+class. Your class can multiplely inherit from this signal class or one
+of its
+ancestor signal classes. In the above example, MyWindow could have
+inherited from Gtk::WindowSignals but it only needs to override
+on_delete_event(), so it inherits from Gtk::WidgetSignals. There is one
+important point to note here. A signal class header file should be
+included
+after the include for the corresponding widget class header file. This
+is because
+signal class header files do not include widget class header files.<br>
+      </div>
+      <span style="font-weight: bold;"></span> <br>
+      <h2><a name="GS09"></a>Compiling
+an XFC Application<span style="color: rgb(21, 67, 116);"></span></h2>
+      <div style="text-align: left;">To
+compile an XFC application you
+need to use pkg-config which can be
+obtained from <a href="http://www.freedesktop.org/">http://www.freedesktop.org</a>.
+pkg-config is a tool for managing library compile and link flags during
+make file exceution. It reads the xfcui-X.X.pc file (X.X is the version
+number)
+which comes with XFC to
+determine what compiler switches are needed to compile an XFC program.
+The --cflags option will output a list of include
+directories for the compiler to look in, and the --libs option will
+output the list of libraries for the compiler to link with and the
+directories to find them in. For example, a typical compile command
+would look like this:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>g++ </code><code></code><code>-Wall
+-g
+-O2 helloworld.cc -o helloworld `pkg-config xfcui-X.X
+--cflags --libs`</code></div>
+      <br>
+      <div style="text-align: left;">Replace
+X.X with the major and
+minor version numbers of the libXFCui library installed on your
+system.&nbsp; Note
+that the type of single quote
+used in the compile command
+above is significant. The
+libraries that are linked by
+this command are:&nbsp;</div>
+      <ul>
+        <li style="text-align: left;">The
+libXFCcore library
+(-lxfccore), the core object library.</li>
+        <li style="text-align: left;">The
+libXFCui library
+(-lxfcui), the application development
+platform based on GTK+.</li>
+        <li style="text-align: left;">The
+GTK library
+(-lgtk), the widget library, based on top
+of
+GDK.</li>
+        <li style="text-align: left;">The
+GDK library
+(-lgdk), the Xlib wrapper.</li>
+        <li style="text-align: left;">The
+gdk-pixbuf library
+(-lgdk_pixbuf), the image
+manipulation
+library.</li>
+        <li style="text-align: left;">The
+Pango library
+(-lpango) for internationalized text.</li>
+        <li style="text-align: left;">The
+gobject library
+(-lgobject), containing the type system
+on
+which GTK is based.</li>
+        <li style="text-align: left;">The
+gmodule library
+(-lgmodule), which is used to load run
+time
+extensions.</li>
+        <li style="text-align: left;">The
+GLib library
+(-lglib), containing miscellaneous
+functions;
+GTK is built on top of GLib so you will always require this library.</li>
+        <li style="text-align: left;">The
+Xlib library
+(-lX11) which is used by GDK.</li>
+        <li style="text-align: left;">The
+Xext library
+(-lXext). This contains code for shared
+memory
+pixmaps and other X extensions.</li>
+        <li style="text-align: left;">The
+math library
+(-lm). This is used by GTK for various
+purposes.</li>
+      </ul>
+      </div>
+      <div align="justify"> <br>
+      <div style="text-align: left;">
+      <hr style="width: 100%; height: 1px;"></div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="getting_started.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

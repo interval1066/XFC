@@ -1,0 +1,452 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="whitestripe"
+ style="background-color: rgb(255, 255, 255); text-align: center; height: 25px;"><span
+ style="font-weight: bold; font-family: Helvetica,Arial,sans-serif; color: rgb(17, 55, 95);">Xfce
+Foundation Classes</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="greybluestripe" colspan="1" rowspan="1">&nbsp;&laquo; <a
+ class="qindexH" href="../../index.html">Main Page</a><span
+ class="qindexH"> </span></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><br>
+      <h1>Frequently Asked Questions</h1>
+      <h3>Table of contents</h3>
+      <ol>
+        <li><a class="mhl" href="index.html#faq01">What is GTK+?</a></li>
+        <li><a class="mhl" href="index.html#faq02">What are the Xfce
+Foundation Classes?</a></li>
+        <li><a class="mhl" href="index.html#faq03">How has XFC evolved?</a></li>
+        <li><a class="mhl" href="index.html#faq04">What are the goals
+of XFC?</a></li>
+        <li><a class="mhl" href="index.html#faq05">What is the
+relationship between XFC and GTK+?</a></li>
+        <li><a class="mhl" href="index.html#faq06">Why use XFC instead
+of GTK+?</a></li>
+        <li><a class="mhl" href="index.html#faq07">What does XFC
+include?</a></li>
+        <li><a class="mhl" href="index.html#faq08">How does XFC improve
+on GTK+?</a></li>
+        <li><a class="mhl" href="index.html#faq09">How does XFC differ
+from the other C++ language
+bindings for GTK+?</a></li>
+        <li><a class="mhl" href="index.html#faq10">How does the XFC
+virtual signal class system work?</a></li>
+        <li><a class="mhl" href="index.html#faq11">How does XFC memory
+management work?</a></li>
+        <li><a class="mhl" href="index.html#faq12">What modules
+does XFC distribute?</a></li>
+        <li><a class="mhl" href="index.html#faq13">How is XFC
+licensed?</a></li>
+        <li><a class="mhl" href="index.html#faq14">What
+documentation is there?</a></li>
+      </ol>
+      <br>
+      <h2><a name="faq01"></a>What is GTK+?</h2>
+      <a href="http://www.gtk.org">GTK+</a> is a powerful graphical
+user interface library originally designed
+for the Linux platform. Written completely in C, it comprises a
+collection of graphical objects, such as buttons, menus&nbsp; and
+dialogs, and
+the function calls needed to implement them. The graphical objects are
+known as widgets and the collection of widgets is known as the GIMP
+toolkit or the GTK+ widget set.<br>
+&nbsp;&nbsp;<br>
+      <h2><a name="faq02"></a>What are the Xfce Foundation Classes?</h2>
+The Xfce Foundation Classes (XFC) is a set of well integrated C++
+classes that wrap the functionality provided by GTK+ into a
+light-weight and easy to use application framework. Such frameworks are
+called language bindings. Here are some other C++ language bindings you
+might be familiar with:<br>
+      <ul>
+        <li>the <a href="http://www.gtkmm.org">Gtkmm</a> package is a
+high level C++ encapsulation that
+includes the use of exceptions, STL-like widget interfaces, template
+classes and offers both automatic memory management and normal C++
+memory management techniques. </li>
+        <li>the <a href="http://vdkbuilder.sf.net">VDK/VDKBuilder</a>
+package, which is a Borland-like builder
+for rapid application development. VDK is a C++ wrapper for GTK+.
+VDKBuilder is a general purpose integrated
+development environment for constructing GUI applications using VDK.
+VDK was built as the base library for VDKBuilder and therefore
+implements an object hierarchy and API more suited to rapid application
+development.</li>
+        <li>the <a href="http://www.wxwidgets.org">wxWindows/GTK</a>
+package, which is a free C++
+library for cross-platform GUI development. Currently it supports MS
+Windows, Unix with GTK+, Unix with Motif, and Mac OS.</li>
+      </ul>
+There are many language bindings available for GTK+, including C#,
+Java, Objective-C, Guile, Perl and PyGtk. You can find more information
+on these and others in the <a href="http://www.gtk.org/bindings.html">bindings</a>
+page on the&nbsp; GTK+ web site.<br>
+&nbsp;&nbsp;<br>
+      <h2><a name="faq03"></a>How has XFC evolved?</h2>
+The Xfce Foundation Classes is not a new library but rather the latest
+incarnation of a stable library that has been in development for the
+past 5 years.&nbsp; XFC started out as the GCode library in early 2000,
+about the same time that GTK+ development version 1.3.1 was released.
+Unfortunately for GCode there was a CAD program of the same name, so a
+new name had to be found, not an easy task! Havoc Pennington was
+approached and he kindly agreed to let GCode use the name Inti,
+originally a set of C++ foundation libraries written by him but no
+longer in active development. Inti was the original library on which
+GCode was based.<br>
+&nbsp; <br>
+Under the new project name, Inti: Integrated Foundation Classes,
+stable versions up to 1.2.0 were released. During the development of
+the Inti 2.0 source code base it was decided to change the project name
+to GTK+ Foundation Classes, to better reflect the library's usage as a
+GTK+ language binding. To get this name Inti had to merge with two
+abandoned projects, GFC: GNU/GTK Foundation Classes and GFCLIB: GNU/GTK
+Foundation Classes. GFC 2.3.1 was the only release made under the newly
+merged project. Prior to its first stable release GFC became a part of
+the Xfce project.<br>
+&nbsp;<br>
+A lot of time has been spent developing the GFC source code base,
+which had been a 'one-person' project. With the source code now mature
+and stable the time was right for the library to become part of a
+larger project, to assure its continued development. The Xfce Desktop
+Environment was the obvious choice because many of its goals were
+similar. Under the new name: Xfce Foundation Classes, the library is
+now an integral part of the Xfce project. Compared with the early days,
+the source code base has continually improved and evolved to the point
+now where XFC is essentially a complete rewrite; almost none of the
+original source code is left.<br>
+&nbsp;&nbsp;<br>
+      <h2><a name="faq04"></a>What are the goals of XFC?</h2>
+The main goal for the Xfce Foundation Classes is to implement a
+light-weight, fast and easy to use C++ interface that adheres to the
+GTK+ programming paradigm, so programmers can continue use the concepts
+they're already familiar with.<br>
+&nbsp;<br>
+Some other goals are: <br>
+      <ul>
+        <li>Only implement essential C++ features.&nbsp;</li>
+        <li>Stable interfaces, with an upgrade path that follows the
+Xfce Desktop Environment release cycle.&nbsp;</li>
+        <li>Use of the standard C++ library features.&nbsp;</li>
+        <li>Automatic memory management to help prevent memory
+leaks.&nbsp;</li>
+        <li>Consistency; to make XFC easier to learn, the interfaces
+religiously follow strict conventions.</li>
+        <li>Ease of use;&nbsp; XFC gives you an integrated package,
+with all the interfaces you need.</li>
+        <li>Documentation; stable releases of XFC will have excellent
+documentation. </li>
+        <li>Maturity; XFC will not be maintained as a 'bleeding edge'
+library; it will support features as they become mature.</li>
+      </ul>
+      <br>
+      <h2><a name="faq05"></a>What is the relationship between XFC and
+GTK+?</h2>
+GTK+ is a C toolkit that comprises several component libraries. These
+include:<br>
+      <ul>
+        <li>the ATK Accessibility Toolkit</li>
+        <li>the GDK Drawing Kit</li>
+        <li>&nbsp;the GDK-PIXBUF Image Library</li>
+        <li>the GLib utility library</li>
+        <li>the GTK GUI Toolkit</li>
+        <li>the Pango internationalized text handling library</li>
+      </ul>
+The Xfce Foundation Classes wraps these libraries in a consistent and
+easy to use C++ interface. XFC should be immediately familiar to most
+GTK+ programmers because it uses the same widget hierarchy, and the
+same API names and identifiers. <br>
+      <br>
+      <h2><a name="faq06"></a>Why use XFC instead of GTK+?</h2>
+Over the years application programming has become more complex. Today,
+C++ is a better way the manage that complexity because it provides you
+with a variety of programming designs, both object-oriented and
+conventional, that let you develop high-quality applications. Properly
+used, C++ code is easily maintainable, is extensible and can be
+performance and memory efficient.<br>
+&nbsp;<br>
+The Xfce Foundation Classes is a compact but comprehensive C++ wrapper
+around the GTK+ library. XFC judiciously uses C++ language features and
+does not layer on too much extra C++ complexity. Its API is easy to
+understand and use, and should feel immediately familiar to most GTK+
+programmers. Throughout its development XFC has maintained a good
+balance between remaining faithful to GTK+ and remaining faithful to
+C++. Hence the catchphrase - "the power of gtk+, the power of c++". <br>
+      <br>
+      <h2><a name="faq07"></a>What does XFC include?</h2>
+The Xfce Foundation Classes includes C++ wrappers for most features
+implemented in the GTK+
+package. These include: <br>
+      <ul>
+        <li>A GUI toolkit</li>
+        <li>An Accessibility Toolkit for writing programs for the
+disabled.</li>
+        <li>Internationalized text handling.</li>
+        <li>Main loop support </li>
+        <li>A signal system.</li>
+        <li>A UTF-8 string class.</li>
+      </ul>
+      <br>
+      <h2><a name="faq08"></a>How does XFC improve on GTK+?</h2>
+The Xfce Foundation Classes adds a number of C++ features: <br>
+      <ul>
+        <li>Namespace support </li>
+        <li>Type safety, no need for type casting. </li>
+        <li>Use of C++ native types such as string and vector.</li>
+        <li>Automatic memory management.</li>
+        <li>Derivation of new widgets using standard C++ mechanisms. </li>
+        <li>Deprecated and legacy interfaces that have built up over
+the years in GTK+ are not included in XFC. </li>
+        <li>Full wrapper for all C types, including enumerations and
+GDK types.</li>
+        <li>Typesafe C++ signal system based on the new libsigc++ 2.0
+callback library.</li>
+        <li>Widget signal classes that minimize the overhead of
+implementing large numbers of virtual signal handlers.</li>
+      </ul>
+      <br>
+      <h2><a name="faq09"></a>How does XFC differ from the other C++
+language bindings for
+GTK+?</h2>
+The differences between the Xfce Foundation Classes and other C++
+language bindings for GTK+ include: <br>
+      <ul>
+        <li>The use of virtual signal classes which are optimized for
+size, execution speed and performance.</li>
+        <li>The judicious use of C++ language features to improve
+performance. </li>
+        <li>Minimal use of exceptions, leaving the decision whether or
+not to use exceptions optional and up to the user.</li>
+        <li>No STL-like widget interfaces; to avoid adding extra layers
+of C++ object code and risking a bloated interface.</li>
+        <li>The use of the new libsigc2 callback library to implement a
+typesafe system of C++ signals and slots as an alternative to the
+virtual signal classes.</li>
+        <li>The use of automatic C++ memory management based on the
+GTK+ reference counting system.</li>
+      </ul>
+      <br>
+      <h2><a name="faq10"></a>How does the XFC
+virtual signal class system work?</h2>
+Most C++ language bindings put widget virtual signal handlers, all 70+
+of them, directly into their respective widget classes. This hooks each
+virtual signal handler directly into the GTK+ signal emission chain. As
+a result, every time a GTK+ widget signal is emitted the corresponding
+virtual signal handler gets called, which usually does nothing but call
+the default GTK+ signal handler. What a waste! Each widget ends up with
+huge virtual function table filled with 70+ entries, and the overhead
+needed to call them. And that's just for one widget. Multiply that by
+all
+the widgets in your application and it starts to add up.<br>
+&nbsp;<br>
+The pre-eminent goal for the Xfce Foundation Classes was to implement a
+virtual signal handler system that overcame these problems. It took
+some time to develop but the result is impressive. Now there is real
+potential for smaller, faster applications, depending on your C++
+programming style. So how does the virtual signal class system work? In
+XFC, all widget
+virtual signal handlers have been moved into an abstract signal class
+hierarchy. To override one or more widget signal handlers a custom
+widget class must multiplely inherit from its parent widget's signal
+class, or one of its base signal classes. For example, to customize
+your main window by overriding one or more Gtk::Widget signal handlers
+you would derive your window class like this:<br>
+&nbsp;<br>
+      <div class="fbox"><code>#include
+&lt;xfc/gtk/window.hh&gt;<br>
+#include &lt;xfc/gtk/widgetsignals.hh&gt;<br>
+&nbsp;<br>
+using namespace Xfc;<br>
+      <br>
+class MyWindow : public Gtk::Window, protected
+Gtk::WidgetSignals<br>
+{<br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; virtual bool
+on_delete_event(const Gdk::EventAny&amp; event);<br>
+&nbsp;&nbsp;&nbsp; virtual bool
+on_configure_event(const Gdk::EventConfigure&amp; event);<br>
+&nbsp;&nbsp;&nbsp; virtual bool
+on_expose_event(const Gdk::EventExpose&amp; event);<br>
+&nbsp;<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; MyWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual ~MyWindow();<br>
+&nbsp;};<br>
+&nbsp;<br>
+MyWindow::MyWindow()<br>
+: Gtk::WidgetSignals(this)<br>
+{<br>
+}</code></div>
+      <br>
+The on_delete_event(), on_configure_event() and
+on_expose_event() signal handlers are all inherited from
+Gtk::WidgetSignals. One thing to note here is that the widget header
+file
+must be included before the widget signal header file. This is because
+signal class header files are interfaces and don't include widget
+header files. The other thing to note is that the Gtk::WidgetSignals
+constructor takes a widget pointer as its only argument. This enforces
+type safety and simplifies the inheritance hierarchy.<br>
+      <h2><a name="faq11"></a>How does XFC memory management work?</h2>
+The Xfce Foundation Classes uses GTK+ reference counting to manage the
+memory of its objects. This ensures that the principles of memory
+management are kept consistent across the GTK+ and XFC libraries, and
+it
+minimizes the risks of memory leaks. Essentially, if you already know
+how to manage memory in GTK+ using functions like g_object_ref() and
+g_object_unref() then you already know how to manage memory in XFC
+using
+the corresponding functions ref() and unref().<br>
+&nbsp;<br>
+Most XFC objects can either be created dynamically on the heap or
+automatically on the stack. When you create a XFC object dynamically
+by calling operator new, the caller is responsible for correctly
+handling the new object's reference count. Objects that derive directly
+from G::Object, but not Gtk::Object, are created with an initial
+reference count of one. This reference count is owned by the caller and
+must be explicitly released by calling unref(). Objects that derive
+from Gtk::Object are also created with an initial reference count of
+one, but unlike G::Objects the initial reference count is floating. A
+floating reference count is not owned by any object. Its purpose is the
+keep the new Gtk::Object alive until an owner calls ref() on the object
+for the first time. The first call to ref() will automatically sink a
+floating object so there is no sink() function. Once a new Gtk::Object
+has been referenced it is no longer floating but its reference count
+will still be one. At this point the caller owns the new Gtk::Object
+and is responsible for releasing its initial reference count by calling
+unref().<br>
+&nbsp;<br>
+One thing to note about Gtk::Objects. You can pass a newly created
+Gtk::Object as an argument to any standard XFC API method, or add it to
+a container widget, without calling ref(). This is because object
+methods that take a Gtk::Object as an argument will call ref() on the
+object and take ownership. The same goes for containers. So as a
+general rule you don't need to call ref() on a Gtk::Object unless you
+specifically want to hold on to a reference.<br>
+&nbsp;<br>
+Here are a few memory management rules that should be remembered:<br>
+      <ul>
+        <li>If you call operator new to create a G::Object you must
+call unref() on the object when it's no longer required.</li>
+        <li>You don't need to call unref() on a new Gtk::Object if you
+pass
+it as an argument to a standard XFC API function or add it to a widget
+container.</li>
+        <li>Otherwise, you only need to call unref() if you first
+called ref().</li>
+        <li>Every call to ref() must be accompanied by a call to
+unref().</li>
+        <li>Never call operator delete on a XFC object. When you call
+unref()
+on a XFC object, delete is automatically called when the object's
+reference count reaches zero. </li>
+        <li>You can ignore the initial reference count for automatic
+stack
+objects, but if you do call ref() on one you must also call unref(). </li>
+        <li>Never call unref() on a Gtk::Window. GTK+ owns all top
+level
+windows. The correct way to destroy a top level window is to call
+dispose().</li>
+        <li>Having remembered all this, there is an easier way to
+handle an
+object's initial reference count. XFC provides Pointer&lt;&gt;, a
+special smart pointer that knows how to handle a XFC object's initial
+reference count. It also provides automatic memory management similar
+to std::auto_ptr&lt;&gt;.</li>
+      </ul>
+      <br>
+      <h2><a name="faq12"></a>What modules does XFC distribute?</h2>
+Currently there are two modules in the Xfce Foundation Classes, the
+core object system and utility library (libXFCcore) and the user
+interface library (libXFCui), but other modules are planned.<br>
+&nbsp;<br>
+libXFCcore wraps the GLib object system and selected objects from
+the GLIb utility library. Essentially it provides a low level object
+system that can be used to build other libraries; libXFCui depends on
+this library. libXFCcore uses the new libsigc++ 2.0 callback library to
+implement a system of signals and slots which make using native GObject
+signals or creating your own signals easy. There is a standard string
+compatible UTF-8 string class, reference documentation and several test
+programs.<br>
+      <br>
+libXFCui combines the power of GTK+ and the power of C++ into a
+state-of-the-art user interface toolkit that makes developing
+GTK+ applications in C++ easy, intuitive and efficient. There are more
+than 420 classes that wrap most of the objects found in the ATK, GDK,
+Gdk-pixbuf, GTK and Pango libraries. Included is a full set of simple
+example programs, a C++ version of the GTK+ widget demonstration
+program, extensive reference documentation and a new tutorial.<br>
+&nbsp;<br>
+      <h2><a name="faq13"></a>How is XFC licensed?</h2>
+The Xfce Foundation Classes is licensed under the GNU Library or Lesser
+General Public License
+(LGPL), similar to most libraries on the Linux operating system. In
+general terms, this means that it's OK to develop proprietary software
+with XFC; however you should read the license yourself (or have your
+lawyers read it), in order to get all the details about your rights and
+responsibilities.<br>
+&nbsp;<br>
+      <h2><a name="faq14"></a>What documentation is there?</h2>
+Stacks! The documentation can be found in the &lt;doc&gt;
+subdirectory where the Xfce Foundation Classes was installed, usually
+&lt;/usr/share/doc&gt;
+for stable releases. There are four kinds of documentation: this FAQ
+sheet, the API reference manual, a new tutorial and numerous widget
+HOWTOs with examples. <br>
+&nbsp;<br>
+The API reference manual is written with Doxygen, so if you look at the
+header files you will find them filled with doxygen comments. The XFC
+tutorial takes you step-by-step through the process of writing three
+simple XFC applications. Then using one of these programs, XfcApp, it
+shows you how to write a feature packed main window that can be used as
+a starting point for any application. The tutorial finishes up by
+building XfcApp into GNU compliant autotols project with international
+language support. New to XFC are the numerous widget HOWTOs, one for
+most widgets, that discuss how each widget is used and works through a
+real example. <br>
+&nbsp;<br>
+      <hr style="height: 1px; width: 100%;">
+      <table style="text-align: left; width: 100%;" border="0"
+ cellpadding="0" cellspacing="0">
+        <tbody>
+          <tr>
+            <td
+ style="vertical-align: top; white-space: nowrap; text-align: left; font-style: italic; width: 33%;"><small>Copyright
+&copy; 2004-2005 The XFC
+Development Team</small></td>
+            <td
+ style="vertical-align: middle; white-space: nowrap; text-align: center;"><a
+ class="qindexF" href="index.html">Top</a> </td>
+            <td
+ style="vertical-align: top; white-space: nowrap; text-align: right; width: 33%;"><small>XFC
+4.4</small> <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

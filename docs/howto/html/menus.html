@@ -1,0 +1,726 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Menus" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Menus</h1>
+      <br>
+There are two ways to create menus in GTK+. You can use the <a
+ href="uimanager.html">User Interface Manager</a> which constructs menu
+and toolbar widgets from an XML description, or you can use a
+Gtk::MenuShell and create the menus manually. It is a lot easier to use
+the user interface manager (Gtk::UIManager) because it takes care of
+constructing both menus and toolbars from one set of UI definitions.
+There will be times though when you will want to create menus manually.<br>
+      <br>
+Gtk::MenuShell is the abstract base class used to derive Gtk::MenuBar
+and
+Gtk::Menu. A MenuShell is a container of <a href="menuitems.html">menu
+item</a> objects arranged in a list
+which can be navigated, selected, and activated by the user to perform
+application functions. A menu item can have a submenu associated with
+it, allowing for nested hierarchical menus. <br>
+      <br>
+MenuBar is a subclass of MenuShell which contains one or more menu
+item. The result is a standard menu bar which can hold many menu
+items. Menu is a MenuShell that implements a drop down menu
+consisting of a list of menu item objects which can be navigated and
+activated by the user to perform application functions. A Menu is most
+commonly dropped down by activating a menu item in
+a MenuBar or popped up by activating a menu item in another Menu.
+Widgets such as Gtk::Entry, Gtk::Notebook and Gtk::TextView can also
+pop up a Menu, but these are context menus that contain menu items
+specific to the widget. <br>
+      <br>
+      <div style="text-align: left;">There are three widgets that go
+into making a
+menubar with submenus:<br>
+      </div>
+      <ul style="list-style-type: square;">
+        <li>a menu item -&nbsp; which is what the user wants to select,
+e.g., 'Save'</li>
+        <li>a menu -&nbsp; which acts as a container for the menu
+items, and</li>
+        <li>a menubar - which is a container for each of the individual
+menus.</li>
+      </ul>
+Menu item widgets are
+used for two different things. They are both the widgets that are
+packed
+into the menu, and the widget that is packed into the menubar, which,
+when selected, activates the menu.<br>
+      <br>
+Let's look at the constructors that are used to create menubars and
+menus. This first constructor is used to create a new menubar:<br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <div class="fbox"><code>MenuBar();</code></div>
+      <br>
+      </div>
+You can either use Gtk::Container::add() to
+add
+the new menubar to a window, or the Gtk::Box <a href="boxes.html">packing
+methods</a> to pack it
+into a box - the same as for buttons.<br>
+      <div style="text-align: left;"> <br>
+There are two constructors that create a new menu: <br>
+      <br>
+      <div class="fbox"><code> Menu();<br>
+      <br>
+Menu(const AccelGroup&amp;
+accel_group);</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">The 'accel_group' argument is the
+accelerator group which holds the global accelerators for this menu.
+The
+first constructor creates the accelerator group for you which can be
+retrieved by calling:<br>
+      </div>
+      <div style="text-align: left;"> <br>
+      <div class="fbox"><code>Gtk::AccelGroup*
+get_accel_group() const;</code></div>
+      <br>
+The next three constructors are used to create menu items that are
+packed into menubars and menus:<br>
+      <br>
+      <div class="fbox"><code>MenuItem();<br>
+      <br>
+MenuItem(const String&amp; label, bool
+use_underline = false);<br>
+      <br>
+MenuItem(const String&amp; label,
+Gtk::Menu&amp; submenu, bool
+use_underline
+= false);</code> </div>
+      <br>
+The 'label' argument is the menu item
+text, 'submenu'
+is a menu to associate with the menu item and 'use_underline<em>',</em>
+if true<em></em>, specifies that label should be parsed for
+the
+mnemonic character. The first constructor creates an empty menu item,
+the second constructor creates a menu item with a label already packed
+into it and the last constructor creates a menu item that displays
+another menu when activated. <br>
+      <br>
+There are other more specialized <a href="menitems.html">menu items</a>
+which can be used to construct menus. ImageMenuItem displays an image
+next to the text string. CheckMenuitem displays a checkbutton that can
+be in an active or inactive state. RadioMenuItem displays a radiobutton
+as part of a group which only allows one active menu item at a time.
+SeparatorMenuItem displays a separator line in the menu and
+TearoffMenuItem allows its menu to be torn off and displayed in a
+separate window.<br>
+      <br>
+Once you have created a menu item you have to put it into a menu. This
+is
+done using one of the Gtk::MenuShell methods: append, prepend or
+insert. There are several indentical overloaded methods for each. These
+are the append methods:<br>
+      <br>
+      <div class="fbox"><code>void append(MenuItem&amp; item);<br>
+      <br>
+void
+append(MenuItem&amp; item, const
+sigc::slot&lt;void&gt;&amp; callback);<br>
+      <br>
+void
+append(MenuItem&amp; item, const
+AccelKey&amp; accel_key, const
+sigc::slot&lt;void&gt;&amp; callback);<br>
+      <br>
+void
+append(MenuItem&amp; item, const
+AccelKey&amp; accel_key, AccelGroup&amp; accel_group, const
+sigc::slot&lt;void&gt;&amp; callback);<br>
+      <br>
+void append(const StockId&amp; stock_id, const
+sigc::slot&lt;void&gt;&amp; callback);<br>
+      <br>
+void
+append_separator();</code> </div>
+      <br>
+The 'item' argument is the menu item to add, 'callback' is the slot
+function to be called if the menu item is activated, 'accel_key' is the
+accelerator key for the menu item, 'accel_group' is the accelerator
+group to add the accelerator key to, and 'stock_id' is the identifier
+of the stock menu item to add. The last method, append_separator(), is
+a convenience method that creates and appends a separator for you.<br>
+      <br>
+In order to capture when a menu item is selected by the user, you
+need to connect a callback slot to the item's 'activate'
+signal.
+If you use the first append method you will have to make this
+connection yourself. If you pass a valid slot to one of the other
+append methods, append() will make this connection for you. <br>
+      <br>
+For example, if you wanted to create a
+standard File menu, with the options File, Save, and Quit, the code
+would look like this:<br>
+      <br>
+      <div class="fbox"><code>Gtk::Menu
+*file_menu = new Gtk::Menu;<br>
+      <br>
+// Create menu items<br>
+Gtk::MenuItem *item = new
+Gtk::Menu("Open");<br>
+file_menu-&gt;append(*item, sigc::mem_fun(this,
+&amp;MyWindow::on_file_open));<br>
+      <br>
+item = new Gtk::Menu("Save");<br>
+file_menu-&gt;append(*item, sigc::mem_fun(this,
+&amp;MyWindow::on_file_save));<br>
+      <br>
+item = new Gtk::Menu("Quit");<br>
+file_menu-&gt;append(*item, sigc::mem_fun(this,
+&amp;MyWindow::on_file_quit));<br>
+      <br>
+// Show all the menu items<br>
+file_menu-&gt;show_all();</code></div>
+      <br>
+      <div style="text-align: left;">At this point you have a menu. Now
+you need
+to
+create a menubar and a menu item for the File menu. The code looks like
+this:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>Gtk::MenuBar
+*menubar = new Gtk::MenuBar<br>
+window-&gt;add(*menubar);<br>
+      <br>
+Gtk::MenuItem *file_item = new
+Gtk::MenuItem("File", *file_menu);<br>
+menubar-&gt;append(*file_item);<br>
+      <br>
+file_item-&gt;show();<br>
+menubar-&gt;show();</code></div>
+      <br>
+      <div style="text-align: left;">If you wanted the menu right
+justified on
+the
+menubar, such as help menus often are, you would use the following
+Gtk::MenuItem method on the menu item before attaching it to the
+menubar.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>void
+set_right_justified(bool right_justified);</code></div>
+      <br>
+Here is a summary of the steps needed to create a
+menu bar with menus attached:<br>
+      <ul style="list-style-type: square;">
+        <li>Construct a new menu.</li>
+        <li>Construct multiple menu items and use
+Gtk::MenuShell::append() to
+add each of these new items to the menu.</li>
+        <li>Construct a menu item that will be the root of the menu,
+the text
+appearing here will be on the menubar itself. </li>
+        <li>Pass a reference to the menu, to the root menu item
+constructor
+(the one created in the above step).</li>
+        <li>Construct a new menubar. This step only needs to be done
+once
+when creating a series of menus on one menu bar.</li>
+        <li>Use Gtk::MenuShell::append() to put the root menu onto the
+menubar.</li>
+      </ul>
+Applications can display a Menu as a popup menu by calling the
+Gtk::Menu::popup() method: <br>
+      <br>
+      <div class="fbox"><code>void popup(unsigned int button, unsigned
+int activate_time =
+GDK_CURRENT_TIME);</code></div>
+      <br>
+The 'button' argument is the button which was pressed to initiate the
+event and 'activate_time' is the time at which the event occurred. This
+method positions the popup menu at the current pointer position. There
+are two other popup() methods with extended options that give you more
+control over where the popup menu will appear.<br>
+      <br>
+You can create a popup menu by explicitly calling popup() from a
+'button_press_event' signal handler, which has the following prototype:<br>
+      <br>
+      <div class="fbox"><code>bool
+MyWindow::event_handler(const
+Gdk::EventButton&amp; event);</code></div>
+      <br>
+      <div style="text-align: left;">For example, to connect to a
+'button_press_event'
+and use its event argument to find out where to pop up the menu, take
+these steps. Connect to a slot with the following extended prototype:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>bool
+MyClass::event_handler(const
+Gdk::EventButton&amp; event, Gtk::Menu *menu);</code></div>
+      <br>
+Use sigc::bind() to bind a pointer to the menu, to your slot:<br>
+      <br>
+      <div class="fbox"><code>sigc::bind(sigc::mem_fun(this,
+&amp;MyWindow::event_handler), menu);</code></div>
+      <br>
+where 'menu' is the bound menu pointer.
+Remember that bound data is always passed as the last argument to the
+bound
+method, unless otherwise specified. This would pass the bound data as
+the first argument: <br>
+      <br>
+      <div class="fbox"><code>sigc::bind&lt;0&gt;(sigc::mem_fun(this,
+&amp;MyWindow::event_handler), menu);</code></div>
+      <br>
+in which case your slot would have this extended prototype:<br>
+      <br>
+      <div class="fbox"><code>bool
+MyClass::event_handler(Gtk::Menu
+*menu, const
+Gdk::EventButton&amp; event);</code></div>
+      <br>
+Using the first prototype, if the event is a mouse button press, treat
+the
+event as a button event (which it is) and use it as shown in the
+following code to pass information to Gtk::Menu::popup():<br>
+      <br>
+      <div class="fbox"><code>bool<br>
+MyClass::event_handler(const
+Gdk::EventButton&amp; event, Gtk::Menu *menu)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; menu-&gt;popup(event.button(), event.time());<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; // return true to
+indicate event has been handled<br>
+&nbsp;&nbsp;&nbsp; return true;<br>
+}</code></div>
+      <br>
+      <h2><a name="example"></a>Menu
+Example</h2>
+Let's take a look at a menu example that implements all of the above
+features. The header file for this example is &lt;menu.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfci/main.hh&gt;<br>
+#include &lt;xfc/gtk/menu.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class MenuWindow : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp;&nbsp; MenuWindow(const
+MenuWindow&amp;);<br>
+&nbsp;&nbsp;&nbsp; MenuWindow&amp; operator=(const
+MenuWindow&amp;);<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; bool
+on_button_press(const
+Gdk::EventButton&amp; event, Gtk::Menu *menu);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; MenuWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual ~MenuWindow();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; void
+menu_item_selected(const char *parent, const
+char *item);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; void on_file_new();<br>
+&nbsp;&nbsp;&nbsp; void on_file_open();<br>
+&nbsp;&nbsp;&nbsp; void on_file_save();<br>
+&nbsp;&nbsp;&nbsp; void on_file_save_as();<br>
+&nbsp;&nbsp;&nbsp; void on_file_quit();<br>
+&nbsp;&nbsp;&nbsp; void
+on_options_preferences();<br>
+&nbsp;&nbsp;&nbsp; void on_help_about();<br>
+};</code></div>
+      <br>
+and the source file is &lt;menu.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "menu.hh"<br>
+#include &lt;xfc/gtk/accelgroup.hh&gt;<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+#include &lt;xfc/gtk/eventbox.hh&gt;<br>
+#include &lt;xfc/gtk/label.hh&gt;<br>
+#include &lt;xfc/gtk/menubar.hh&gt;<br>
+#include &lt;xfc/gtk/menuitem.hh&gt;<br>
+      <br>
+MenuWindow::MenuWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("Menu Window");<br>
+&nbsp;&nbsp;&nbsp; set_size_request(300, 200);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Boxes don't
+receive
+button events so use an eventbox. The eventbox is added first<br>
+&nbsp;&nbsp;&nbsp; // and then all the other widgets added to it.<br>
+&nbsp;&nbsp;&nbsp; Gtk::EventBox *eventbox = new
+Gtk::EventBox;<br>
+&nbsp;&nbsp;&nbsp; add(*eventbox);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Set the events
+the
+eventbox is to receive. These can be any number of or'd (|) values<br>
+&nbsp;&nbsp;&nbsp; // from the Gdk::EventMask enumeration.<br>
+&nbsp;&nbsp;&nbsp;
+eventbox-&gt;set_events(Gdk::BUTTON_PRESS_MASK);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Add the packing box to
+eventbox<br>
+&nbsp;&nbsp;&nbsp; Gtk::VBox *vbox = new
+Gtk::VBox(false, 1);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;set_border_width(1);<br>
+&nbsp;&nbsp;&nbsp; eventbox-&gt;add(*vbox);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create the
+menubar.
+Menus can be created by using the append, prepend or insert methods<br>
+&nbsp;&nbsp;&nbsp; // in menushell.hh to add menu items.<br>
+&nbsp;&nbsp;&nbsp; Gtk::MenuBar *menubar = new Gtk::MenuBar;<br>
+&nbsp;&nbsp;&nbsp; Gtk::AccelGroup *accel_group = add_accel_group();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create the File
+menu<br>
+&nbsp;&nbsp;&nbsp; Gtk::Menu *menu = new
+Gtk::Menu(*accel_group);<br>
+&nbsp;&nbsp;&nbsp; menu-&gt;append(*(new
+Gtk::MenuItem("_New", true)),
+"&lt;control&gt;N", slot(this,
+&amp;MenuWindow::on_file_new));<br>
+&nbsp;&nbsp;&nbsp; menu-&gt;append(*(new
+Gtk::MenuItem("_Open", true)),
+"&lt;control&gt;O", slot(this,
+&amp;MenuWindow::on_file_open));<br>
+&nbsp;&nbsp;&nbsp; menu-&gt;append(*(new
+Gtk::MenuItem("_Save", true)),
+"&lt;control&gt;S", slot(this,
+&amp;MenuWindow::on_file_save));<br>
+&nbsp;&nbsp;&nbsp; menu-&gt;append(*(new
+Gtk::MenuItem("Save _As", true)), slot(this,
+&amp;MenuWindow::on_file_save_as));<br>
+&nbsp;&nbsp;&nbsp; menu-&gt;append_separator();<br>
+&nbsp;&nbsp;&nbsp; menu-&gt;append(*(new
+Gtk::MenuItem("_Quit", true)),
+"&lt;control&gt;Q", slot(this, &amp;MenuWindow::on_file_quit));<br>
+&nbsp;&nbsp;&nbsp; menubar-&gt;append(*(new
+Gtk::MenuItem("_File", *menu, true)));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Bind the file
+menu to
+the button_press event and use it as the popup menu.<br>
+&nbsp;&nbsp;&nbsp;
+eventbox-&gt;signal_button_press_event().connect(sigc::bind(sigc::mem_fun(this,
+&amp;MenuWindow::on_button_press), menu));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create Options
+menu<br>
+&nbsp;&nbsp;&nbsp; menu = new
+Gtk::Menu;<br>
+&nbsp;&nbsp;&nbsp; menu-&gt;append(*(new
+Gtk::MenuItem("_Preferences", true)),
+slot(this,
+&amp;MenuWindow::on_options_preferences));<br>
+&nbsp;&nbsp;&nbsp; menubar-&gt;append(*(new Gtk::MenuItem("_Options",
+*menu, true)));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create Help menu<br>
+&nbsp;&nbsp;&nbsp; menu = new
+Gtk::Menu;<br>
+&nbsp;&nbsp;&nbsp; menu-&gt;append(*(new
+Gtk::MenuItem("About")), slot(this,
+&amp;MenuWindow::on_help_about));<br>
+&nbsp;&nbsp;&nbsp; Gtk::MenuItem *menu_item = new
+Gtk::MenuItem("_Help", *menu, true);<br>
+&nbsp;&nbsp;&nbsp; menu_item-&gt;set_right_justified(true);<br>
+&nbsp;&nbsp;&nbsp; menubar-&gt;append(*menu_item);<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; // Pack the
+menubar into
+the vbox<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*menubar, false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Add a label that tells the
+user to click the mouse button inside the client area.<br>
+&nbsp;&nbsp;&nbsp; Gtk::Label *label = new Gtk::Label("Click mouse
+button here...");<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*label);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Being lazy,
+just show
+everything with one call.<br>
+&nbsp;&nbsp;&nbsp; show_all();<br>
+}<br>
+      <br>
+MenuWindow::~MenuWindow()<br>
+{<br>
+}<br>
+      <br>
+bool<br>
+MenuWindow::on_button_press(GdkEventButton *event, Gtk::Menu *menu)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; menu-&gt;popup(event-&gt;button, event-&gt;time);<br>
+&nbsp;&nbsp;&nbsp; return true;<br>
+}<br>
+      <br>
+void<br>
+MenuWindow::menu_item_selected(const char
+*parent, const char *item)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; g_message("Menu: activated the \"%s\" menu item:
+\"%s\"", parent, item);<br>
+}<br>
+      <br>
+void<br>
+MenuWindow::on_file_new()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; menu_item_selected("File", "New");<br>
+}<br>
+      <br>
+void<br>
+MenuWindow::on_file_open()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; menu_item_selected("File", "Open");<br>
+}<br>
+      <br>
+void<br>
+MenuWindow::on_file_save()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; menu_item_selected("File", "Save");<br>
+}<br>
+      <br>
+void<br>
+MenuWindow::on_file_save_as()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; menu_item_selected("File", "Save As");<br>
+}<br>
+      <br>
+void<br>
+MenuWindow::on_file_quit()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; dispose();<br>
+}<br>
+      <br>
+void<br>
+MenuWindow::on_options_preferences()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; menu_item_selected("Options", "Preferences");<br>
+}<br>
+      <br>
+void<br>
+MenuWindow::on_help_about()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; menu_item_selected("Help", "About");<br>
+}<br>
+      <br>
+XFC_MAIN(MenuWindow)</code></div>
+      <br>
+      <h2>Compiling Menu<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Menu in the
+&lt;examples/howto/menu&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/menu&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Menu, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+menu: menu.cc menu.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) menu.cc -o menu $(CFLAGS) `pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean:<br>
+&nbsp;&nbsp;&nbsp; rm -f *.o menu</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 324px; height: 243px;" alt="" src="../../images/menu.png"><br>
+      </div>
+      <br>
+      <div align="left">The window displays a menubar across the top
+that contains three menu items: File, Options and Help.
+When
+you click a mouse button down anywhere inside its client area the
+menubar's File menu pops up at the current pointer position. <br>
+      <br>
+      <h2>Stock Menu Example</h2>
+There is a second menu example in the &lt;examples/howto/menu&gt;
+subdirectory that creates the same window as
+above but instead uses stock menu items and their icons. Except for the
+menu creation code in the MenuWindow constructor the source
+code in &lt;stock.cc&gt; is the same:<br>
+      </div>
+      <br>
+      <div class="fbox"><code> // Create the menubar. Menus can be
+created by using the append, prepend or insert methods<br
+ style="color: rgb(0, 0, 102);">
+// in menushell.hh to
+add menu items.<br style="color: rgb(0, 0, 102);">
+Gtk::MenuBar *menubar = new
+Gtk::MenuBar;<br>
+Gtk::AccelGroup *accel_group = add_accel_group();<br>
+      <br>
+// Create the File menu<br style="color: rgb(0, 0, 102);">
+Gtk::Menu *menu = new
+Gtk::Menu(*accel_group);<br>
+menu-&gt;append(Gtk::StockId::NEW, sigc::mem_fun(this,
+&amp;MenuWindow::on_file_new));<br>
+menu-&gt;append(Gtk::StockId::OPEN, sigc::mem_fun(this,
+&amp;MenuWindow::on_file_open));<br>
+menu-&gt;append(Gtk::StockId::SAVE, sigc::mem_fun(this,
+&amp;MenuWindow::on_file_save));<br>
+menu-&gt;append(Gtk::StockId::SAVE_AS, sigc::mem_fun(this,
+&amp;MenuWindow::on_file_save_as));<br>
+menu-&gt;append_separator();<br>
+menu-&gt;append(Gtk::StockId::QUIT,
+sigc::mem_fun(this,
+&amp;MenuWindow::on_file_quit));<br>
+menubar-&gt;append(*(new
+Gtk::MenuItem("_File", *menu, true)));<br>
+      <br>
+// Bind the file menu
+to the button_press event and use it as the popup menu.<br
+ style="color: rgb(0, 0, 102);">
+eventbox-&gt;signal_button_press_event().connect(sigc::bind(sigc::mem_fun(this,
+&amp;MenuWindow::on_button_press), menu));<br>
+      <br>
+// Create Options menu<br style="color: rgb(0, 0, 102);">
+menu = new
+Gtk::Menu(*accel_group);<br>
+menu-&gt;append(Gtk::StockId::PREFERENCES, sigc::mem_fun(this,
+&amp;MenuWindow::on_options_preferences));<br>
+menubar-&gt;append(*(new
+Gtk::MenuItem("_Options", *menu, true)));<br>
+      <br>
+// Create Help menu<br style="color: rgb(0, 0, 102);">
+menu = new Gtk::Menu;<br>
+Gtk::MenuItem *menu_item = new
+Gtk::ImageMenuItem(*(new Gtk::Image(Gtk::StockId::DIALOG_INFO,
+Gtk::ICON_SIZE_MENU)), "_About", true);<br>
+menu-&gt;append(*menu_item, sigc::mem_fun(this,
+&amp;MenuWindow::on_help_about));<br>
+menu_item = new
+Gtk::MenuItem("_Help", *menu, true);<br>
+menu_item-&gt;set_right_justified(true);<br>
+menubar-&gt;append(*menu_item);</code></div>
+      <br>
+      <h2>Compiling Stock<br>
+      </h2>
+To create a Makefile for Stock, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+stock: stock.cc menu.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) stock.cc -o stock $(CFLAGS) `pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean:<br>
+&nbsp;&nbsp;&nbsp; rm -f *.o stock</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When you
+compile and run the Stock program you will see the following window
+appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 324px; height: 243px;" alt=""
+ src="../../images/stock.png"><br>
+      </div>
+      <br>
+The XFC_MAIN macro is a convenience macro that writes a simple main
+function, its only argument is the name of the main window class. The
+macro is defined in &lt;xfc/main.hh&gt; as:<br>
+      <br>
+      <div class="fbox"><code>#define XFC_MAIN(MainWidget)\<br>
+&nbsp;&nbsp;&nbsp; int main (int argc, char *argv[])\<br>
+&nbsp;&nbsp;&nbsp; {\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Xfc::Main::init(&amp;argc,
+&amp;argv);\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; MainWidget main_widget;\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+main_widget.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; main_widget.show();\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Xfc::Main::run();\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return 0;\<br>
+&nbsp;&nbsp;&nbsp; }</code></div>
+      <br>
+Most main functions in C++ are simple because all the
+creation work for the main window is done inside its constructor, not
+the main function.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="menus.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

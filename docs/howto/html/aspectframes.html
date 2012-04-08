@@ -1,0 +1,239 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Aspect Frames" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Aspect
+Frames</h1>
+      <br>
+The aspect frame widget is like a frame widget,
+except that it also enforces the aspect ratio (that is, the ratio of
+the
+width to the height) of the child widget to have a certain value,
+adding
+extra space if necessary. This is useful, for instance, if you want to
+preview a larger image. The size of the preview should vary when the
+user resizes the window, but the aspect ratio needs to always match the
+original image.<br>
+      <br>
+      <div style="text-align: left;">To create a new aspect frame use
+one of the following constructors:<br>
+      </div>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify"><br>
+      <div class="fbox"><code>AspectFrame();<br>
+      <br>
+AspectFrame(float
+xalign, float yalign);<br>
+      <br>
+AspectFrame(float xalign, float yalign, float
+ratio);<br>
+      <br>
+AspectFrame(const String&amp; label, float xalign, float
+yalign, float ratio);</code> </div>
+      <br>
+      <div style="text-align: left;">Aspect frames have an 'obey_child'
+(bool) and a 'ratio' (float)
+property. If obey_child
+is true<em>,</em> the aspect ratio of a child widget will match the
+aspect ratio of the size it requests. If obey_child
+is false the aspect ratio is given by
+the ratio property. When obey_child is true ratio is ignored. The
+'xalign' and 'yalign'
+arguments
+specify the alignment, as with Alignment widgets. <br>
+      <br>
+The first constructor creates an AspectFrame with the default values:
+xalign 0.5, yalign 0.5, ratio 1.0 and obey_child true. The second
+constructor creates an AspectFrame with the specified xalign and yalign
+values. This constructor takes the aspect ratio from the requisition of
+the child and sets obey_child to true. The third constructor creates an
+AspectFrame with the specified xalign, yalign and ratio values. This
+constructor takes the aspect ratio from the ratio argument and sets
+obey_child to false. The fourth constructor creates a labeled
+AspectFrame with the specified xalign, yalign and ratio values. This
+constructor takes the aspect ratio from the ratio argument and sets
+obey_child to false.<br>
+      </div>
+      <br>
+      <div style="text-align: left;">To change the options of an
+existing AspectFrame, you can use:<br>
+      </div>
+      <samp><br>
+      </samp>
+      <div class="fbox"><code>void
+set(float xalign, float
+yalign, float ratio, bool
+obey_child);</code></div>
+      <br>
+      <div style="text-align: left;">AspectFrame is derived from
+Gtk::Frame so you can call the <a href="frames.html">Frame</a> methods
+that set the label, label widget
+or shadow type.<br>
+      <br>
+      <h2><a name="example"></a>Aspect
+Frame Example</h2>
+As an example, the following program uses an
+AspectFrame to present a drawing area whose aspect ratio will always be
+2:1, no matter how the user resizes the top-level window.<br>
+      <br>
+      <div align="left">The header file for the Aspect Frame example is
+&lt;aspectframe.hh&gt;:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class AspectFrameWindow : public Gtk::Window<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; AspectFrameWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual
+~AspectFrameWindow();<br>
+};</code> </div>
+      <br>
+and the source file is &lt;aspectframe.cc&gt;:<br>
+      <br>
+      <div class="fbox"><samp>#include "aspectframe.hh"<br>
+#include &lt;xfc/gtk/aspectframe.hh&gt;<br>
+#include &lt;xfc/gtk/drawingarea.hh&gt;<br>
+      <br>
+AspectFrameWindow::AspectFrameWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("Aspect Frame");<br>
+&nbsp;&nbsp;&nbsp; set_border_width(10);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create an aspect_frame and
+add it to our toplevel window<br>
+&nbsp;&nbsp;&nbsp; Gtk::AspectFrame *aspect_frame = new
+Gtk::AspectFrame("2x1", 0.5, 0.5, 2);<br>
+      </samp><samp>&nbsp;&nbsp;&nbsp; add(*aspect_frame);<br>
+&nbsp;&nbsp;&nbsp; aspect_frame-&gt;show();<br>
+      <br>
+      </samp><samp>&nbsp;&nbsp;&nbsp; // Now add a child widget to
+the aspect frame<br>
+&nbsp;&nbsp;&nbsp; Gtk::DrawingArea *drawing_area = new
+Gtk::DrawingArea;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // We ask for a 200x200
+window but get a 200x100 window since we are forcing a 2x1 aspect ratio.<br>
+&nbsp;&nbsp;&nbsp; drawing_area-&gt;set_size_request(200, 200);<br>
+&nbsp;&nbsp;&nbsp; aspect_frame-&gt;add(*drawing_area);<br>
+&nbsp;&nbsp;&nbsp; drawing_area-&gt;show();<br>
+}<br>
+      <br>
+AspectFrameWindow::~AspectFrameWindow()<br>
+{<br>
+}<br>
+      <br>
+int main (int
+argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; AspectFrameWindow window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp;&nbsp; window.show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return 0;<br>
+}</samp> </div>
+      <br>
+      <h2>Compiling Aspect Frame<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Aspect Frame in the
+&lt;examples/howto/aspectframe&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/aspectframe&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Aspect Frame, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+aspectframe: aspectframe.cc aspectframe.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) aspectframe.cc -o aspectframe $(CFLAGS)
+`pkg-config xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o aspectframe</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 246px; height: 281px;" alt=""
+ src="../../images/aspectframe.png"><br>
+      </div>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="aspectframes.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

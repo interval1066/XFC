@@ -1,0 +1,20 @@
+install-data-local:
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(xfc_docdir)/$(subdir)
+	for p in $(srcdir)/*.cc $(srcdir)/*.hh; do \
+	  if test -f $$p; then \
+	    f="`echo $$p | sed -e 's|^.*/||'`"; \
+	    echo " $(INSTALL_DATA) $$p  $(DESTDIR)$(xfc_docdir)/$(subdir)/$$f"; \
+	    $(INSTALL_DATA) $$p  $(DESTDIR)$(xfc_docdir)/$(subdir)/$$f; \
+	  fi; \
+	done
+
+uninstall-local:
+	@$(NORMAL_UNINSTALL)
+	for p in $(srcdir)/*.cc $(srcdir)/*.hh; do \
+	  if test -f $$p; then \
+	    f="`echo $$p | sed -e 's|^.*/||'`"; \
+	    echo " rm -f  $(DESTDIR)$(xfc_docdir)/$(subdir)/$$f"; \
+	    rm -f  $(DESTDIR)$(xfc_docdir)/$(subdir)/$$f; \
+	  fi; \
+	done

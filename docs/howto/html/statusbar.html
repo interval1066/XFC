@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Statusbars" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Statusbars</h1>
+      <br>
+Statusbars are simple widgets used to display a
+text message. They keep a stack of the messages pushed onto them, so
+that popping the current message will re-display the previous text
+message. In order to allow different parts of an
+application to use the same statusbar to display messages, the
+statusbar
+widget issues Context Identifiers which are used to identify different
+'users'. The message on top of the stack is the one displayed, no
+matter
+what context it is in. Messages are stacked in last-in-first-out order,
+not context identifier order.<br>
+      <br>
+A statusbar is created with the constructor:<br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <div class="fbox"><code>Statusbar();</code></div>
+      <br>
+      </div>
+A new Context Identifier is requested using a call to the following
+method with a short textual description of the context:<br>
+      <div style="text-align: left;"> <br>
+      <div class="fbox"><code>unsigned
+int get_context_id(const
+String&amp;
+context_description) const;</code></div>
+      <br>
+      </div>
+There are three methods that can operate on statusbars:<br>
+      <div style="text-align: left;"> <br>
+      <div class="fbox"><code>unsigned
+int push(const String&amp; text, unsigned int context_id = 0);<br>
+&nbsp;<br>
+void pop(unsigned
+int context_id = 0);<br>
+      <br>
+void remove(unsigned
+int message_id, unsigned int
+context_id = 0);</code></div>
+      <br>
+The first, push(), is used to add
+a new message to the statusbar. It returns a message identifier, which
+can be passed later to the function remove() to remove
+the message with the given message and context identifiers from the
+statusbar's stack. The pop() method removes the message highest in the
+stack with the given context identifier.<br>
+      <br>
+In addition to messages, statusbars may also display a resize grip,
+which can be dragged with the mouse to resize the top level window
+containing the statusbar, similar to dragging the window frame. The
+following methods control the display of the resize grip.<br>
+      <br>
+      <div class="fbox"><code>void
+set_has_resize_grip(bool setting);<br>
+      <br>
+bool get_has_resize_grip() const;</code> </div>
+      <br>
+      <h2><a name="example"></a>Statusbar
+Example</h2>
+The following example creates a statusbar and two
+buttons, one for pushing items onto the statusbar, and one for popping
+the last item off.<br>
+      <br>
+The header file for the Statusbar example is &lt;statusbar.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/statusbar.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class StatusbarWindow : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Gtk::Statusbar *status_bar;<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; void on_push_item(int context_id);<br>
+&nbsp;&nbsp;&nbsp; void on_pop_item(int context_id);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; StatusbarWindow();<br>
+&nbsp;&nbsp;&nbsp; ~StatusbarWindow();<br>
+};</code></div>
+      <br>
+and the source file is &lt;statusbar.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "statusbar.hh"<br>
+#include &lt;xfc/box.hh&gt;<br>
+#include &lt;xfc/gtk/button.hh&gt;<br>
+      <br>
+StatusbarWindow::StatusbarWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("Statusbar Example");<br>
+&nbsp;&nbsp;&nbsp; set_size_request(200, 100);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::VBox *vbox = new
+Gtk::VBox(false, 1);<br>
+&nbsp;&nbsp;&nbsp; add(*vbox);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; status_bar = new
+Gtk::Statusbar;<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*status_bar);<br>
+&nbsp;&nbsp;&nbsp; status_bar-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; int context_id =
+status_bar-&gt;get_context_id("Statusbar example");<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::Button *button = new
+Gtk::Button("push item");<br>
+&nbsp;&nbsp;&nbsp; button-&gt;signal_clicked().connect(bind(slot(this,
+&amp;StatusbarWindow::on_push_item),
+context_id));<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*button, true,true, 2);<br>
+&nbsp;&nbsp;&nbsp; button-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; button = new
+Gtk::Button("pop last item");<br>
+&nbsp;&nbsp;&nbsp; button-&gt;signal_clicked().connect(bind(slot(this,
+&amp;StatusbarWindow::on_pop_item),
+context_id));<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*button, true,true, 2);<br>
+&nbsp;&nbsp;&nbsp; button-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Always display
+the
+window as the last step so it all splashes on the screen at once.<br>
+&nbsp;&nbsp;&nbsp; show();<br>
+}<br>
+      <br>
+StatusbarWindow::~StatusbarWindow()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+StatusbarWindow::on_push_item(int
+context_id)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; static int count = 1;<br>
+&nbsp;&nbsp;&nbsp; String text = String::format("Item %d", count++);<br>
+&nbsp;&nbsp;&nbsp; status_bar-&gt;push(text, context_id);<br>
+}<br>
+      <br>
+void<br>
+StatusbarWindow::on_pop_item(int
+context_id)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; status_bar-&gt;pop(context_id);<br>
+}<br>
+      <br>
+int main (int
+argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; StatusbarWindow window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return 0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling Statusbar </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Statusbar in the
+&lt;examples/howto/statusbar&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/statusbar&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Statusbar, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+statusbar: statusbar.cc statusbar.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) statusbar.cc -o statusbar $(CFLAGS)
+`pkg-config xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o statusbar</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When<br>
+&nbsp;The source code for Status Example can be found in the
+&lt;examples/howto/statusbar&gt; subdirectory along with a Makefile. If
+you
+compile and run this program you will see the following window appear:<br>
+      <div style="text-align: center;"><img
+ style="width: 236px; height: 143px;" alt=""
+ src="../../images/statusbar.png"><br>
+      </div>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="statusbar.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

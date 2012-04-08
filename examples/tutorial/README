@@ -1,0 +1,7 @@
+Tutorial Source Code.
+=====================
+The <examples/tutorial> directory contains the source code for all the
+examples that the XFC tutorial works through. The XFC tutorial can be
+found in your <docs/tutorial/html> subdirectory. As you work through
+the tutorial, each chapter will show you how to create a Makefile for
+its example.

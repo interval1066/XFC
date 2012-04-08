@@ -1,0 +1,745 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+  <meta content="Widgets: Drag and Drop" name="description">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Drag and Drop<br>
+      </h1>
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a class="mhl" href="draganddrop.html#DD01">Overview</a></li>
+        <li><a class="mhl" href="draganddrop.html#DD02">Properties</a></li>
+        <li><a class="mhl" href="draganddrop.html#DD03">Defining a
+Destination
+Widget</a></li>
+        <li><a class="mhl" href="draganddrop.html#DD04">Defining a
+Source Widget</a></li>
+        <li><a class="mhl" href="draganddrop.html#example">Drag and
+Drop Example</a></li>
+      </ol>
+      <br>
+      <h2><a name="DD01"></a>Overview</h2>
+GTK+ has a high level set of functions for doing inter-process
+communication via the drag-and-drop system and can perform
+drag-and-drop
+on top of the low level Xdnd and Motif drag-and-drop protocols. <br>
+      <br>
+An application capable of drag-and-drop first defines and sets up the
+widget(s) for drag-and-drop. Each widget can be a source and/or
+destination for drag-and-drop. Note that these widgets must have an
+associated X Window; check using Gtk::Widget::has_no_window() which
+returns true if the widget has no X window. Source
+widgets can send out drag data, thus allowing the user to drag things
+off of them, while destination widgets can receive drag data.
+Drag-and-drop destinations can limit who they accept drag data from,
+e.g. the same application or any application (including itself).<br>
+      <br>
+Sending and receiving drop data makes use of signals. Dropping an item
+to a destination widget requires both a data request (for the source
+widget) and a data received signal handler (for the target widget).
+Additional signal handers can be connected if you want to know when a
+drag begins (at the very instant it starts), when a drop is made, and
+when the entire drag-and-drop procedure has ended (successfully or not).<br>
+      <br>
+Your application will need to provide data for source widgets when
+requested, that involves having a drag data request signal handler. For
+destination widgets they will need a drop data received signal handler.
+A typical drag-and-drop cycle would look as follows:<br>
+      <ul>
+        <li>Drag begins.</li>
+        <li> Drag data request (when a drop occurs).</li>
+        <li> Drop data received (may be on same or different
+application).</li>
+        <li> Drag data delete (if the drag was a move).</li>
+        <li> Drag-and-drop procedure done.</li>
+      </ul>
+There are a few minor steps that go in between here and there, but we
+will get into detail about that later.<br>
+      <br>
+      <h2><a name="DD02"></a>Properties</h2>
+      <div align="justify">
+      <div style="text-align: left;">Drag data has the following
+properties:<br>
+      <ul>
+        <li>a Gtk::TargetEntry for each target a destination widget
+accepts
+or a source widget provides.</li>
+        <li>a Gdk::DragAction type (Gdk::ACTION_COPY or
+Gdk::ACTION_MOVE).</li>
+        <li>a Sent and received data format type.</li>
+      </ul>
+The first thing you need to do when setting up a destination or source
+widget is construct a Gtk::TargetEntry (for a single target) or a
+vector
+of Gtk::TargetEntry (for multiple targets).<br>
+      <br>
+You can create a new TargetEntry object with one of the following
+constructors:<br>
+      <br>
+      <div class="fbox"><code>TargetEntry();<br>
+&nbsp;<br>
+TargetEntry(const String&amp; target_name, unsigned int unique_id,
+Gtk::TargetFlagsField drag_flags = 0);</code></div>
+      <br>
+The first constructor creates an empty TargetEntry. The second
+constructor creates a target entry with the specified name and unique
+id. The 'target_name' argument is a string corresponding to the target
+atom and 'unique_id' is the unique integer id. The 'drag_flags'
+argument
+is only used when implementing Drag and Drop. It restricts the validity
+of the corresponding target to the same application or the same widget,
+and can be one or more of the
+values
+defined in the Gtk::TargetFlags enum:<br>
+      <ul>
+        <li>TARGET_SAME_APP</li>
+        <li>TARGET_SAME_WIDGET</li>
+      </ul>
+There are a number of possible drag actions that can be applied to the
+data exchanged through drag-and-drop, and are defined in the
+Gdk::DragAction enum:<br>
+      <ul>
+        <li>ACTION_COPY - data provided by the source will be copied to
+the destination widget.</li>
+        <li>ACTION_MOVE - data provided by the source will be moved to
+the
+destination widget.</li>
+        <li>ACTION_LINK - the destination widget will create a link to
+the
+provided data, rather than copy its contents.</li>
+        <li>ACTION_PRIVATE - the destination widget is free to do
+anything
+with the copy of the data provided.</li>
+        <li>ACTION_ASK - allows the destination widget to ask the user
+which
+action should be performed.</li>
+      </ul>
+If you create an empty TargetEntry, you can set its target_name and
+unique_id by calling the Gtk::TargetEntry method:<br>
+      <br>
+      <div class="fbox"><code>void set(const String&amp; target_name,
+unsigned int unique_id, Gtk::TargetFlagsField drag_flags = 0);</code></div>
+      <br>
+Drag actions are quite obvious, they specify if the widget can drag
+with the specified action(s). A Gdk::ACTION_COPY would be a typical
+drag-and-drop without the source data being deleted while
+Gdk::ACTION_MOVE would be just like Gdk::ACTION_COPY but the source
+data
+will be 'suggested' to be deleted after the received signal handler is
+called. You may want to look into the additional drag actions including
+Gdk::ACTION_LINK when you get to more advanced levels of drag-and-drop.<br>
+      <br>
+Sent and received data format types (selection target) come into play
+only in your request and received data handler methods. The term
+selection target is somewhat misleading. It is a term adapted from GTK+
+selection (cut, copy and paste). What 'selection target' actually means
+is
+the data's format type (i.e. a Gdk::Atom, integer, or string) that is
+being sent or received. Your request data handler method needs to
+specify the type (selection target) of data that it sends out and your
+received data handler needs to handle the type (selection target) of
+data received.<br>
+      <br>
+      <h2><a name="DD03"></a>Defining a
+Destination Widget</h2>
+To turn a widget into a drag-and-drop destination call the one of the
+following methods:<br>
+      <br>
+      <div class="fbox"><code>void
+drag_dest_set(Gtk::DestDefaultsField flags, const
+Gtk::TargetEntry&amp; target, Gdk::DragActionField actions);<br>
+      <br>
+void
+drag_dest_set(Gtk::DestDefaultsField flags, const
+std::vector&lt;Gtk::TargetEntry&gt;&amp; targets, Gdk::DragActionField
+actions);</code> </div>
+      <br>
+The 'flags' argument defines the automatic behaviour options of
+the destination widget and can be one or more values from the
+&nbsp;Gtk::DestDefaults enum OR'd together:<br>
+      <ul>
+        <li>DEST_DEFAULT_MOTION - during a drag over this widget will
+check if
+the
+drag matches this widget's list of possible targets and actions.</li>
+        <li>DEST_DEFAULT_HIGHLIGHT - will draw a highlight on this
+widget as long as
+a drag is over this widget and the widget drag format and action are
+acceptable.</li>
+        <li>DEST_DEFAULT_DROP - checks if the drag matches this
+widget's list of
+possible targets and actions. If so, it calls
+Gtk::Widget::drag_data_get() for you.</li>
+        <li>DEST_DEFAULT_ALL - specifies that all default actions
+should be
+taken. This is an appropriate choice for most applications.</li>
+      </ul>
+The 'actions' argument can be one or more values from the
+Gdk::DragAction enum above, OR'd together. The first method is
+used to define a single target. The second method is used to define
+multiple targets.<br>
+      <br>
+To remove drag-and-drop functionality from a destination widget call:<br>
+      <br>
+      <div class="fbox"><code>void
+drag_dest_unset();</code></div>
+      <br>
+To be able to receive data from a drag-and-drop source you must either
+connect the destination widget to the "drag_data_received"
+signal
+or derive a destination widget from an <br>
+existing widget and override its Gtk::WidgetSignals
+on_drag_data_received()
+virtual
+signal handler. <br>
+      <br>
+You can connect to the "drag_data_received" signal like this:<br>
+      <br>
+      <div class="fbox">widget-&gt;signal_drag_data_received().connect(sigc::mem_fun(this,
+&amp;MyClass::drag_data_received_handler));</div>
+      <br>
+where the drag_data_received handler has the following
+prototype:<br>
+      <br>
+      <div class="fbox"><code>void
+drag_data_received_handler(Gdk::DragContext&amp; context, int
+x, int y,
+const Gtk::SelectionData&amp; data, unsigned int
+info, unsigned int time);</code> </div>
+      <br>
+The 'context' argument is the Gtk::DragContext for the current
+drag-and-drop event; 'x' and 'y' are the x and y positions of the mouse
+pointer relative to the widget; 'data' is the Gtk::SelectionData object
+that contains all the information about the data received; 'info' is
+the info integer that was set when the target was registered and 'time'
+is the time of the conversion request.<br>
+      <br>
+During a drag-and-drop operation the destination widget is sent the
+following signals:<br>
+      <ul>
+        <li>drag_leave</li>
+        <li>drag_motion</li>
+        <li>drag_drop</li>
+        <li>drag_data_received</li>
+      </ul>
+      <br>
+      <h2><a name="DD04"></a>Defining a
+Source
+Widget</h2>
+To define a widget as a drag-and-drop source call one of the following
+methods:<br>
+      <br>
+      <div class="fbox"><code>void
+drag_source_set(Gdk::ModifierTypeField start_button_mask, const
+Gtk::TargetEntry&amp; target, Gdk::DragActionField actions);<br>
+      <br>
+void drag_source_set(Gdk::ModifierTypeField start_button_mask, const
+std::vector&lt;Gtk::TargetEntry&gt;&amp; targets, Gdk::DragActionField
+actions);</code><br>
+      </div>
+      <br>
+The 'start_button_mask' defines which mouse button has to be
+pressed to start the drag action. It can be one of the values in the
+Gdk::ModifierType enum but only the following values are useful:<br>
+      <ul>
+        <li>BUTTON1_MASK - the left mouse button.</li>
+        <li>BUTTON2_MASK - the middle mouse button.</li>
+        <li>BUTTON3_MASK - the right mouse button.</li>
+        <li>BUTTON4_MASK - a possible fourth mouse button.</li>
+        <li>BUTTON5_MASK - a possible fifth mouse button.</li>
+      </ul>
+The 'actions' argument can be one or more values from the
+Gdk::DragAction enum above, OR'd together. The TargetEntry arguments
+describe the target(s) the drag will support.The first method is
+used to define a single target. The second method is used to define
+multiple targets.<br>
+      <br>
+To remove drag-and-drop functionality from a source widget call:<br>
+      <br>
+      <div class="fbox"><code>void drag_source_unset();</code></div>
+      <br>
+A custom drag icon can be used to represent the data being dragged. To
+set the drag icon for the source widget call one of the following
+Gtk::Widget methods:<br>
+      <br>
+      <div class="fbox"><code>void drag_source_set_icon(Gdk::Colormap
+*colormap, Gdk::Pixmap *pixmap, Gdk::Bitmap *mask);<br>
+      <br>
+void drag_source_set_icon_pixbuf(Gdk::Pixbuf&amp; pixbuf);<br>
+      <br>
+void drag_source_set_icon_stock(const Gtk::StockId&amp; stock_id);</code><br>
+      </div>
+      <br>
+The first method sets the icon that will be used for drags from the
+widget from a pixmap and mask, the second sets the icon from a pixbuf
+and the third sets the icon from a stock image.<br>
+      <br>
+To receive notification that a drag-and-drop operation has started and
+ended you can either connect to the "drag_begin" and "drag_end"
+signals or derive your source widget from an existing widget and
+override its Gtk::WidgetSignals on_drag_begin() and on_drag_end()
+virtual signal handlers.<br>
+      <br>
+You can connect to the "drag_begin" and "drag_end"
+signals like this:<br>
+      <br>
+      <div class="fbox"><code>widget-&gt;signal_drag_begin().connect(sigc::mem_fun(this,
+&amp;MyClass::drag_begin_handler));<br>
+      <br>
+widget-&gt;signal_drag_end().connect(sigc::mem_fun(this,
+&amp;MyClass::drag_end_handler));</code> </div>
+      <br>
+where the 'drag_begin_handler' and the 'drag_end_handler'
+have the following prototypes:<br>
+      <br>
+      <div class="fbox"><code>void
+MyClass::drag_begin_handler(Gdk::DragContext&amp; context);<br>
+      <br>
+void
+MyClass::drag_end_handler(Gdk::DragContext&amp; context);</code> </div>
+      <br>
+The 'context' argument is the Gdk::Context for the drag event. After a
+valid drop, the data of the first target supported by the
+destination widget is requested from the source widget. To provide the
+data that corresponds to the requested target you will either have to
+connect to the "drag_data_get" signal or derive your source
+widget from an existing widget and override its Gtk::WidgetSignal
+on_drag_data_get()
+virtual signal handler.<br>
+      <br>
+You can connect to the "drag_data_get" signal like this:<br>
+      <br>
+      <div class="fbox"><code>widget-&gt;signal_drag_data_get().connect(sigc::mem_fun(this,
+&amp;MyClass::drag_data_get_handler));</code></div>
+      <br>
+where the 'drag_data_get_handler' has the following prototype:<br>
+      <br>
+      <div class="fbox"><code>void
+drag_data_get_handler(Gdk::DragContext&amp; context,
+Gtk::SelectionData&amp; data, unsigned int info, unsigned int time);</code></div>
+      <br>
+The 'context' argument is the Gdk::DragContext for the drag; 'data' is
+a reference to the SelectionData object that needs to be filled in to
+provide the requested data; 'info' is the unique id that was set when
+the target
+was registered and 'time' is the time the request occurred.<br>
+      <br>
+To provide the data you will need to fill in the fields of the
+SelectionData object by calling one of the Gtk::SelectionData set
+methods:<br>
+      <br>
+      <div class="fbox"><code>void
+set(Gdk::Atom type, int format, const void *data, int
+length);<br>
+      <br>
+bool set_text(const String&amp; str);<br>
+      </code></div>
+      <br>
+These methods should only be called from a drag-and-drop handler
+callback.
+The 'type' argument is an atom that describes the 'data' provided and
+the 'format' is
+the number of bits required to store one element of the target type.
+Usually it will be 8 for a character or 32 for an integer. The most
+commonly used target types are: ATOM, COMPOUND_TEXT, INTEGER and
+STRING. This method takes care of properly making a copy of the data so
+that you don't have to worry about keeping it around. The length
+argument is the data length. The data should
+be null-terminated.<br>
+      <br>
+For convenience, the set_text() method sets the contents of the
+selection from a UTF-8 encoded string. The string is converted to the
+form determined by the target and true is returned if the selection was
+successfully set. <br>
+      <br>
+During a drag-and-drop operation the source widget is sent the
+following signals:<br>
+      <ul>
+        <li>drag_begin</li>
+        <li>drag_end</li>
+        <li>drag_data_get</li>
+        <li>drag_data_delete</li>
+      </ul>
+      <br>
+      <h2><a name="example"></a>Drag and Drop Example</h2>
+This drag-and-drop example creates a window with three buttons, one
+drag
+source button and two drag destination buttons. The example is based on
+the drag-and-drop example in Donna Martin's book "GTK+ Programming in
+21
+Days". <br>
+      <br>
+The header file for the Drag and Drop example is &lt;dnd.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/button.hh&gt;<br>
+#include &lt;xfc/gtk/widgetsignals.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class DestinationButton : public Gtk::Button, protected
+Gtk::WidgetSignals<br>
+{<br>
+protected:<br>
+&nbsp;&nbsp; &nbsp;virtual void
+on_drag_data_received(Gtk::DragContext&amp; context, int x, int y,
+const Gtk::SelectionData&amp; data, unsigned int info, unsigned int
+event_time);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp; &nbsp;DestinationButton(const String&amp; label, const
+Gtk::TargetEntry&amp; entry);<br>
+&nbsp;&nbsp; &nbsp;virtual ~DestinationButton();<br>
+};<br>
+      <br>
+class SourceButton : public Gtk::Button, protected Gtk::WidgetSignals<br>
+{<br>
+&nbsp;&nbsp; &nbsp;static std::vector&lt;Gtk::TargetEntry&gt;
+target_entries;<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;String target_html;<br>
+&nbsp;&nbsp; &nbsp;String target_string;<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp; &nbsp;virtual void on_drag_begin(Gtk::DragContext&amp;
+context);<br>
+&nbsp;&nbsp; &nbsp;virtual void on_drag_end(Gtk::DragContext&amp;
+context);<br>
+&nbsp;&nbsp; &nbsp;virtual void on_drag_data_get(Gtk::DragContext&amp;
+context, Gtk::SelectionData&amp; data, unsigned int info, unsigned int
+time);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp; &nbsp;SourceButton(const String&amp; label);<br>
+&nbsp;&nbsp; &nbsp;virtual ~SourceButton();<br>
+};<br>
+      <br>
+class Window : public Gtk::Window<br>
+{<br>
+public:<br>
+&nbsp;&nbsp; &nbsp;Window();<br>
+&nbsp;&nbsp; &nbsp;virtual ~Window();<br>
+};</code><br>
+      </div>
+      <br>
+and the source file is &lt;dnd.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "dnd.hh"<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+#include &lt;xfc/gdk/bitmap.hh&gt;<br>
+#include &lt;xfc/gdk/color.hh&gt;<br>
+#include &lt;iostream&gt;<br>
+#include &lt;ctime&gt;<br>
+      <br>
+std::vector&lt;Gtk::TargetEntry&gt; SourceButton::target_entries;<br>
+      <br>
+enum<br>
+{<br>
+&nbsp;&nbsp; &nbsp;//&nbsp; Define the info fields for the supported
+targets.<br>
+&nbsp;&nbsp; &nbsp;TEXT_HTML,<br>
+&nbsp;&nbsp; &nbsp;STRING<br>
+};<br>
+      <br>
+DestinationButton::DestinationButton(const String&amp; label, const
+Gtk::TargetEntry&amp; entry)<br>
+: Gtk::Button(label),<br>
+&nbsp; Gtk::WidgetSignals(this)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;// Set up this button as a drag destination.<br>
+&nbsp;&nbsp; &nbsp;drag_dest_set(Gtk::DEST_DEFAULT_ALL, entry,
+Gdk::ACTION_COPY);<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp;
+&nbsp;signal_drag_data_received().connect(sigc::mem_fun(this,
+&amp;DestinationButton::on_drag_data_received));<br>
+}<br>
+      <br>
+DestinationButton::~DestinationButton()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+DestinationButton::on_drag_data_received(Gtk::DragContext&amp; context,
+int x, int y, const Gtk::SelectionData&amp; data, unsigned int info,
+unsigned int event_time)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace std;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Get current time<br>
+&nbsp;&nbsp; &nbsp;time_t now = ::time(0);<br>
+&nbsp;&nbsp; &nbsp;struct tm *now_tm = localtime(&amp;now);<br>
+&nbsp;&nbsp; &nbsp;char now_string[10];<br>
+&nbsp;&nbsp; &nbsp;strftime(now_string, sizeof(now_string), "%T",
+now_tm);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Get button id from enum info<br>
+&nbsp;&nbsp; &nbsp;int id = info + 1;<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// Set button label to reflect the dropped data<br>
+&nbsp;&nbsp; &nbsp;String label = String::format(" Drag DESTINATION %i
+received % s data at %s ", id, data.get_target().c_str(), now_string);<br>
+&nbsp;&nbsp; &nbsp;set_label(label);<br>
+&nbsp;&nbsp; &nbsp;cout &lt;&lt; "Destination " &lt;&lt; id &lt;&lt; ":
+Received data for the '" &lt;&lt; data.get_target() &lt;&lt; "'
+target." &lt;&lt; endl;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Print the dropped data to the standard output<br>
+&nbsp;&nbsp; &nbsp;switch(info)<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;case TEXT_HTML:<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;cout &lt;&lt; "text/html data =
+'" &lt;&lt; data.data() &lt;&lt; "'" &lt;&lt;endl;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;break;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;case STRING:<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;cout &lt;&lt; "STRING data = '"
+&lt;&lt; data.data() &lt;&lt; "'" &lt;&lt; endl;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;break;<br>
+&nbsp;&nbsp; &nbsp;}<br>
+}<br>
+      <br>
+SourceButton::SourceButton(const String&amp; label)<br>
+: Gtk::Button(label),<br>
+&nbsp; Gtk::WidgetSignals(this)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;// Add text/html and STRING targets to the primary
+selection.<br>
+&nbsp;&nbsp;
+&nbsp;target_entries.push_back(Gtk::TargetEntry("text/html", TEXT_HTML,
+Gtk::TARGET_SAME_APP));<br>
+&nbsp;&nbsp; &nbsp;target_entries.push_back(Gtk::TargetEntry("STRING",
+STRING));<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Set up this button as a source for a drap
+operation<br>
+&nbsp;&nbsp; &nbsp;drag_source_set(Gdk::BUTTON1_MASK, target_entries,
+Gdk::ACTION_COPY);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Create a custom icon to be used for the drags<br>
+&nbsp;&nbsp; &nbsp;Pointer&lt;Gdk::Bitmap&gt; drag_mask;<br>
+&nbsp;&nbsp; &nbsp;Gdk::Pixmap *drag_icon(new
+Gdk::Pixmap(Gdk::Colormap::get_system(), "gtk.xpm", &amp;drag_mask));<br>
+&nbsp;&nbsp; &nbsp;drag_source_set_icon(Gdk::Colormap::get_system(),
+drag_icon, drag_mask);<br>
+}<br>
+      <br>
+SourceButton::~SourceButton()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+SourceButton::on_drag_begin(Gtk::DragContext&amp; context)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;// Get the current time<br>
+&nbsp;&nbsp; &nbsp;time_t now = time(0);<br>
+&nbsp;&nbsp; &nbsp;char *now_string = ctime(&amp;now);<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// Remove terminating new line character.<br>
+&nbsp;&nbsp; &nbsp;now_string[strlen(now_string) - 1] = '\0';<br>
+      <br>
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "Source: Drag begun..." &lt;&lt;
+std::endl;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Set data strings&nbsp;&nbsp; &nbsp;for the
+supported targets<br>
+&nbsp;&nbsp; &nbsp;target_html = String::format("&lt;P&gt;It's now
+&lt;B&gt;%s&lt;/B&gt;.&lt;/P&gt;", now_string);<br>
+&nbsp;&nbsp; &nbsp;target_string = String::format("It's now %s.",
+now_string);<br>
+}<br>
+      <br>
+void<br>
+SourceButton::on_drag_data_get(Gtk::DragContext&amp; context,
+Gtk::SelectionData&amp; data, unsigned int info, unsigned int time)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "Source: Got request for the '"
+&lt;&lt; data.get_target() &lt;&lt; "' target." &lt;&lt; std::endl;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Fill the Gtk::SelectionData with the values to be
+passed to the requesting destination.<br>
+&nbsp;&nbsp; &nbsp;switch(info)<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;case TEXT_HTML :<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;data.set(gdk_atom_intern("text/html", TRUE), 8,
+target_html.c_str(), target_html.size());<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;break;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;case STRING :<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;data.set(gdk_atom_intern("STRING", TRUE), 8,
+target_string.c_str(), target_string.size());<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;break;<br>
+&nbsp;&nbsp; &nbsp;}<br>
+}<br>
+      <br>
+void<br>
+SourceButton::on_drag_end(Gtk::DragContext&amp; context)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "Source: Drag ended!\n" &lt;&lt;
+std::endl;<br>
+}<br>
+      <br>
+Window::Window()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_title("Drag and Drop Example");<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Gtk::VBox *vbox = new Gtk::VBox(true, 5);<br>
+&nbsp;&nbsp; &nbsp;vbox-&gt;set_border_width(5);<br>
+&nbsp;&nbsp; &nbsp;add(*vbox);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Create drag destination button 1<br>
+&nbsp;&nbsp; &nbsp;Gtk::TargetEntry entry("text/html", TEXT_HTML);<br>
+&nbsp;&nbsp; &nbsp;Gtk::Button *button = new DestinationButton(" Drag
+DESTINATION 1 received nothing ", entry);<br>
+&nbsp;&nbsp; &nbsp;vbox-&gt;pack_start(*button);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Create drag destination button 2<br>
+&nbsp;&nbsp; &nbsp;entry.set("STRING", STRING);<br>
+&nbsp;&nbsp; &nbsp;button = new DestinationButton(" Drag DESTINATION 2
+received nothing ", entry);<br>
+&nbsp;&nbsp; &nbsp;vbox-&gt;pack_start(*button);<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// Create drag source button<br>
+&nbsp;&nbsp; &nbsp;button = new SourceButton(" Drag SOURCE providing
+current time ");<br>
+&nbsp;&nbsp; &nbsp;vbox-&gt;pack_start(*button);<br>
+&nbsp;&nbsp; &nbsp;vbox-&gt;show_all();<br>
+}<br>
+      <br>
+Window::~Window()<br>
+{<br>
+}<br>
+      <br>
+int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace Main;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Window window;<br>
+&nbsp;&nbsp;
+&nbsp;window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp; &nbsp;window.show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;run();<br>
+&nbsp;&nbsp; &nbsp;return 0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling Drag and Drop<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Drag-and-Drop in the
+&lt;examples/howto/dnd&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/dnd&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Drag-and-Drop, add the following lines to a
+new text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+dnd: dnd.cc dnd.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) dnd.cc -o dnd $(CFLAGS) `pkg-config xfcui-X.X
+--cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o dnd</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 283px; height: 138px;" alt="" src="../../images/dnd.png">&nbsp;&nbsp;
+      <br>
+      </div>
+      <br>
+Run the example from a shell. The drag source button registers two
+target types "text/html" and "STRING". When the source button receives
+the "drag_data_get" signal it fills the Gtk::SelectionData data
+field with the string "It's now" followed by the current date and time.
+Depending on the requested target the string is either formatted as
+html
+text or plain text. <br>
+      <br>
+Each drag destination button registers only one target type. The first
+button registers the "text/html" target type and the second button
+registers the "STRING" target type. When a drag-and-drop action occurs
+over the first button it requests the string data in html format. When
+a
+drag-and-drop action occurs over the second button it requests the
+string data in plain text format. If a successful drop occurs the
+button
+label changes to show the time the drop occurred. <br>
+      <br>
+You can also try a drag-and-drop action on the gnome-terminal or one of
+the many html or text editors to see what happens. <br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="draganddrop.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

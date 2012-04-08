@@ -1,0 +1,73 @@
+Summary: 	Xfce Foundation Classes
+Name: 		@PACKAGE@
+Version: 	@VERSION@
+Release: 	1
+License:	LGPL
+Group: 		System Environment/Libraries
+URL: 		http://xfc.xfce.org/
+Source0: 	%{name}-%{version}.tar.gz
+BuildRoot: 	%{_tmppath}/%{name}-root
+BuildRequires:	libsigc++20-devel >= @SIGC_REQUIRED_VERSION@
+BuildRequires:	glib2-devel >= @GLIB_REQUIRED_VERSION@
+BuildRequires:	atk-devel >= @ATK_REQUIRED_VERSION@
+BuildRequires:	pango-devel >= @PANGO_REQUIRED_VERSION@
+BuildRequires:	gtk2-devel >= @GTK_REQUIRED_VERSION@
+
+%description
+The Xfce Foundation Classes combines the power of GTK+ and the power of
+C++ into a state-of-the-art graphical user interface toolkit that makes
+developing GTK+ applications in C++ easy, intuitive and efficient. There
+are more than 420 classes that wrap most of the objects found in the ATK,
+GDK, Gdk-Pixbuf, GLib, GTK and Pango libraries. Included is a full set of
+simple example programs, a C++ version of the GTK+ widget demonstration
+program, extensive reference documentation and a tutorial.
+
+Xfce Foundation Classes Core Library. The core library wraps the GLib object system
+and selected objects from the GLIb utility library. Essentially it provides a low 
+level object system that can be used to build other libraries. Xfc-Core uses the new
+libsigc++ 2.0 callback library to implement a system of signals and slots which make
+using native GObject signals or creating your own signals easy. There is a standard
+string compatible UTF-8 string class, reference documentation and example programs.
+
+%package devel
+Summary:	Development tools for Xfce Foundation Classes
+Group:		Development/Libraries
+Requires:       %{name} = %{version}, libsigc++20-devel, glib2-devel, atk-devel, pango-devel, gtk2-devel 
+
+%description devel
+Static libraries and header files for developing programs that will use %{name}. 
+
+%prep
+%setup -q
+
+%build
+%configure --prefix=/usr --enable-static --enable-shared
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make install DESTDIR=$RPM_BUILD_ROOT
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
+
+%files
+%defattr(-,root,root)
+%{_bindir}/*
+%{_libdir}/lib*.so.*
+%{_libdir}/xfce4/xfc/include
+%{_libdir}/xfce4/xfc/include/xfccore-config.h
+%{_libdir}/xfce4/xfc/include/xfcui-config.h
+
+%files devel
+%defattr(-, root, root)
+%{_libdir}/lib*.so
+%{_libdir}/*a
+%{_libdir}/pkgconfig/*.pc
+%{_includedir}/xfce4/xfc
+%{_datadir}/xfce4/xfc
+%{_datadir}/doc/%{name}-@XFC_API_VERSION@

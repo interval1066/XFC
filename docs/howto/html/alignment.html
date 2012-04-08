@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: The Alignment Widget" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>The
+Alignment Widget</h1>
+      <br>
+      <div style="text-align: left;">The alignment widget allows you to
+place a
+widget
+within its window at a position and size relative to the size of the
+Alignment widget itself. For example, it can be very useful for
+centering a widget within the window.<br>
+      </div>
+      <br>
+There are only two constructors associated with the Alignment widget:<br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div class="qindexH" align="justify"><br>
+      <div class="fbox"><code>Alignment();<br>
+      <br>
+Alignment(float xalign, float yalign, float xscale
+= 0.0, float yscale = 0.0);</code> </div>
+      <br>
+      <div style="text-align: left;">The first constructor creates an
+empty
+alignment,
+the second creates an Alignment with the specified parameters. To alter
+the parameters of an existing Alignment widget use the
+Gtk::Alignment::set() method.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>void
+set(float xalign, float
+yalign, float xscale, float
+yscale);</code></div>
+      <br>
+      <div style="text-align: left;">The 'xalign' and 'yalign'
+arguments affect the position of the widget placed within the Alignment
+widget and can range from 0.0 (on the left) to 1.0 (on the right). The
+'xscale' and 'yscale' arguments effect the
+amount of space allocated to the widget and can be 0.0 (never expand)
+to 1.0 (fully expand).<br>
+      <br>
+You can also add padding (or blank space) on the different sides of a
+widget:<br>
+      <br>
+      <div class="fbox"><code>void set_padding(unsigned int top,
+unsigned int bottom, unsigned int
+left, unsigned int right);</code></div>
+      <br>
+For example, you could indent a widget by adding padding on the left. <br>
+      <br>
+A child widget can be added to an Alignment widget using
+Gtk::Container::add():<br>
+      <br>
+      <div class="fbox"><code>alignment-&gt;add(*child_widget);</code></div>
+      <br>
+For an example of using an Alignment widget have a look at the <a
+ href="progressbar.html#example">Progress Bar</a> example.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td class="ftable qindexH ftd qindexF"
+ style="text-align: center;"> <a class="qindexF" href="alignment.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

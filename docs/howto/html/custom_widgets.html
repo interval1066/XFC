@@ -1,0 +1,1296 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+  <meta content="Widgets: Writing a Custom Widget" name="description">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1"><span class="qindexH">&nbsp;&laquo; </span><a
+ class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"></span></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Writing a Custom Widget</h1>
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a class="mhl" href="custom_widgets.html#CW01">The X Window</a><br>
+        </li>
+        <li><a class="mhl" href="custom_widgets.html#CW02">Displaying a
+widget
+on
+the
+screen</a></li>
+        <li><a class="mhl" href="custom_widgets.html#CW03">The Realize
+Signal<br>
+          </a></li>
+        <li><a class="mhl" href="custom_widgets.html#CW04">Size
+Negotiation</a></li>
+        <li><a class="mhl" href="custom_widgets.html#CW05">The Expose
+Event</a></li>
+        <li><a class="mhl" href="custom_widgets.html#CW06">Event
+Handling</a></li>
+        <li><a class="mhl" href="custom_widgets.html#CW07">Putting it
+all
+together</a><br>
+        </li>
+        <li><a class="mhl" href="custom_widgets.html#CW08">Possible
+Enhancements</a></li>
+      </ol>
+      <br>
+      <div align="justify">
+      <div style="text-align: left;">In
+order to write a custom widget
+you need to understand how widgets display themselves on the screen and
+interact with
+events. As an example of this, we'll create a analog dial widget
+with a pointer that the user can drag to set the value.<br>
+      <br>
+      <div style="text-align: left;">Most
+GTK widgets tend to start off
+as variants of some other,
+previously written widget. The Dial widget is no exception. It's just a
+C++ version of the GtkDial widget that comes with the GTK+ source
+code. GtkDial began with the source code for the GtkRange widget. This
+widget was picked as a starting point so GtkDial could have the same
+interface as the scale widgets, which are just specialized descendants
+of the range widget. If you aren't yet familiar with how scale
+widgets work from the application writer's point of view, it would be a
+good idea to look them over before continuing.<br>
+      <br>
+Dial is a custom widget that
+derives
+directly from Gtk::Widget. Creating this kind of widget is akin
+to creating a new C widget in GTK+. It's more involved than
+simply deriving a new widget from an existing widget and making a few
+changes. Most of the time you can find a predefined widget that meets
+your needs, like in the <a href="composite_widgets.html">Tictactoe</a>
+example, but
+occasionally you wont. This is when you will need to create a new
+widget from
+scratch. The steps involved are the same as those used to create a GTK+
+widget, except in C++ there are fewer of them. Lets take a look. <br>
+      <br>
+      <h2><a name="CW01"></a>The
+X Window</h2>
+An X window is not the user-visible concept of a window as represented
+by Gtk::Window; rather, it's an abstraction used by the X server to
+partition the screen. The background displayed by the X server is the
+root window; the root window has no parent.&nbsp; An X window, or
+Gdk::Window, gives the X server hints about the structure of the
+graphics being displayed.&nbsp; A Gdk::Window is also the
+fundamental
+unit for drawing graphics - you can't draw to the screen as a whole,
+you must draw on a Gdk::Window. <br>
+&nbsp;<br>
+Most GTK+ widgets have a corresponding Gdk::Window. There are
+exceptions, such as Frame and Label; these are referred to as 'no
+window' widgets, and are relatively lightweight. Widgets with no
+associated Gdk::Window draw onto their parent's Gdk::Window.<br>
+&nbsp; <br>
+Sometimes you may need to access the Gdk::Window of a widget before it
+gets created. For example, Gtk::Widget::show() has no immediate effect,
+it merely schedules the widget to be shown. This means you don't have
+to worry about showing widgets in any particular order; it also means
+that you can't immediately access the widget's Gdk::Window. In those
+cases you'll want to&nbsp; manually call Gtk::Widget::realize() to
+create it. This will&nbsp; also realize the widget's parents, if
+appropriate. It's uncommon to need Gtk::Widget::realize(); if you find
+that you do, perhaps you are approaching the problem incorrectly. <br>
+      <br>
+      <h2><a name="CW02"></a>Displaying
+a widget on the screen</h2>
+There are several steps involved in displaying a widget on the screen.
+After the widget is constructed you have to override several protected
+Gtk::Widget signal handlers:<br>
+      <br>
+      <div class="fbox"><code>virtual
+void on_realize();</code><br>
+      </div>
+      <br>
+Realization is the process of creating GDK resources associated
+with the widget; usually the GDK window if it has one and the widget's
+Style. The on_realize() method should do the following:<br>
+      <ul>
+        <li>Set the Gtk::REALIZED
+flag.</li>
+        <li>Create the widget's
+windows, especially its GDK window,
+which should be a child of the widget's parent's GDK window (obtained
+by calling get_parent_window()). </li>
+        <li>Place a pointer to the
+GTK+ widget in the user data field
+of each window. </li>
+        <li>For windowless
+widgets, the GDK window should be set to the
+parent widget's GDK window and the window's reference count should be
+incremented.<br>
+        </li>
+        <li>Set the widget style
+using Gtk::Style::attach(). </li>
+        <li>Set the background of
+each window using
+Gtk::Style::set_background() if possible, and failing that using some
+color from the style. A windowless widget should not do this, since its
+parent already has. </li>
+      </ul>
+The default implementation of on_realize() is only appropriate for
+windowless widgets; it sets the Gtk::REALIZED flag, sets the widget's
+window to the parent widget's GDK window, increases the reference count
+on the parent's window, and sets the widget style. Widgets with their
+own GDK Window must override the on_realize() method. <br>
+      <br>
+      <div class="fbox"><code>virtual
+void on_map();</code></div>
+      <br>
+Mapping is responsible for making sure the widget is actually drawn on
+the screen. on_map() is called after the user calls
+Gtk::Widget::show(). The default implementation sets the Gtk::MAPPED
+flag, and calls Gdk::Window::show() on the widget's GDK window, for
+widgets that have a window. If a widget has subwindows, or needs to
+take any special action when it appears on the screen, it must override
+the on_map() method. Container widgets are required to override the map
+method, because they must iterate over their children and map each
+child widget that's been shown (has the Gtk::VISIBLE flag set). <br>
+      <br>
+      <div class="fbox"><code>virtual
+bool on_expose_event(const
+Gdk::EventExpose&amp; event);</code></div>
+      <br>
+Expose events are received when all or part of a widget's GDK window
+has just become visible on the screen and needs repainting. A widget's
+on_expose_event() signal handler is responsible for performing these
+redraws,
+and should make the necessary calls to the drawing functions to draw
+the exposed portion. For container widgets, this method must generate
+expose events for its child widgets which don't have their own GDK
+windows (if they have their own windows, then X will generate the
+necessary expose events).<br>
+&nbsp;<br>
+      <h2><a name="CW03"></a>The
+Realize Signal</h2>
+      </div>
+To display the Dial widget on-screen we have to override the
+on_realize() signal handler and create the widget's GDK window.<br>
+&nbsp;<br>
+      <div class="fbox"><code>void<br>
+Gtk::Dial::on_realize()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_flags(REALIZED);<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;Gdk::EventMaskField mask = get_events()
+|
+Gdk::EXPOSURE_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK;<br>
+&nbsp;&nbsp; &nbsp;mask |= (Gdk::POINTER_MOTION_MASK |
+Gdk::POINTER_MOTION_HINT_MASK);<br>
+&nbsp;&nbsp; &nbsp;Gdk::WindowAttr
+attributes(get_allocation(),
+Gdk::WINDOW_CHILD, mask);<br>
+&nbsp;&nbsp; &nbsp;attributes.set_visual(*get_visual());<br>
+&nbsp;&nbsp; &nbsp;attributes.set_colormap(*get_colormap());<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;Gdk::Window *window = new
+Gdk::Window(*get_parent_window(), attributes);<br>
+&nbsp;&nbsp; &nbsp;set_window(*window);<br>
+&nbsp;&nbsp; &nbsp;get_style()-&gt;attach(*window);<br>
+&nbsp;&nbsp;
+&nbsp;window-&gt;set_user_data(gtk_widget());<br>
+&nbsp;&nbsp;
+&nbsp;get_style()-&gt;set_background(*window,
+STATE_ACTIVE);<br>
+}</code><br>
+      </div>
+      <br>
+First, on_realize() sets the Gtk::REALIZE flag and then sets up a
+'mask' specifying the events the Dial widget should receive. When
+setting the event mask, we first call the Gtk::Widget get_events()
+function to
+retrieve the event mask that the user has set for the widget (with
+Gtk::Widget::set_events()), and then we add the events we're
+interested in ourselves.<br>
+&nbsp;<br>
+Gdk::WindowAttr specifies the creation parameters for the new window
+and is later passed to the Gdk::Window constructor.&nbsp;
+Gdk::WindowAttr is a wrapper class for the GdkWindowAttr structure. It
+manages the GdkWindowAttributesType mask internally so you don't need
+to set this mask manually. Next, the visual and colormap the widget
+will use is set. After creating the new window the widget style and
+background are set. Note the Gtk::Style::attach() method. This is the
+only time you should use this method, and there is no corresponding
+detach() method because GtkWidget will detach the style for you when
+the widget is destroyed. We also need to put a pointer to the GtkWidget
+in the user data field of
+the Gdk::Window. This allows GTK to dispatch events for this window to
+the correct widget.<br>
+&nbsp;<br>
+      <h2><a name="CW04"></a>Size
+Negotiation</h2>
+Before the window containing a widget is displayed on-screen for the
+first time,
+and whenever the layout of the window changes, GTK asks each child
+widget for its desired size. This request is handled by the
+on_size_request() signal handler. Since our widget isn't a container
+widget, and has no real constraints on its size, we can just return a
+reasonable default value.<br>
+      <br>
+      <div class="fbox"><code>void <br>
+Gtk::Dial::on_size_request(Requisition *requisition)<br>
+{<br>
+&nbsp;&nbsp;
+&nbsp;requisition-&gt;set(dial_default_size,
+dial_default_size);<br>
+}</code><br>
+      </div>
+      <br>
+After all the widgets have requested an ideal size, the layout of the
+window is computed and each child widget is notified of its actual
+size. Usually, this will be at least as large as the requested size,
+but if for instance the user has resized the window, it may
+occasionally be smaller than the requested size. The size notification
+is handled by the on_size_allocate() signal handler. Notice that as
+well as computing the sizes of some component pieces for future use,
+this routine also does the grunt work of moving the widget's X window
+into the new position and size.<br>
+&nbsp;<br>
+      <div class="fbox"><code>void<br>
+Gtk::Dial::on_size_allocate(const Allocation&amp; allocation)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_allocation(allocation);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;if (is_realized())<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;get_window()-&gt;move_resize(allocation);<br>
+&nbsp;&nbsp; &nbsp;}<br>
+      <br>
+&nbsp;&nbsp; &nbsp;radius =
+(int)(std::min(allocation.width(),
+allocation.height()) * 0.45);<br>
+&nbsp;&nbsp; &nbsp;pointer_width = radius / 5;<br>
+}</code><br>
+      </div>
+      <br>
+      <h2><a name="CW05"></a>The
+Expose Event</h2>
+All the drawing for this widget is done in the on_expose_event() signal
+handler. There's not much to remark on here except the use of the
+function Gdk::Drawable::draw_polygon to draw the pointer with three
+dimensional shading according to the colors stored in the widget's
+style.<br>
+      <br>
+      <div class="fbox"><code>bool <br>
+Gtk::Dial::on_expose_event(const Gdk::EventExpose&amp; event)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;if (event.count() &gt; 0)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;return
+false;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Allocation allocation = get_allocation();<br>
+&nbsp;&nbsp; &nbsp;int xc = allocation.width() / 2;<br>
+&nbsp;&nbsp; &nbsp;int yc = allocation.height() / 2;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;int upper =
+(int)adjustment_-&gt;upper();<br>
+&nbsp;&nbsp; &nbsp;int lower =
+(int)adjustment_-&gt;lower();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;double s = sin(last_angle);<br>
+&nbsp;&nbsp; &nbsp;double c = cos(last_angle);<br>
+&nbsp;&nbsp; &nbsp;last_angle = angle;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Gdk::Point points[6];<br>
+&nbsp;&nbsp; &nbsp;points[0].set(int(xc + s * pointer_width
+/ 2),
+int(yc + c * pointer_width / 2));<br>
+&nbsp;&nbsp; &nbsp;points[1].set(int(xc + c * radius),
+int(yc - s *
+radius));<br>
+&nbsp;&nbsp; &nbsp;points[2].set(int(xc - s * pointer_width
+/ 2),
+int(yc - c * pointer_width / 2));<br>
+&nbsp;&nbsp; &nbsp;points[3].set(int(xc - c * radius / 10),
+int(yc + s
+* radius / 10));<br>
+&nbsp;&nbsp; &nbsp;points[4].set(points[0].x(),
+points[0].y());<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Gdk::Window *window = get_window();<br>
+&nbsp;&nbsp; &nbsp;window-&gt;invalidate(allocation,
+false);<br>
+&nbsp;&nbsp; &nbsp;Gtk::Style *style = get_style();<br>
+&nbsp;&nbsp; &nbsp;style-&gt;draw_polygon(*window,
+STATE_NORMAL,
+SHADOW_OUT, points, 5, false, 0, this);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Draw ticks<br>
+&nbsp;&nbsp; &nbsp;int inc = upper - lower;<br>
+&nbsp;&nbsp; &nbsp;if (inc == 0)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;return
+false;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;double increment = (100 * G_PI) / (
+radius * radius);<br>
+&nbsp;&nbsp; &nbsp;while (inc &lt; 100) inc *= 10;<br>
+&nbsp;&nbsp; &nbsp;while (inc &gt;= 1000) inc /= 10;<br>
+&nbsp;&nbsp; &nbsp;double last = -1;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;for (int i = 0; i &lt;= inc; i++)<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;double
+theta = ((float)i * G_PI /
+(18 * inc / 24.) - G_PI / 6.);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if
+((theta - last) &lt;
+(increment))<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;continue;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;last =
+theta;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;s =
+sin(theta);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;c =
+cos(theta);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;int
+tick_length = (i % (inc / 10)
+== 0) ? pointer_width : pointer_width / 2;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;window-&gt;draw_line(*style-&gt;fg_gc(get_state()),
+int(xc + c *
+(radius - tick_length)),<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;int(yc -
+s * (radius -
+tick_length)), int(xc + c * radius), int(yc - s * radius));<br>
+&nbsp;&nbsp; &nbsp;}<br>
+      <br>
+&nbsp; &nbsp;&nbsp; &nbsp;// Draw pointer<br>
+&nbsp;&nbsp; &nbsp;s = sin(angle);<br>
+&nbsp;&nbsp; &nbsp;c = cos(angle);<br>
+&nbsp;&nbsp; &nbsp;last_angle = angle;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;points[0].set(int(xc + s * pointer_width
+/ 2),
+int(yc + c * pointer_width / 2));<br>
+&nbsp;&nbsp; &nbsp;points[1].set(int(xc + c * radius),
+int(yc - s *
+radius));<br>
+&nbsp;&nbsp; &nbsp;points[2].set(int(xc - s * pointer_width
+/ 2),
+int(yc - c * pointer_width / 2));<br>
+&nbsp;&nbsp; &nbsp;points[3].set(int(xc - c * radius / 10),
+int(yc + s
+* radius / 10));<br>
+&nbsp;&nbsp; &nbsp;points[4].set(points[0].x(),
+points[0].y());<br>
+      <br>
+&nbsp;&nbsp; &nbsp;style-&gt;draw_polygon(*window,
+STATE_NORMAL,
+SHADOW_OUT, points, 5, true, 0, this);<br>
+&nbsp;&nbsp; &nbsp;return false;<br>
+}</code></div>
+      <br>
+      <h2><a name="CW06"></a>Event
+Handling</h2>
+The rest of the widget's code handles various types of events, and
+isn't too different from what would be found in many other XFC
+applications. Two types of events can occur - either the user can click
+on the widget with the mouse and drag to move the pointer, or the value
+of the Adjustment object can change due to some external circumstance.<br>
+&nbsp;<br>
+When the user clicks on the widget, we check to see if the click was
+appropriately near the pointer, and if so, store the button that the
+user clicked with in the button field of the widget, and grab all mouse
+events with a call to Main::grab_add(). Subsequent motion of the mouse
+causes the value of the control to be recomputed (by the function
+update_mouse()). Depending on the policy that has been set,
+"value_changed" events are either generated instantly
+(Gtk::UPDATE_CONTINUOUS), after a delay in a timer added with the
+timeout_signal(Gtk::UPDATE_DELAYED), or only when the button is
+released (Gtk::UPDATE_DISCONTINUOUS).<br>
+      <br>
+      <h2><a name="CW07"></a>Putting
+it all together</h2>
+The widget class has a header file which declares the object and its
+members. To prevent multiple inclusions at compile time, the entire
+header file is wrapped in an inclusion guard:<br>
+&nbsp;<br>
+      <div class="fbox">#ifndef
+XFC_GTK_DIAL_HH<br>
+#define XFC_GTK_DIAL_HH<br>
+.<br>
+.<br>
+#endif // XFC_GTK_DIAL_HH<br>
+      </div>
+      <br>
+The header file for the Dial widget is &lt;dial.hh&gt;:<br>
+&nbsp; <br>
+      <div class="fbox"><code>#ifndef
+XFC_GTK_DIAL_HH<br>
+#define XFC_GTK_DIAL_HH<br>
+      <br>
+#ifndef XFC_GTK_WIDGET_HH<br>
+#include &lt;xfc/gtk/widget.hh&gt;<br>
+#endif<br>
+      <br>
+#ifndef XFC_GTK_WIDGET_SIGNALS_HH<br>
+#include &lt;xfc/gtk/widgetsignals.hh&gt;<br>
+#endif<br>
+      <br>
+namespace Xfc {<br>
+      <br>
+namespace Gtk {<br>
+      <br>
+class Adjustment;<br>
+      <br>
+class Dial : public Widget, protected WidgetSignals<br>
+{<br>
+&nbsp;&nbsp; &nbsp;UpdateType policy_;<br>
+&nbsp;&nbsp; &nbsp;// Either UPDATE_CONTINUOUS, UPDATE
+DISCONTINUOUS or
+UPDATE_DELAYED.<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;unsigned int button;<br>
+&nbsp;&nbsp; &nbsp;// The mouse button currently pressed or
+0 if none.<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;int radius;<br>
+&nbsp;&nbsp; &nbsp;int pointer_width;<br>
+&nbsp;&nbsp; &nbsp;// Dimensions of the dial components.<br>
+      <br>
+&nbsp;&nbsp; &nbsp;sigc::connection timer;<br>
+&nbsp;&nbsp; &nbsp;// Signal connection of the update timer.<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;float angle;<br>
+&nbsp;&nbsp; &nbsp;float last_angle;<br>
+&nbsp;&nbsp; &nbsp;// Current angle.<br>
+      <br>
+&nbsp;&nbsp; &nbsp;float old_value;<br>
+&nbsp;&nbsp; &nbsp;float old_lower;<br>
+&nbsp;&nbsp; &nbsp;float old_upper;<br>
+&nbsp;&nbsp; &nbsp;// Old values from adjustment stored so
+we know when
+something changes.<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Pointer&lt;Adjustment&gt;
+adjustment_;<br>
+&nbsp;&nbsp; &nbsp;// The adjustment object that stores the
+data for
+this dial. A smart<br>
+&nbsp;&nbsp; &nbsp;// pointer is used to handle the
+reference counting.<br>
+      <br>
+&nbsp;&nbsp; &nbsp;void update();<br>
+&nbsp;&nbsp; &nbsp;void update_mouse(int x, int y);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;bool on_timeout();<br>
+      <br>
+protected:<br>
+// Signal Handlers<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;virtual void on_realize();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;virtual bool on_expose_event(const
+Gdk::EventExpose&amp; event);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;virtual void on_size_request(Requisition
+*requisition);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;virtual void on_size_allocate(const
+Allocation&amp;
+allocation);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;virtual bool on_button_press_event(const
+Gdk::EventButton&amp; event);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;virtual bool
+on_button_release_event(const
+Gdk::EventButton&amp; event);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;virtual bool
+on_motion_notify_event(const
+Gdk::EventMotion&amp; event);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;void on_adjustment_changed();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;void on_adjustment_value_changed();<br>
+      <br>
+public:<br>
+// Constructors<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Dial(Adjustment *adjustment = 0);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;virtual ~Dial();<br>
+&nbsp;&nbsp; &nbsp;<br>
+// Accessors<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Adjustment* get_adjustment() const;<br>
+&nbsp;&nbsp; &nbsp;<br>
+// Methods<br>
+      <br>
+&nbsp;&nbsp; &nbsp;void set_adjustment(Adjustment
+*adjustment);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;void set_update_policy(UpdateType
+policy);<br>
+};<br>
+      <br>
+} // namespace Gtk<br>
+      <br>
+} // namespace Xfc<br>
+      <br>
+#endif // XFC_GTK_DIAL_HH</code><br>
+      </div>
+      <br>
+Since there is quite a bit more going on in this widget than the <a
+ href="composite_widgets.html">Tictactoe</a>
+example, there are more
+class data members and signal handlers, but otherwise
+things are pretty similar. Note that when we store a pointer to the
+Adjustment object, we need to increment its reference count, (and
+decrement it when we no longer use it) so that GTK can
+keep track of when it can safely be destroyed. For convenience, Dial
+uses a smart pointer to manage the adjustment's reference counting but
+it could have done it manually. There are also a few methods to
+manipulate the widget's options: get_adjustment(), set_adjustment() and
+set_update_policy().<br>
+&nbsp;<br>
+The source file for the Dial widget is &lt;dial.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include
+"dial.hh"<br>
+#include &lt;xfc/gtk/private/widgetclass.hh&gt;<br>
+#include &lt;xfc/gtk/adjustment.hh&gt;<br>
+#include &lt;xfc/gtk/style.hh&gt;<br>
+#include &lt;xfc/gdk/window.hh&gt;<br>
+#include &lt;xfc/glib/main.hh&gt;<br>
+#include &lt;xfc/main.hh&gt;<br>
+#include &lt;algorithm&gt;<br>
+#include &lt;cmath&gt;<br>
+      <br>
+const int scroll_delay_length = 300;<br>
+const int dial_default_size = 100;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+Gtk::Dial::Dial(Adjustment *adjustment)<br>
+: Gtk::Widget((GtkWidget*)Gtk::WidgetClass::create()),<br>
+&nbsp; Gtk::WidgetSignals(this),<br>
+&nbsp; adjustment_(0)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;button = 0;<br>
+&nbsp;&nbsp; &nbsp;policy_ = UPDATE_CONTINUOUS;<br>
+&nbsp;&nbsp; &nbsp;radius = 0;<br>
+&nbsp;&nbsp; &nbsp;pointer_width = 0;<br>
+&nbsp;&nbsp; &nbsp;angle = 0.0;<br>
+&nbsp;&nbsp; &nbsp;old_value = 0.0;<br>
+&nbsp;&nbsp; &nbsp;old_lower = 0.0;<br>
+&nbsp;&nbsp; &nbsp;old_upper = 0.0;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;if (!adjustment)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;adjustment = new Gtk::Adjustment;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;set_adjustment(adjustment);<br>
+}<br>
+      <br>
+Gtk::Dial::~Dial()<br>
+{<br>
+}<br>
+      <br>
+Gtk::Adjustment*<br>
+Gtk::Dial::get_adjustment() const<br>
+{<br>
+&nbsp;&nbsp; &nbsp;return adjustment_;<br>
+}<br>
+      <br>
+void <br>
+Gtk::Dial::set_adjustment(Adjustment *adjustment)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;if (adjustment_)<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;adjustment_-&gt;disconnect_by_name("changed");<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;adjustment_-&gt;disconnect_by_name("value_changed");<br>
+&nbsp;&nbsp; &nbsp;}<br>
+      <br>
+&nbsp;&nbsp; &nbsp;adjustment_ = adjustment;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;if (adjustment_)<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;adjustment_-&gt;signal_changed().connect(sigc::mem_fun(this,
+&amp;Dial::on_adjustment_changed));<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;adjustment_-&gt;signal_value_changed().connect(sigc::mem_fun(this,
+&amp;Dial::on_adjustment_value_changed));<br>
+&nbsp;&nbsp; &nbsp;}<br>
+      <br>
+&nbsp;&nbsp; &nbsp;old_value =
+adjustment_-&gt;get_value();<br>
+&nbsp;&nbsp; &nbsp;old_lower = adjustment_-&gt;lower();<br>
+&nbsp;&nbsp; &nbsp;old_upper = adjustment_-&gt;upper();<br>
+&nbsp;&nbsp; &nbsp;update();<br>
+}<br>
+      <br>
+void<br>
+Gtk::Dial::on_realize()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_flags(REALIZED);<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;Gdk::EventMaskField mask = get_events()
+|
+Gdk::EXPOSURE_MASK | Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK;<br>
+&nbsp;&nbsp; &nbsp;mask |= (Gdk::POINTER_MOTION_MASK |
+Gdk::POINTER_MOTION_HINT_MASK);<br>
+&nbsp;&nbsp; &nbsp;Gdk::WindowAttr
+attributes(get_allocation(),
+Gdk::WINDOW_CHILD, mask);<br>
+&nbsp;&nbsp; &nbsp;attributes.set_visual(*get_visual());<br>
+&nbsp;&nbsp; &nbsp;attributes.set_colormap(*get_colormap());<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;Gdk::Window *window = new
+Gdk::Window(*get_parent_window(), attributes);<br>
+&nbsp;&nbsp; &nbsp;set_window(*window);<br>
+&nbsp;&nbsp; &nbsp;get_style()-&gt;attach(*window);<br>
+&nbsp;&nbsp;
+&nbsp;window-&gt;set_user_data(gtk_widget());<br>
+&nbsp;&nbsp;
+&nbsp;get_style()-&gt;set_background(*window,
+STATE_ACTIVE);<br>
+}<br>
+&nbsp;&nbsp; &nbsp;<br>
+void <br>
+Gtk::Dial::on_size_request(Requisition *requisition)<br>
+{<br>
+&nbsp;&nbsp;
+&nbsp;requisition-&gt;set(dial_default_size,
+dial_default_size);<br>
+}<br>
+      <br>
+void<br>
+Gtk::Dial::on_size_allocate(const Allocation&amp; allocation)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_allocation(allocation);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;if (is_realized())<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;get_window()-&gt;move_resize(allocation);<br>
+&nbsp;&nbsp; &nbsp;}<br>
+      <br>
+&nbsp;&nbsp; &nbsp;radius =
+(int)(std::min(allocation.width(),
+allocation.height()) * 0.45);<br>
+&nbsp;&nbsp; &nbsp;pointer_width = radius / 5;<br>
+}<br>
+      <br>
+bool <br>
+Gtk::Dial::on_expose_event(const Gdk::EventExpose&amp; event)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;if (event.count() &gt; 0)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;return
+false;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Allocation allocation = get_allocation();<br>
+&nbsp;&nbsp; &nbsp;int xc = allocation.width() / 2;<br>
+&nbsp;&nbsp; &nbsp;int yc = allocation.height() / 2;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;int upper =
+(int)adjustment_-&gt;upper();<br>
+&nbsp;&nbsp; &nbsp;int lower =
+(int)adjustment_-&gt;lower();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;double s = sin(last_angle);<br>
+&nbsp;&nbsp; &nbsp;double c = cos(last_angle);<br>
+&nbsp;&nbsp; &nbsp;last_angle = angle;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Gdk::Point points[6];<br>
+&nbsp;&nbsp; &nbsp;points[0].set(int(xc + s * pointer_width
+/ 2),
+int(yc + c * pointer_width / 2));<br>
+&nbsp;&nbsp; &nbsp;points[1].set(int(xc + c * radius),
+int(yc - s *
+radius));<br>
+&nbsp;&nbsp; &nbsp;points[2].set(int(xc - s * pointer_width
+/ 2),
+int(yc - c * pointer_width / 2));<br>
+&nbsp;&nbsp; &nbsp;points[3].set(int(xc - c * radius / 10),
+int(yc + s
+* radius / 10));<br>
+&nbsp;&nbsp; &nbsp;points[4].set(points[0].x(),
+points[0].y());<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Gdk::Window *window = get_window();<br>
+&nbsp;&nbsp; &nbsp;window-&gt;invalidate(allocation,
+false);<br>
+&nbsp;&nbsp; &nbsp;Gtk::Style *style = get_style();<br>
+&nbsp;&nbsp; &nbsp;style-&gt;draw_polygon(*window,
+STATE_NORMAL,
+SHADOW_OUT, points, 5, false, 0, this);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Draw ticks<br>
+&nbsp;&nbsp; &nbsp;int inc = upper - lower;<br>
+&nbsp;&nbsp; &nbsp;if (inc == 0)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;return
+false;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;double increment = (100 * G_PI) / (
+radius * radius);<br>
+&nbsp;&nbsp; &nbsp;while (inc &lt; 100) inc *= 10;<br>
+&nbsp;&nbsp; &nbsp;while (inc &gt;= 1000) inc /= 10;<br>
+&nbsp;&nbsp; &nbsp;double last = -1;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;for (int i = 0; i &lt;= inc; i++)<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;double
+theta = ((float)i * G_PI /
+(18 * inc / 24.) - G_PI / 6.);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if
+((theta - last) &lt;
+(increment))<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;continue;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;last =
+theta;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;s =
+sin(theta);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;c =
+cos(theta);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;int
+tick_length = (i % (inc / 10)
+== 0) ? pointer_width : pointer_width / 2;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;window-&gt;draw_line(*style-&gt;fg_gc(get_state()),
+int(xc + c *
+(radius - tick_length)),<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;int(yc -
+s * (radius -
+tick_length)), int(xc + c * radius), int(yc - s * radius));<br>
+&nbsp;&nbsp; &nbsp;}<br>
+      <br>
+&nbsp; &nbsp;&nbsp; &nbsp;// Draw pointer<br>
+&nbsp;&nbsp; &nbsp;s = sin(angle);<br>
+&nbsp;&nbsp; &nbsp;c = cos(angle);<br>
+&nbsp;&nbsp; &nbsp;last_angle = angle;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;points[0].set(int(xc + s * pointer_width
+/ 2),
+int(yc + c * pointer_width / 2));<br>
+&nbsp;&nbsp; &nbsp;points[1].set(int(xc + c * radius),
+int(yc - s *
+radius));<br>
+&nbsp;&nbsp; &nbsp;points[2].set(int(xc - s * pointer_width
+/ 2),
+int(yc - c * pointer_width / 2));<br>
+&nbsp;&nbsp; &nbsp;points[3].set(int(xc - c * radius / 10),
+int(yc + s
+* radius / 10));<br>
+&nbsp;&nbsp; &nbsp;points[4].set(points[0].x(),
+points[0].y());<br>
+      <br>
+&nbsp;&nbsp; &nbsp;style-&gt;draw_polygon(*window,
+STATE_NORMAL,
+SHADOW_OUT, points, 5, true, 0, this);<br>
+&nbsp;&nbsp; &nbsp;return false;<br>
+}<br>
+      <br>
+      <br>
+bool<br>
+Gtk::Dial::on_button_press_event(const Gdk::EventButton&amp; event)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;// Determine if button press was within
+pointer
+region - we do this by<br>
+&nbsp;&nbsp; &nbsp;// computing the parallel and
+perpendicular distance
+of the point where<br>
+&nbsp;&nbsp; &nbsp;// the mouse was pressed from the line
+passing
+through the pointer.<br>
+      <br>
+&nbsp;&nbsp; &nbsp;int dx = int(event.x()) -
+get_allocation().width() /
+2;<br>
+&nbsp;&nbsp; &nbsp;int dy = get_allocation().height() / 2 -
+int(event.y());<br>
+      <br>
+&nbsp;&nbsp; &nbsp;double s = sin(angle);<br>
+&nbsp;&nbsp; &nbsp;double c = cos(angle);<br>
+&nbsp;&nbsp; &nbsp;double d_parallel = s * dy + c * dx;<br>
+&nbsp;&nbsp; &nbsp;double d_perpendicular = fabs(s * dx - c
+* dy);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;if (!button &amp;&amp;
+(d_perpendicular &lt;
+pointer_width/2) &amp;&amp; (d_parallel &gt; -
+pointer_width))<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;Main::grab_add(*this);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;button =
+event.button();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;update_mouse(int(event.x()),
+int(event.y()));<br>
+&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;return false;<br>
+}<br>
+      <br>
+bool<br>
+Gtk::Dial::on_button_release_event(const Gdk::EventButton&amp;
+event)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;if (button == event.button())<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;Main::grab_remove(*this);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;button =
+0;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if
+(policy_ == UPDATE_DELAYED)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+&nbsp;timer.disconnect();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if
+((policy_ !=
+UPDATE_CONTINUOUS) &amp;&amp; (old_value !=
+adjustment_-&gt;get_value()))<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+&nbsp;adjustment_-&gt;value_changed();<br>
+&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;return false;<br>
+}<br>
+      <br>
+bool <br>
+Gtk::Dial::on_motion_notify_event(const Gdk::EventMotion&amp; event)<br>
+{<br>
+&nbsp;&nbsp;
+&nbsp;Gtk::WidgetSignals::on_motion_notify_event(event);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;if (button != 0)<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;int x =
+int(event.x());<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;int y =
+int(event.y());<br>
+      <br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;Gdk::ModifierTypeField mods;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;Gdk::Window *window =
+get_window();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if
+(event.is_hint() ||
+(event.window() != window))<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+&nbsp;window-&gt;get_pointer(&amp;x, &amp;y,
+&amp;mods);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;int mask;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;switch
+(button)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;case 1:<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;mask =
+GDK_BUTTON1_MASK;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;break;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;case 2:<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;mask =
+GDK_BUTTON2_MASK;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;break;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;case 3:<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;mask =
+GDK_BUTTON3_MASK;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;break;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;default:<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;mask = 0;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;break;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if (mods
+&amp; mask)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+&nbsp;update_mouse(x, y);<br>
+&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;return false;<br>
+}<br>
+      <br>
+void<br>
+Gtk::Dial::set_update_policy(UpdateType policy)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;policy_ = policy;<br>
+}<br>
+      <br>
+void<br>
+Gtk::Dial::update()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;double value =
+adjustment_-&gt;get_value();<br>
+&nbsp;&nbsp; &nbsp;double lower =
+adjustment_-&gt;lower();<br>
+&nbsp;&nbsp; &nbsp;double upper =
+adjustment_-&gt;upper();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;double new_value = std::max(lower,
+value);<br>
+&nbsp;&nbsp; &nbsp;new_value = std::min(new_value, upper);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;if (new_value != value)<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;adjustment_-&gt;set_value(new_value);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;adjustment_-&gt;value_changed();<br>
+&nbsp;&nbsp; &nbsp;}<br>
+      <br>
+&nbsp;&nbsp; &nbsp;angle = 7.*G_PI/6. - (new_value - lower)
+*
+4.*G_PI/3. / (upper - lower);<br>
+&nbsp;&nbsp; &nbsp;queue_draw();<br>
+}<br>
+      <br>
+void<br>
+Gtk::Dial::update_mouse(int x, int y)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;int xc = get_allocation().width() / 2;<br>
+&nbsp;&nbsp; &nbsp;int yc = get_allocation().height() / 2;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;float old_value =
+adjustment_-&gt;get_value();<br>
+&nbsp;&nbsp; &nbsp;angle = atan2(yc - y, x - xc);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;if (angle &lt; -G_PI/2.)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;angle +=
+2*G_PI;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;if (angle &lt; -G_PI/6)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;angle =
+-G_PI/6;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;if (angle &gt; 7.*G_PI/6.)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;angle =
+7.*G_PI/6.;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;double lower =
+adjustment_-&gt;lower();<br>
+&nbsp;&nbsp; &nbsp;adjustment_-&gt;set_value(lower +
+(7.*G_PI/6 -
+angle) * (adjustment_-&gt;upper() - lower) / (4.*G_PI/3.));<br>
+      <br>
+&nbsp;&nbsp; &nbsp;if (adjustment_-&gt;get_value() ==
+old_value)<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if
+(policy_ == UPDATE_CONTINUOUS)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+&nbsp;adjustment_-&gt;value_changed();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;else<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;queue_draw();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;if (policy_ ==
+UPDATE_DELAYED)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;timer = G::timeout_signal.connect(sigc::mem_fun(this,
+&amp;Dial::on_timeout), scroll_delay_length);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;}<br>
+}<br>
+      <br>
+bool<br>
+Gtk::Dial::on_timeout()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;if (policy_ == UPDATE_DELAYED)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;adjustment_-&gt;value_changed();<br>
+&nbsp;&nbsp; &nbsp;return false;<br>
+}<br>
+      <br>
+void<br>
+Gtk::Dial::on_adjustment_changed()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;double value =
+adjustment_-&gt;get_value();<br>
+&nbsp;&nbsp; &nbsp;double lower =
+adjustment_-&gt;lower();<br>
+&nbsp;&nbsp; &nbsp;double upper =
+adjustment_-&gt;upper();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;if ((old_value != value) || (old_lower
+!= lower) ||
+(old_upper != upper))<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;update();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;old_value
+= value;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;old_lower
+= lower;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;old_upper
+= upper;<br>
+&nbsp;&nbsp; &nbsp;}<br>
+}<br>
+      <br>
+void<br>
+Gtk::Dial::on_adjustment_value_changed()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;double value =
+adjustment_-&gt;get_value();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;if (old_value != value)<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;update();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;old_value
+= value;<br>
+&nbsp;&nbsp; &nbsp;}<br>
+}</code><br>
+      </div>
+      <br>
+The source file for the application that will test the Dial widget is
+&lt;dial_test.cc&gt;<br>
+      <br>
+      <div class="fbox"><code>#include
+&lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+#include &lt;xfc/gtk/frame.hh&gt;<br>
+#include &lt;xfc/gtk/label.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+#include &lt;cstdio&gt;<br>
+#include &lt;cstdlib&gt;<br>
+#include "dial.hh"<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class DialTest : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp; &nbsp;Gtk::Adjustment *adjustment;<br>
+&nbsp;&nbsp; &nbsp;Gtk::Label *label;<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp; &nbsp;void on_adjustment_value_changed();<br>
+      <br>
+public:<br>
+&nbsp;&nbsp; &nbsp;DialTest();<br>
+&nbsp;&nbsp; &nbsp;virtual ~DialTest();<br>
+};<br>
+      <br>
+DialTest::DialTest()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_title("Dial");<br>
+&nbsp;&nbsp; &nbsp;set_border_width(10);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Gtk::VBox *vbox = new Gtk::VBox(false,
+5);<br>
+&nbsp;&nbsp; &nbsp;add(*vbox);<br>
+&nbsp;&nbsp; &nbsp;vbox-&gt;show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Gtk::Frame *frame = new Gtk::Frame;<br>
+&nbsp;&nbsp;
+&nbsp;frame-&gt;set_shadow_type(Gtk::SHADOW_IN);<br>
+&nbsp;&nbsp; &nbsp;vbox-&gt;add(*frame);<br>
+&nbsp;&nbsp; &nbsp;frame-&gt;show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;adjustment = new Gtk::Adjustment(0, 0,
+100, 0.01,
+0.1, 0);<br>
+&nbsp;&nbsp; &nbsp;Gtk::Dial *dial = new
+Gtk::Dial(adjustment);<br>
+&nbsp;&nbsp;
+&nbsp;dial-&gt;set_update_policy(Gtk::UPDATE_DELAYED);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;frame-&gt;add(*dial);<br>
+&nbsp;&nbsp; &nbsp;dial-&gt;show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;label = new Gtk::Label("0.00");<br>
+&nbsp;&nbsp; &nbsp;vbox-&gt;pack_end(*label, false,
+false);<br>
+&nbsp;&nbsp; &nbsp;label-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;
+&nbsp;adjustment-&gt;signal_value_changed().connect(sigc::mem_fun(this,
+&amp;DialTest::on_adjustment_value_changed));<br>
+&nbsp;&nbsp; &nbsp;show();<br>
+}<br>
+      <br>
+DialTest::~DialTest()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+DialTest::on_adjustment_value_changed()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;String buffer = String::format("%4.2f",
+adjustment-&gt;get_value());<br>
+&nbsp;&nbsp; &nbsp;label-&gt;set_text(buffer);<br>
+}<br>
+      <br>
+int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace Main;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;DialTest window;<br>
+&nbsp;&nbsp;
+&nbsp;window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+      <br>
+&nbsp;&nbsp; &nbsp;run();<br>
+&nbsp;&nbsp; &nbsp;return 0;<br>
+}</code><br>
+      </div>
+      <br>
+      <h2>Compiling Dial<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Dial in the
+&lt;examples/howto/dial&gt; source directory along with a Makefile.
+If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/dial&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Dial, add the following lines to a new text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC
+= g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+dial_test: dial.o dial_test.o<br>
+&nbsp;&nbsp;&nbsp; $(CC) dial_test.o dial.o -o dial_test
+`pkg-config
+xfcui-X.X --libs`<br>
+      <br>
+dial_test.o: dial_test.cc dial.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) -c dial_test.cc -o dial_test.o
+$(CFLAGS)
+`pkg-config xfcui-X.X --cflags`<br>
+      <br>
+dial.o: dial.cc dial.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) -c dial.cc -o dial.o $(CFLAGS)
+`pkg-config
+xfcui-X.X --cflags`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o dial_test</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When you
+compile and run the program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 158px; height: 187px;" alt="" src="../../images/dial.png"><br>
+      <div style="text-align: left;"><br>
+      </div>
+      </div>
+      <h2><a name="CW08"></a>Possible
+Enhancements</h2>
+The Dial widget as we've described it so far runs about 494 lines of
+code. Although that might sound like a fair bit, we've really
+accomplished quite a bit with that much code, especially since much of
+that length is headers and boilerplate. However, there are quite a few
+more enhancements that could be made to this widget.<br>
+      <br>
+If you try this widget out, you'll find that there is some flashing as
+the pointer is dragged around. This is because the entire widget is
+erased every time the pointer is moved before being redrawn. Often, the
+best way to handle this problem is to draw to an offscreen pixmap, then
+copy the final results onto the screen in one step (the ProgressBar
+widget draws itself in this fashion).<br>
+&nbsp;<br>
+The user should be able to use the up and down arrow keys to
+increase and decrease the value. Also it would be nice if the widget
+had buttons to increase and
+decrease the value in small or large steps. Although it would be
+possible to use embedded Button widgets for this, we would also like
+the buttons to auto-repeat when held down, as the arrows on a scrollbar
+do. Most of the code to implement this type of behavior can be found in
+the GtkRange widget.<br>
+&nbsp;<br>
+The Dial widget could be made into a container widget with a
+single child widget positioned at the bottom between the buttons
+mentioned above. The user could then add their choice of a label or
+entry widget to display the current value of the dial.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="custom_widgets.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Font Selection" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Font
+Selection</h1>
+      <br>
+The font selection widget is an interactive widget
+that lists all the available fonts, styles and sizes, allowing the user
+to select a font. It is used in the FontSelectionDialog widget to
+provide a dialog box for selecting fonts.<br>
+      <div style="text-align: left;"> <br>
+A&nbsp;FontSelection can be created with the constructor:<br>
+      <span style="color: rgb(0, 55, 85);"></span> </div>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <div class="fbox"><code>FontSelection();</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">You will probably not be using
+this constructor
+directly. It creates an orphan FontSelection widget which you'll have
+to
+parent yourself. The FontSelection widget inherits from the Gtk::VBox.<br>
+      </div>
+      <div style="text-align: left;"> <br>
+      <div class="fbox"><code>FontSelectionDialog();<br>
+      <br>
+FontSelectionDialog(const String&amp; title);</code> </div>
+      <br>
+      </div>
+      <div style="text-align: left;">These are the most common font
+selection
+constructors. Both constructors create a FontSelectionDialog, the first
+with the default title, which is just the program name and the second
+with the specified title. A FontSelectionDialog consists of a VBox
+containing the FontSelection widget, an HSeparator and an HBox with
+three buttons, "Ok", "Cancel" and "Apply". The Apply button is not
+shown
+by default. You can reach these buttons by using one of the
+corresponding accessors:<br>
+      </div>
+      <div style="text-align: left;"> <br>
+      <div class="fbox"><code>Gtk::Button* ok_button() const;<br>
+      <br>
+Gtk::Button* apply_button() const;<br>
+      <br>
+Gtk::Button* cancel_button() const;</code></div>
+      <br>
+You can set and retrieve the selected font name by calling either of
+the following FontSelection or FontSelectionDialog methods:<br>
+      <br>
+      <div class="fbox"><code>bool set_font_name(const String&amp;
+fontname);<br>
+      <br>
+String get_font_name() const;</code></div>
+      <br>
+There are two FontSelection methods which can be used to retrieve Pango
+font information:<br>
+      <br>
+      <div class="fbox"><code>Pango::FontFamily*
+get_font_family() const;<br>
+      <br>
+Pango::FontFace* get_font_face() const;</code></div>
+      <br>
+These methods return the current font family and face. To change the
+font used by a widget that displays
+text you will need to create a FontDescription. You can do this with
+the
+following Pango::FontDescription constructor:<br>
+      <br>
+      <div class="fbox"><code> FontDescription(const String&amp; desc);</code></div>
+      <br>
+The 'desc' argument is the string returned by the call to
+get_font_name() above. To change a widget's font you must call the
+Gtk::Widget method:<br>
+      <br>
+      <div class="fbox"><code>void
+modify_font(const
+Pango::FontDescription&amp; font_desc);</code></div>
+      <br>
+      <h2><a name="example"></a>Font
+Selection Example</h2>
+Here's a simple example demonstrating the use of
+the FontSelectionDialog. The program displays a window that contains
+two
+widgets: a label displaying the text "Welcome to XFC" and a button.
+When the button is clicked a FontSelectionDialog appears. Selecting a
+new font, font style and/or font size and clicking on the "OK" button
+will result in the selected font being applied to the text in the
+label. <br>
+      <br>
+The header file for the Font Selection example is
+&lt;fontselection.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/label.h&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class FontSelectionWindow : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Gtk::Label *label;<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; void on_select_font();<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; FontSelectionWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual
+~FontSelectionWindow();<br>
+};</code></div>
+      <br>
+and the source file is &lt;fontselection.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "fontselection.hh"<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+#include &lt;xfc/gtk/button.hh&gt;<br>
+#include &lt;xfc/gtk/fontselection.hh&gt;<br>
+#include &lt;xfc/pango/font.hh&gt;<br>
+#include &lt;iostream&gt;<br>
+      <br>
+FontSelectionWindow::FontSelectionWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; // Sets the border
+width
+of the window.<br>
+&nbsp;&nbsp;&nbsp; set_title("Font Selection
+Example");<br>
+&nbsp;&nbsp;&nbsp; set_border_width(10);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::VBox *vbox = new
+Gtk::VBox;<br>
+&nbsp;&nbsp;&nbsp; add(*vbox);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create a label
+and
+add it to the vbox<br>
+&nbsp;&nbsp;&nbsp; label = new Gtk::Label("Welcome
+to XFC");<br>
+&nbsp;&nbsp;&nbsp; label-&gt;set_size_request(300, 100);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*label);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Creates a new
+button
+and add it to the vbox<br>
+&nbsp;&nbsp;&nbsp; Gtk::Button *button = new Gtk::Button("Select a
+font");<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*button);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // When the button
+receives the "clicked" signal, it calls the on_select_font() slot.<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;FontSelectionWindow::on_select_font));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // The final step
+is to
+display this newly created widgets.<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;show_all();<br>
+}<br>
+      <br>
+FontSelectionWindow::~FontSelectionWindow()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+FontSelectionWindow::on_select_font()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; // Create a
+temporary
+FontSelectionDialog on the stack<br>
+&nbsp;&nbsp;&nbsp; Gtk::FontSelectionDialog
+dialog("Select
+a font");<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Call Gtk::Dialog::run()
+which runs a modal dialog<br>
+&nbsp;&nbsp;&nbsp; if
+(dialog.run())<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+&nbsp;//
+Get the selected font name<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+String
+font_name = dialog.get_font_name();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+//
+Print the font name to the standard output<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; std::cout
+&lt;&lt;
+"The selected font name is \"" &lt;&lt; font_name &lt;&lt; "\""
+&lt;&lt;
+std::endl;<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+//
+Modify the label's font and destroy the dialog<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+label-&gt;modify_font(Pango::FontDescription(font_name));<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; dialog.dispose();<br>
+&nbsp;&nbsp;&nbsp; }<br>
+}<br>
+      <br>
+int main (int
+argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; FontSelectionWindow window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp;&nbsp; window.show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return
+0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling Font Selection<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Font Selection in the
+&lt;examples/howto/fontselection &gt; source directory along with a Makefile.
+If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/fontselection&gt; subdirectory.
+In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Font Selection, add the following lines to a
+new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+fontselection: fontselection.cc fontselection.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) fontselection.cc -o fontselection $(CFLAGS)
+`pkg-config xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o fontselection</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 344px; height: 188px;" alt=""
+ src="../../images/fontselection1.png"><br>
+      </div>
+      <br>
+Click the 'Select a font' button to display a FontSelectionDialog.
+Any changes made to the selected font will be applied to the 'Welcome
+to XFC' label when you click the OK button:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 462px; height: 351px;" alt=""
+ src="../../images/fontselection2.png"><br>
+      </div>
+      <div style="text-align: center;"><br>
+      </div>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="fontselection.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

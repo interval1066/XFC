@@ -1,0 +1,49 @@
+xfc (4.6.0-1) unstable; urgency=low
+
+  * Convert the builing system to cmake
+
+ -- Bo Lorentsen <bl@lue.dk>  Mon, 15 Aug 2011 23:55:46 +0100
+ 
+xfc (4.3.4-1) unstable; urgency=low
+
+  * New micro release
+
+ -- Bo Lorentsen <bl@lue.dk>  Sun, 17 Apr 2010 23:19:50 +0100
+
+xfc (4.3.2-5) unstable; urgency=low
+
+  * include missing config.h file in dev packages
+
+ -- Bo Lorentsen <bl@lue.dk>  Mon, 22 Mar 2010 23:19:50 +0100
+
+xfc (4.3.2-4) unstable; urgency=low
+
+  * Added G::SList template
+  * Added Gtk::Builder class to make it possible to stop using libglade
+
+ -- Bo Lorentsen <bl@lue.dk>  Sun, 15 Nov 2009 20:12:19 +0100
+
+xfc (4.3.2-3) unstable; urgency=low
+
+  * Basic printing support added
+  * Cairo support
+
+ -- Bo Lorentsen <bl@lue.dk>  Tue, 11 Jun 2009 19:27:00 +0200
+
+xfc (4.3.2-2) unstable; urgency=low
+
+  * pkg-config cflags fixups
+
+ -- Bo Lorentsen <bl@lue.dk>  Mon, 16 Mar 2007 23:27:00 +0200
+
+xfc (4.3.2-1) unstable; urgency=low
+
+  * Fixup internal structure, like pkg-config files and dependency
+
+ -- Bo Lorentsen <bl@lue.dk>  Mon, 16 Mar 2007 11:53:00 +0200
+
+xfc (4.3.2) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Bo Lorentsen <bl@lue.dk>  Fri, 30 Mar 2007 18:28:04 +0200

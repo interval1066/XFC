@@ -1,0 +1,560 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+  
+  
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+
+  
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+
+  
+  <meta content="Tutorial: Hello Buttons" name="description">
+</head>
+
+
+<body>
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="white-space: nowrap; height: 25px;" class="darkbluestripe"><br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="text-align: center; white-space: nowrap; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="white-space: nowrap; height: 25px;" class="greybluestripe" colspan="1" rowspan="1">
+      
+      <table style="width: 100%; text-align: left;" border="0" cellpadding="0" cellspacing="0">
+
+        <tbody>
+
+          <tr>
+
+            <td style="width: 50%; white-space: nowrap;">&nbsp;&laquo; <a class="qindexH" href="index.html">Index</a><span class="qindexH"> | </span><a class="qindexH" href="chapter02.html">Hello World</a><span class="qindexH"></span> </td>
+
+            <td style="white-space: nowrap; text-align: right; width: 50px;"><a href="pretend"><span class="qindexF"></span><span class="qindexF"></span></a><a class="qindexH" href="chapter04.html">Adding a
+menubar and toolbar</a>
+&raquo; <br>
+
+            </td>
+
+          </tr>
+
+        
+        </tbody>
+      
+      </table>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td colspan="1" rowspan="1">
+      
+      <div style="text-align: center;"><br>
+
+      </div>
+
+      
+      <h1>Chapter
+3: Hello Buttons<br>
+
+      </h1>
+
+      <br>
+
+Let's take a look at Hello Buttons, a slightly improved version of <a href="chapter02.html">Hello World</a>
+that provides a better
+example of using libsigc++ signals
+and slots. Hello Buttons makes
+use of a horizontal <a href="../../howto/html/boxes.html">packing box</a>
+to pack two buttons into
+the main window. A packing box is a rectangular layout
+container
+that lets you pack one or more child widgets inside it, with respect to
+a particular position, either the start or the end. A packing box is a
+very convenient way to manage the
+position and relative size of several child widgets.<br>
+
+      <br>
+
+One thing you will notice in the Hello Buttons source code
+is that the <a href="../../howto/html/signal_system.html#SS03">signals
+and
+slots</a>
+make use of the sigc::bind() function to bind
+an extra argument that gets passed to the connected slot every
+time a "clicked" signal is emitted. This is one of the many powerful
+functions available in the libsigc++ library, and one that you will use
+frequently, so do familiarize yourself with its documentation.<br>
+
+      <br>
+
+The header file for the Hello Buttons program is
+&lt;hellobuttons.hh&gt;:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>#include
+&lt;xfc/main.hh&gt;<br>
+
+#include &lt;xfc/gtk/window.hh&gt;<br>
+
+      <br>
+
+using namespace Xfc;<br>
+
+      <br>
+
+class HelloButtons : public Gtk::Window<br>
+
+{<br>
+
+protected:<br>
+
+&nbsp;&nbsp; &nbsp;void on_clicked(const char *text);<br>
+
+      <br>
+
+public:<br>
+
+&nbsp;&nbsp; &nbsp;HelloButtons();<br>
+
+&nbsp;&nbsp; &nbsp;virtual ~HelloButtons();<br>
+
+};</code></div>
+
+      <br>
+
+and the source file is &lt;hellobuttons.cc&gt;:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>#include
+"hellobuttons.hh"<br>
+
+#include &lt;xfc/gtk/box.hh&gt;<br>
+
+#include &lt;xfc/gtk/button.hh&gt;<br>
+
+#include &lt;iostream&gt;<br>
+
+      <br>
+
+HelloButtons::HelloButtons()<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; // This is a new call, which just sets
+the title of
+our new window to "Hello Buttons!"<br>
+
+&nbsp;&nbsp;&nbsp; set_title("Hello Buttons");<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Set the default
+size&nbsp;&nbsp;&nbsp; of the
+window <br>
+
+&nbsp;&nbsp;&nbsp; set_default_size(200, -1);<br>
+
+&nbsp;&nbsp;&nbsp; <br>
+
+&nbsp;&nbsp;&nbsp; // Sets the border width of the window.<br>
+
+&nbsp;&nbsp;&nbsp; set_border_width(10);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // We create a box to pack widgets into.
+The box is
+not really visible, it is just used<br>
+
+&nbsp;&nbsp;&nbsp; // as a tool to arrange widgets.<br>
+
+&nbsp;&nbsp;&nbsp; Gtk::HBox *box = new Gtk::HBox;<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Put the box into the main window.<br>
+
+&nbsp;&nbsp;&nbsp; add(*box);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Creates a new button with the label
+"Button 1".<br>
+
+&nbsp;&nbsp;&nbsp; Gtk::Button *button = new
+Gtk::Button("Button 1");<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Now when the button is clicked, we
+call the slot
+function with a pointer to "button 1" bound to it.<br>
+
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::bind(sigc::mem_fun(this,
+&amp;HelloButtons::on_clicked), "button 1"));<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Instead of Gtk::Container::add, we
+pack this
+button into the invisible box, which has been added to the window.<br>
+
+&nbsp;&nbsp;&nbsp; box-&gt;pack_start(*button);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Always remember this step, this tells XFC that
+our preparation for this button is complete,<br>
+
+&nbsp;&nbsp;&nbsp; // and it can now be displayed.<br>
+
+&nbsp;&nbsp;&nbsp; button-&gt;show();<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Do these same steps again to create a
+second
+button<br>
+
+&nbsp;&nbsp;&nbsp; button = new Gtk::Button("Button 2");<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Call the same slot function with a
+different
+argument, passing a pointer to "button 2" instead.<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::bind(sigc::mem_fun(this,
+&amp;HelloButtons::on_clicked), "button 2"));<br>
+
+&nbsp;&nbsp;&nbsp; box-&gt;pack_start(*button);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // The order we show the buttons is not
+really
+important, but I recommend always showing the window last,<br>
+
+&nbsp;&nbsp;&nbsp; // so it all pops up at once.<br>
+
+&nbsp;&nbsp;&nbsp; button-&gt;show();<br>
+
+&nbsp;&nbsp;&nbsp; box-&gt;show();<br>
+
+}<br>
+
+      <br>
+
+HelloButtons::~HelloButtons()<br>
+
+{<br>
+
+}<br>
+
+      <br>
+
+void<br>
+
+HelloButtons::on_clicked(const char *text)<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; std::cout &lt;&lt; "Hello again"
+&lt;&lt; " - "
+&lt;&lt; text &lt;&lt; " " &lt;&lt; "was
+pressed" &lt;&lt; std::endl;<br>
+
+}<br>
+
+      <br>
+
+int main (int argc, char *argv[])<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; HelloButtons window;<br>
+
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+
+&nbsp;&nbsp;&nbsp; window.show();<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; run();<br>
+
+&nbsp;&nbsp;&nbsp; return 0;<br>
+
+}</code><br>
+
+      </div>
+
+      <br>
+
+      
+      <h2>Compiling Hello Buttons</h2>
+
+If you compiled and installed XFC yourself, you will find the source
+code for Hello Buttons in the
+&lt;examples/tutorial/chapter03&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/tutorial/chapter03&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+
+      <br>
+
+To create a Makefile for Hello Buttons, add the following lines to a
+new
+text file
+and save it using the name "Makefile":<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>CC = g++<br>
+
+      <br>
+
+CFLAGS = -Wall -O2<br>
+
+      <br>
+
+hellobuttons: hellobuttons.cc hellobuttons.hh<br>
+
+&nbsp;&nbsp; &nbsp;$(CC) hellobuttons.cc -o hellobuttons `pkg-config
+xfcui-X.X
+--cflags --libs`<br>
+
+      <br>
+
+clean: <br>
+
+&nbsp;&nbsp; &nbsp;rm -f *.o hellobuttons</code><br>
+
+      </div>
+
+      <br>
+
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+
+      <br>
+
+      
+      <div style="text-align: center;"><img style="width: 222px; height: 87px;" alt="" src="../../images/hellobuttons.png"><br>
+
+      </div>
+
+      <br>
+
+Run the program from a command shell. This time you will notice that
+there is no easy way to exit the
+program; you have to use your window manager or command line to kill
+it.
+A good exercise for the reader would be to insert a third "Quit" button
+that will exit the program. You may also wish to play with the options
+passed to Gtk::Box::pack_start(). Try resizing
+the window, and observe the two buttons' behavior.<br>
+
+      <br>
+
+      
+      <h2>Stepping through the source code</h2>
+
+The "clicked" signals for both buttons are connected to the same signal
+handler: <br>
+
+      <br>
+
+      
+      <div class="fbox">void on_clicked(const char *text);</div>
+
+      <br>
+
+but the "clicked" signal handler must have the following prototype:<br>
+
+      <br>
+
+      
+      <div class="fbox">void on_clicked();<br>
+
+      </div>
+
+      <br>
+
+Sometimes it's convenient to connect several widgets to the same signal
+handler. If you do this, you need some way of identifying the widget
+emitting the signal. In Hello Buttons it's a text string but it could
+easily be an integer value, or a widget pointer. To accomplish this
+feat using libsigc++ we use the sigc::bind() template function. This
+function can be used to bind up to 7 arguments to the bound slot, but
+usually you will only ever use one or two. You can also specify a
+zero-based position for each bound argument in the function's parameter
+list. Usually though, you will pass extra arguments at the end. A
+position value of 0 indicates 'pass as the first argument'. A position
+value of -1, or no position value indicates 'pass as the last
+argument'. <br>
+
+      <br>
+
+For example, this call from the source code:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>button-&gt;signal_clicked().connect(sigc::bind(sigc::mem_fun(this,
+&amp;HelloButtons::on_clicked), "button 1"));</code></div>
+
+      <br>
+
+is equivalent to this call:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>button-&gt;signal_clicked().connect(sigc::bind&lt;-1&gt;(sigc::mem_fun(this,
+&amp;HelloButtons::on_clicked), "button 1"));</code></div>
+
+      <br>
+
+and because on_clicked() takes only one argument, it is also equivalent
+to this call:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>button-&gt;signal_clicked().connect(sigc::bind&lt;0&gt;(sigc::mem_fun(this,
+&amp;HelloButtons::on_clicked), "button 1"));</code></div>
+
+      <br>
+
+As you can see, the source code is more readable if you do not specify
+a position and pass any extra arguments at the end of the parameter
+list. bind() works by returning a slot that takes the number of
+arguments the signal being connected to expects.<br>
+
+      <br>
+
+After finishing the first three chapters of this tutorial you should
+have a basic understanding of GTK+ programming using the Xfce
+Foundation Classes. Now it's time to move on to more advanced topics.
+Before proceeding though, if you are unfamiliar with <a href="../../howto/html/boxes.html">Packing Boxes</a> or the GTK+ <a href="../../howto/html/uimanager.html">User Interface Manager</a>, you
+should
+read the related HOWTO.<br>
+
+      <br>
+
+In the <a href="chapter04.html">next chapter</a> we will add an
+action-based menubar and toolbar to the XfcApp application from chapter
+1. Then remainder
+of the tutorial will take you step by step through the process
+enhancing XfcApp, adding such
+features as a composite statusbar, a client area
+and a pop up context menu. The last two chapters cover two important
+topics. In Chapter 8 you will build XfcApp into a fully compliant GNU
+autotools project, then in chapter 9 you learn how to add
+international language support.&nbsp; After completing
+this tutorial you will have written your own reusable application shell
+and
+you should know how to use the GNU autotools to manage your projects.
+An updated copy of
+each chapter's source code can be found in that chapter's
+subdirectory.<br>
+
+      <br>
+
+      
+      <div align="justify">
+      
+      <div style="text-align: left;">
+      
+      <hr style="width: 100%; height: 1px;"> </div>
+
+      </div>
+
+      
+      <table style="width: 100%; text-align: left;" border="0" cellpadding="2" cellspacing="0">
+
+        <tbody>
+
+          <tr>
+
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+
+            <td style="text-align: center;"><span style="text-decoration: underline;"></span><small><a class="qindexF" href="../../../../../projects/xfcui/docs/examples/tutorial/chapter03.html">Top</a></small><br>
+
+            <span style="text-decoration: underline;"></span></td>
+
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font> </td>
+
+          </tr>
+
+        
+        </tbody>
+      
+      </table>
+
+      
+      <div style="text-align: center;"><a class="qindexF" href="index.html">Index</a><br>
+
+      </div>
+
+      </td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+</body>
+</html>

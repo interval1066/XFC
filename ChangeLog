@@ -1,0 +1,340 @@
+2010-04-17  Bo Lorentsen  <bl@lue.dk>
+
+ * Add PaperSize implimentation, to be able to request for non default
+   pages sizes.
+ 
+2009-09-10  Bo Lorentsen  <bl@lue.dk>
+
+ * Remove xfce-panel build in automake if not Xfce 4.7 or later
+ * Simple xfcegui support (simple dialogs)
+
+2009-08-15 20:40  bl
+
+   * configure.ac : Version 4.3.3
+   * moved to Xfce git repos
+   * added module.xml
+
+2009-07-28 23:30  bl
+
+   * fix from Mateusz Loskot, added (bug 1648)
+
+2009-07-28 23:11  bl
+
+   * add basic build structure for libXFCde as panel, utils and ui
+   * basic xfconf client works 
+   * outline for new panel code 
+   * xfcde debian packet added
+
+2009-06-28 23:21  bl
+
+   * PageSetup code added
+   * show_layout in cairo context added
+   * printer bug fixes
+
+2009-05-22 10:40  bl
+
+   * Experimental printing support added
+
+2008-03-22 16:11  bl
+
+    * Cairo wrapper is added, and working, but details are missing and it
+      need more wrapping code.
+    * An Cairo example have been added, to make it more easy to get startet
+      using the new Cairo wrapper.
+    * Alot of builing cleanup have been performed to detect cairo and to
+      include it in doxygen the reference documentation.
+      
+2007-04-05 18:28  bl
+
+	* Made the first attempt to wrap this into a set of debian packages,
+	to make installation of XFC more easy.
+
+	* add the dir structure of the Xfce4 integration parts.
+
+2006-12-10 21:00  bl
+
+	* Ported the inti sourceview source code to the libXFCsourceview
+	and made detection for gtksourceview in the build process.
+
+	* examples/sourceview/simple: Added to show how to make a simple 
+	sourceview application.
+
+2005-08-21 00:03  jcfranks
+
+	* examples/glade/example-5: Added new Glade example that shows
+	how to dynamcially switch images on an icon button created with
+	Glade.
+
+2005-08-16 21:29  jcfranks
+
+	* libXFCcore, libXFCglade, libXFCui: Fixed LGPL license notices.
+
+2005-08-15 17:58  jcfranks
+
+	* configure.ac: Version 4.3.2
+
+	* examples, tests, tutorial: Reorganized example source code layout
+	to make it easier to add new example applications in the future.
+	Moved all the HOWTO examples into the examples/howto subdirectory. 
+	Moved the Glade examples into the examples/glade subdirectory. Moved
+	the liXFCcore examples into the examples/core subdirectory. Moved the 
+	user interface test programs into the examples/ui subdirectory. 
+
+2005-08-15 00:59  jcfranks
+
+	* autogen.sh: Fixed the autogen script so that it will run from the
+	xfce4svn build script. Added tests for the various GNU autotools.
+	If doxygen is found on the build system autogen will automatically
+	generate the API reference documentation.
+
+	* configure.ac, docs/Makefile.am: Added a test to configure.ac that
+	checks for doxygen. If doxygen is not found a warning message is 
+	printed to stdout and the API reference is not generated.
+
+2005-08-10 22:36  jcfranks
+
+	* demos/xfc-demo/appwindow.cc: Added an example Gtk::AboutDialog
+	to the application window. 
+
+	* libXFCui/xfc/gtk/window.[cchh]: Added a show_about_dialog() 
+	method to Gtk::Window that creates an about dialog whose parent is
+	the calling window instance. The logo argument has been changed from
+	a Gdk::Pixbuf reference to a pointer, so that a null value can passed
+	to the method when no logo is displayed.
+
+	* libXFCui/xfc/gtk/aboutdialog.[cchh]: Removed Gtk::show_about_dialog()
+	function and moved it into Gtk::Window as a member function.  
+
+	* libXFCcore/xfc/convert.[cchh],
+	  libXFCcore/xfc/Makefile.am: Added a new component containing 
+	miscellaneous XFC string conversion functions.
+
+	* libXFCui/xfc/gtk/aboutdialog.cc: Removed local array-to-vector
+	and vector-to-array string conversion functions and moved them
+	into a separate component in libXFCcore.
+
+2005-08-09 15:28  jcfranks
+
+	* libXFCui/xfc/gtk/Makefile.am,
+	  libXFCui/xfc/gtk/aboutdialog.[cchh],
+	  libXFCui/xfc/gtk/private/aboutdialogclass.hh: Fixed broken
+	Gtk::AboutDialog module (patch by Bjoern Paetzel).
+
+	* libXFCcore/xfc/utfstring.cc,
+	  libXFCcore/xfc/glib/iochannel.cc,
+	  libXFCcore/xfc/glib/keyfile.cc,
+	  libXFCui/xfc/gdk-pixbuf/puxbuf.cc, 
+	  libXFCui/xfc/gdk-pixbuf/puxbuf-loader.cc, 
+	  libXFCui/xfc/gtk/uimanager.cc: Fixed gsize and gssize 
+	compiler errors on 64 bit systems, hopefully (Sean Lynn).
+
+	* tutorial/chapter03/hellobuttons.cc,
+	  tutorial/chapter06/statusbar.[cchh],
+	  tutorial/chapter07/statusbar.[cchh],
+	  tutorial/chapter08/statusbar.[cchh],
+	  tutorial/chapter09/statusbar.[cchh]: Fixed several spelling
+	mistakes in the custom statusbar module (Sylvain Vedrenne).
+
+
+	* docs/tutorial/html/chapter03.html,
+	  docs/tutorial/html/chapter04.html,
+	  docs/tutorial/html/chapter05.html,
+	  docs/tutorial/html/chapter06.html,
+	  docs/tutorial/html/chapter07.html: Fixed several spelling mistakes
+	and coding errors in the tutorial documentation (Sylvain Vedrenne).
+
+2005-06-17 21:29  jcfranks
+
+	* libXFCcore/xfccore-config.h.in,
+	  libXFCcore/xfcglade-config.h.in,
+	  libXFCcore/xfcui-config.h.in: Removed duplicated config files and 
+	replaced them with a single config file, xfc-config.h.in, which is
+	generated when by autoheader when autogen.sh in run.
+
+2005-06-06 15:37  jcfranks
+
+	* tests/glade/example-3/example-3.cc: Added include for 
+        unistd.h (Daichi).
+
+2005-05-30 20:00  jcfranks
+
+	* Released version 4.3.1
+
+	* docs/howto/html/glade.html,
+	  docs/images/example-2.png: Added Glade HOWTO that works through using
+	the new libXFCglade library.
+
+2005-05-09 21:12  jcfranks
+
+	* tests/glade/example-2/example-2.[cchh],
+          tests/glade/example-3/example-3.[cchh]: Removed usage of WidgetSignals
+	from example-2 and exmaple-3. You can't use XFC signal classes with Glade
+	widgets.
+
+2005-05-06 20:47  jcfranks
+
+	* docs/tutorial/html/chapter06.html,
+	  docs/tutorial/html/chapter07.html,
+	  docs/tutorial/html/chapter08.html: Fixed several text errors and omissions
+	(Ari Makela).
+
+2005-04-29 20:42  jcfranks
+
+	* libXFCui/xfc/gdk/spawn.cc: Added missing 'extern char **environ' 
+	declaration (Daichi).
+
+	* tests/core/mainloop/mainloop.cc: Added missing include for <unistd.h> if
+	G_OS_UNIX is defined (Daichi).  
+
+	* configure.ac: Added --enable-pedantic-errors configure option. 
+
+2005-04-29 00:49  jcfranks
+
+	* libXFCcore/xfc/trackable.[cchh]: Added a fix for a GCC compiler error
+	for versions prior to 3.4.0. libstdc++ with these versions makes a call
+	to the class placement new operator when it should call of the global new 
+	operator. For GCC versions prior to 3.4.0 a class placement new operator
+	is defined that simply calls the global placement new operator. The GCC
+	version required is now 3.3.2 or higher.
+
+2005-04-28 00:19  jcfranks
+
+	* libXFCcore, libXFCui: Fixed a design flaw in the implementation of the
+	XFC signal handling chain that prevented the loading and usage of Glade
+	widgets. There are too many files to list here but includes all object
+	and widget source files (*.cc) that handle signals.
+
+	* libXFCglade: Added a libglade binding for GladeXML.
+
+	* tests/glade: Added four simple libXFCglade example programs. 
+
+2005-04-14 00:25  jcfranks
+
+	* libXFCui/xfc/gtk/widgetsignals.cc: Fixed the size_request_proxy() and
+	size_allocate_proxy callback functions which were broken when the 
+	implementation of Gdk::Rectangle was changed.
+
+	* libXFCui/xfc/gtk/widget.[cchh]: Added a new constructor to Gtk::Allocation
+	that takes a reference to a GtkAllocation object.
+
+2005-04-12 21:52  jcfranks
+
+	* libXFCcore/xfc/glib/main.cc: Fixed G::MainContext constructor that takes
+	a GMainContext pointer as one of its argument. A typo caused this argument
+	being ignored.  
+
+	* libXFCui/xfc/main.[cchh]: For convenience, added a Gtk::Window pointer
+	argument to Xfc::Main::run() that defaults to null. If a pointer to the 
+	main application window is passed to run(), it automatically connects the
+	main window's "destroy" signal to Xfc::Main::quit() and shows the window
+	on the screen. Otherwise the application will have to manage showing and
+	destroying the main window itself.
+
+2005-03-26 21:31  jcfranks
+
+	* libXFCui/xfc/gdk/color.hh, 
+	  libXFCui/xfc/gdk/inline/color.inl:
+	Added overloaded convenience functions: red(), green(), and blue(), that
+	can either return or set the current color component value as a fraction.
+
+ 	* libXFCui/xfc/gdk/pangorenderer.[cchh]: Changed get_default() function
+	so that it returns a Gdk::PangoRenderer pointer.
+
+	* demos/xfc-demo/clipboard.cc, 
+	  demos/xfc-demo/iconview.cc, 
+	  demos/xfc-demo/rotated_text.cc: Added GTK+ 2.6 clipboard, iconview and
+	rotated text demos.
+
+2005-03-26 00:07  jcfranks
+
+	* libXFCui/xfc/pango/types.hh, 
+	  libXFCui/xfc/pango/inline/types.inl:
+	Added missing Pango::Matrix functions translate(), scale(), rotate() 
+	and concat().
+	
+2005-03-23 23:26  jcfranks
+
+	* libXFCcore/xfc/glib/utils.[cchh]: Added overloaded build_filename()
+	and build_path() namespace functions.
+
+	* libXFCui/xfc/gtk/liststore.[cchh], 
+	  libXFCui/xfc/gtk/treestore.[cchh]:
+	For convenience when using filenames, added an overloaded set_value() 
+	function that takes a std::string. 
+
+	* libXFCui/xfc/gtk/treemodel.[cchh]: For convenience when using filenames,
+	added an overloaded get_value() function that takes a std::string. 
+
+2005-03-23 15:40  jcfranks
+
+	* Updated SVN source files and documentation to GTK+ 2.6
+	compatibility.	
+
+2005-03-22 14:35  jcfranks
+
+	* libXFCui/xfc/gtk/treesortable.[cchh]: Fixed signature for 
+	TreeSortable::CompareSlot.
+
+	* libXFCui/xfc/gtk/treesortable.[cchh]: Added new function,
+	reset_default_sort_func(), to reset the default sort function
+	to the unsorted state.
+
+2005-03-21 22:36  jcfranks
+
+	* libXFCui/*.cc: Changed remaining include directories to use 
+	syntax releative to the current location.
+
+2005-03-16 16:55
+
+	* configure.ac, README, docs/howto/html/getting_started.html:
+	Incremented minimum libsigc++ requirement to version 2.0.6 because
+	of a bug in the previous version.
+	
+	* README, docs/howto/html/getting_started.html:
+	Incremented minimum GCC requirement to version 3.4.0 because of a 
+	bug in the STL header stl_construct.h in earlier versions.
+	
+	* docs/tutorial/html/chapter06.html: Fixed link text to previous chapter.	
+	
+	* configure.ac: Version 4.3.1
+	
+2005-03-08 00:43  jcfranks 
+
+	* libXFCcore/xfc/glib/fileutils.hh:
+	  libXFCcore/xfc/glib/inline/fileutils.inl: Added G::FileError, a 
+	C++ wrapper for the GFileError enumeration. 
+
+2005-02-26 21:52  jcfranks
+
+	* Makefile.am: Added a dist-hook entry to remove CVS directories
+	from the <docs> html subdirectores that don't use a makefile.
+
+2005-02-22 21:58  jcfranks
+
+	* docs/*: Improved HTML page font. 
+
+2005-02-22 14:50  jcfranks
+
+	* tests/core/: Added missing libXFCcore (iochannel, mainloop, spawn
+	and threads) test programs to the new <tests/core/> subdirectory.
+	
+2005-02-22 00:12  jcfranks
+
+	* docs/faq/html/index.html: Added some new questions and made a few
+	grammatical and layout changes.
+
+2005-02-19 21:48  jcfranks
+
+	* docs/*, ChangeLog: Changed appearence of HTML hyperlinks.
+	
+	* TODO: Fixed some todo items.
+
+2005-02-18 23:45  jcfranks
+
+	* docs/*, ChangeLog: Improved appearence of PNG images and HTML pages. 
+
+2005-02-09 15:15  jcfranks
+
+	* Initial import into the SVN.
+	
+	* configure.ac: Version 4.3.0

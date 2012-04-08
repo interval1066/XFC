@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+  <meta content="Widgets: Entry Completion" name="description">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp; &laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Entry Completion<br>
+      </h1>
+      <br>
+Gtk::EntryCompletion is an auxiliary object used in conjunction
+with Gtk::Entry to provide completion functionality. Essentially,
+EntryCompletion maintains a pop-up tree view window with a tree model,
+usually
+a ListStore, that lists one or more completion matches. <br>
+      <br>
+'Completion functionality'
+means that as the user types text into an entry widget,
+EntryCompletion compares
+the current text (the key) with its list of completion matches. If any
+possible
+completions for the key are found they are displayed in the
+pop-up window. EntryCompletion implements
+the Gtk::CellLayout interface to allow the user to add extra cells
+displaying completion matches to the tree view. By
+default, the matching is done by comparing the text
+case-insensitively against the text column of the completion model, but
+this can be overridden with a custom match
+function.<br>
+      <br>
+When the user selects a completion, the content of the entry is
+updated. By default, the content of the entry is replaced by the text
+column of the model, but this can be overridden by connecting to the
+"match-selected" signal and updating the entry in the signal handler.
+Note that you should return true from the signal handler to suppress
+the default behaviour.<br>
+      <br>
+You can create a completion object with one of the following
+constructors:<br>
+      <br>
+      <div class="fbox"><code>EntryCompletion();<br>
+      <br>
+      </code><code>EntryCompletion(Gtk::TreeModel&amp; model);</code><br>
+      </div>
+      <br>
+The second constructor creates an entry completion that uses the
+specified model. The first constructor creates an empty entry
+completion. If you call this constructor you can set the model later by
+calling:<br>
+      <br>
+      <div class="fbox"><code>void set_model(TreeModel&amp; model);</code></div>
+      <br>
+To add completion functionality to an entry widget, call the following
+Gtk::Entry method:<br>
+      <br>
+      <div class="fbox"><code>void set_completion(EntryCompletion
+*completion);</code></div>
+&nbsp;<br>
+Alternatively, you can create an EntryCompletion object, set its model
+and assign it to an Entry widget all with one function call,
+using
+this Gtk::Entry method:<br>
+      <br>
+      <div class="fbox"><code>Gtk::EntryCompletion*
+create_completion(Gtk::TreeModel&amp; model);</code></div>
+      <br>
+The 'model' argument is the completion model for the entry completion.
+The new EntryCompletion is owned by the Entry widget so you can safely
+use the returned pointer without reference counting.<br>
+      <br>
+For convenience, you can call the following method to set up the
+completion to have a list displaying strings only:<br>
+      <br>
+      <div class="fbox"><code>void set_text_column(int column);</code></div>
+      <br>
+This method adds a text cell renderer to the completion and sets
+'column' as the column in the completion model to get the strings from.
+This is equivalent to creating a new text cell renderer yourself,
+adding it to the
+completion, and then calling Gtk::CellLayout::add_attribute() to set
+the text column.<br>
+      <br>
+When entry completion using a small key takes a lot of time (for
+example, when the
+dataset is too large) you can set the minimum key length required to
+start completing:<br>
+      <br>
+      <div class="fbox"><code>void set_minimum_key_length(int length);</code></div>
+      <br>
+In addition to regular completion matches, which will be inserted into
+the entry when they are selected, EntryCompletion also allows you to
+display 'actions' in the pop-up window. Their appearance is similar to
+menu items, to differentiate them clearly from completion strings. When
+an action is selected, the "action-activated" signal is emitted. <br>
+      <br>
+To insert an action in the completion's action item list, call one of
+the following two methods:<br>
+      <br>
+      <div class="fbox"><code>void insert_action_text(int index, const
+String&amp; text);<br>
+      <br>
+void insert_action_markup(int index, const String&amp; markup);</code><br>
+      </div>
+      <br>
+Both methods insert the text string at position 'index' in the list.
+However, the second method allows you to insert text marked up with the
+Pango
+text markup language. <br>
+      <br>
+To delete an action from the completion's action list, call:<br>
+      <br>
+      <div class="fbox"><code>void delete_action(int index);</code></div>
+      <br>
+      <h2><a name="example"></a>EntryCompletion Example</h2>
+Here is a simple example that shows you how to add a completion object
+to an entry widget. The header file for the example is
+&lt;entrycompletion.hh&gt;<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/liststore.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class CompletionModel : public Gtk::ListStore<br>
+{<br>
+public:<br>
+&nbsp;&nbsp; &nbsp;CompletionModel();<br>
+};<br>
+      <br>
+class Window : public Gtk::Window<br>
+{<br>
+public:<br>
+&nbsp;&nbsp; &nbsp;Window();<br>
+&nbsp;&nbsp; &nbsp;virtual ~Window();<br>
+};</code></div>
+      <br>
+and the source file is &lt;entrycompletion.cc&gt;<br>
+      <br>
+      <div class="fbox"><code>#include "entrycompletion.hh"<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+#include &lt;xfc/gtk/cellrenderertext.hh&gt;<br>
+#include &lt;xfc/gtk/entry.hh&gt;<br>
+#include &lt;xfc/gtk/entrycompletion.hh&gt;<br>
+#include &lt;xfc/gtk/label.hh&gt;<br>
+#include &lt;iostream&gt;<br>
+      <br>
+CompletionModel::CompletionModel()<br>
+: Gtk::ListStore(1, G_TYPE_STRING)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; // Fill the list with possible
+completions&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp;&nbsp; Gtk::TreeIter iter = append();<br>
+&nbsp;&nbsp; &nbsp;set_value(iter, 0, "total");<br>
+&nbsp;&nbsp; &nbsp;iter = append();<br>
+&nbsp;&nbsp; &nbsp;set_value(iter, 0, "totally");<br>
+&nbsp;&nbsp; &nbsp;iter = append();<br>
+&nbsp;&nbsp; &nbsp;set_value(iter, 0, "toto");<br>
+&nbsp;&nbsp; &nbsp;iter = append();<br>
+&nbsp;&nbsp; &nbsp;set_value(iter, 0, "tottery");<br>
+&nbsp;&nbsp; &nbsp;iter = append();<br>
+&nbsp;&nbsp; &nbsp;set_value(iter, 0, "totterer");<br>
+&nbsp;&nbsp; &nbsp;iter = append();<br>
+&nbsp;&nbsp; &nbsp;set_value(iter, 0, "totipotent");<br>
+&nbsp;&nbsp; &nbsp;iter = append();<br>
+&nbsp;&nbsp; &nbsp;set_value(iter, 0, "totipotency");<br>
+&nbsp;&nbsp; &nbsp;iter = append();<br>
+&nbsp;&nbsp; &nbsp;set_value(iter, 0, "totemism");<br>
+&nbsp;&nbsp; &nbsp;iter = append();<br>
+&nbsp;&nbsp; &nbsp;set_value(iter, 0, "totem pole");<br>
+&nbsp;&nbsp; &nbsp;iter = append();<br>
+&nbsp;&nbsp; &nbsp;set_value(iter, 0, "Totara");<br>
+&nbsp;&nbsp; &nbsp;iter = append();<br>
+&nbsp;&nbsp; &nbsp;set_value(iter, 0, "totalizer");<br>
+&nbsp;&nbsp; &nbsp;iter = append();<br>
+&nbsp;&nbsp; &nbsp;set_value(iter, 0, "totalizator");<br>
+&nbsp;&nbsp; &nbsp;iter = append();<br>
+&nbsp;&nbsp; &nbsp;set_value(iter, 0, "totalitarianism");<br>
+&nbsp;&nbsp; &nbsp;iter = append();<br>
+}<br>
+      <br>
+Window::Window()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_title("Completion Example");<br>
+&nbsp;&nbsp; &nbsp;set_border_width(5);<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp;&nbsp; Gtk::VBox *vbox = new
+Gtk::VBox(false, 2);<br>
+&nbsp;&nbsp; &nbsp;vbox-&gt;set_border_width(5);<br>
+&nbsp;&nbsp; &nbsp;add(*vbox);<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;Gtk::Label *label = new Gtk::Label;<br>
+&nbsp;&nbsp; &nbsp;label-&gt;set_markup("Try entering
+&lt;b&gt;total&lt;/b&gt; for example:");<br>
+&nbsp;&nbsp; &nbsp;vbox-&gt;pack_start(*label, false, false);<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// Add entry widget<br>
+&nbsp;&nbsp; &nbsp;Gtk::Entry *entry = new Gtk::Entry;<br>
+&nbsp;&nbsp; &nbsp;vbox-&gt;pack_start(*entry, false, false);<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// Create the completion model<br>
+&nbsp;&nbsp; &nbsp;Pointer&lt;Gtk::ListStore&gt; completion_model = new
+CompletionModel;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Create the completion object. <br>
+&nbsp;&nbsp; &nbsp;Gtk::EntryCompletion *completion =
+entry-&gt;create_completion(*completion_model);<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// Use model column 0 as the text column<br>
+&nbsp;&nbsp; &nbsp;completion-&gt;set_text_column(0);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Show everything&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;vbox-&gt;show_all();<br>
+}<br>
+      <br>
+Window::~Window()<br>
+{<br>
+}<br>
+      <br>
+int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace Main;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Window window;<br>
+&nbsp;&nbsp;
+&nbsp;window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp; &nbsp;window.show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;run();<br>
+&nbsp;&nbsp; &nbsp;return 0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling<span style="font-weight: bold;"> </span>EntryCompletion</h2>
+      <h2> </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for EntryCompletion in the
+&lt;examples/howto/entrycompletion&gt; source directory along with a
+Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/entrycompletion&gt; subdirectory.
+In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for EntryCompletion, add the following lines to a
+new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+entrycompletion: entrycompletion.cc entrycompletion.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) entrycompletion.cc -o entrycompletion
+$(CFLAGS) `pkg-config xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o entrycompletion</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 250px; height: 232px;" alt=""
+ src="../../images/entrycompletion.png"><br>
+      </div>
+      <br>
+As you type the word "total" into the entry, a list of possible
+completions pops up and progressively gets smaller as you type. You
+will find a more advanced entry completion example in the
+&lt;tests/entrycompletion&gt; subdirectory that implements a custom
+match function, dynamic entry completion, and shows you how to handle
+images. <br>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="entrycompletion.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

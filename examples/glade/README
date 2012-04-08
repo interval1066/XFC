@@ -1,0 +1,7 @@
+Example Glade Programs.
+======================= 
+The <examples/glade> subdirectory contains five simple example programs that
+show you the basics of loading and using widgets defined in Glade XML files.
+
+The example programs are compiled by default but you can disable this by 
+passing the "--disable-examples" option to configure. 

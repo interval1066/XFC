@@ -1,0 +1,513 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Notebooks" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Notebooks</h1>
+      <br>
+The NoteBook Widget is a collection of "pages" that overlap each other,
+each page contains different information with only one page visible at
+a
+time. The pages can be switched between using tab labels along one
+edge. This widget has become more common lately in GUI programming, and
+it is a good way to show blocks of similar information that warrant
+separation in their display.<br>
+      <br>
+The first method you will need to know, as you can probably guess, is
+the constructor used to create a new notebook widget:<br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <div class="fbox"><code>Notebook();</code></div>
+      <br>
+      </div>
+Once the notebook has been created, there are a number of methods that
+operate on the notebook widget. Let's look at them individually.<br>
+      <div style="text-align: left;"> <br>
+The first one we will look at is how to position the page indicators.
+These page indicators or 'tabs' as they are referred to, can be
+positioned in four ways: top, bottom, left, or right:<br>
+      <br>
+      <div class="fbox"><code>void
+set_tab_pos(Gtk::PositionType pos);</code></div>
+      <br>
+      <div style="position: absolute; left: 10px; top: 349px;"><br>
+      </div>
+      </div>
+The 'pos' argument can be one of the following values from the
+Gtk::PositionType enum:<br>
+      <div style="text-align: left;">
+      <ul style="list-style-type: square;">
+        <li>POS_LEFT</li>
+        <li>POS_RIGHT</li>
+        <li>POS_TOP (the default)</li>
+        <li>POS_BOTTOM</li>
+      </ul>
+      <div style="text-align: left;">Next we will look at how to add
+pages to the notebook. There are three
+ways to add pages to the NoteBook - append, prepend and insert. Let's
+look at the first two together as they are quite similar.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>void
+append_page(Gtk::Widget&amp; child, Gtk::Widget *tab_label = 0,
+Gtk::Widget *menu_label = 0);<br>
+      <br>
+void
+append_page(Gtk::Widget&amp;
+child, const String&amp; tab_label, const String&amp; menu_label = 0);<br>
+      <br>
+void
+prepend_page(Gtk::Widget&amp;
+child, Gtk::Widget *tab_label = 0, Gtk::Widget *menu_label = 0);<br>
+      <br>
+void
+prepend_page(Gtk::Widget&amp;
+child, const String&amp; tab_label, const String&amp; menu_label = 0);</code></div>
+      <br>
+There are two overloaded versions of each method. These methods
+add pages to the notebook by inserting them from the back of the
+notebook (append), or the front of the notebook (prepend). The
+'child'
+argument is the widget that is placed within the notebook page,
+'tab_label'
+is the label for the page being added and 'menu_label' is the
+label to use for the page-switch menu, if that is enabled. The child
+widget must be created separately, and is typically a set of options
+setup within one of the other container widgets, such as a table. <br>
+      <br>
+In the first append and prepend page methods 'tab_label' and
+'menu_label'
+are pointers to the widgets that are to be used as the page and
+page-switch menu labels. The second append and prepend page methods
+create these widgets for you and sets 'tab_label' and
+'menu_label'&nbsp;
+as the label text. <br>
+      <br>
+The final method for adding a page to the notebook contains all of the
+properties of the previous two, but it allows you to specify what
+position you want the page to be in the notebook:<br>
+      <br>
+      <div class="fbox"><code>void
+insert_page(Gtk::Widget&amp; child, int
+position, Gtk::Widget *tab_label = 0, Gtk::Widget *menu_label = 0);<br>
+      <br>
+void insert_page(Gtk::Widget&amp; child, int
+position, const String&amp; tab_label, const String&amp; menu_label =
+0);</code></div>
+      <br>
+The arguments are the same as the append and prepend page methods
+except there is an extra argument, position. This argument
+is used to specify what place this page will be inserted into, the
+first
+page having position zero.<br>
+      <br>
+Now that we know how to add a page, lets see how we can remove a page
+from the notebook:<br>
+      <br>
+      <div class="fbox"><code>void
+remove_page(int page_num);</code></div>
+      <br>
+This method takes the page specified by 'page_num' and removes
+it from the widget.<br>
+      <br>
+To find out what the current page is in a notebook use the following
+method:<br>
+      <br>
+      <div class="fbox"><code>int
+get_current_page() const;</code></div>
+      <br>
+These next two methods are simple calls to move the current notebook
+page forward or backward: <br>
+      <br>
+      <div class="fbox"><code>void
+next_page();<br>
+      <br>
+void prev_page();</code></div>
+      <br>
+Simply call the respective method for the
+notebook widget you wish to operate on. Note, when the NoteBook is
+currently on the last page, and next_page() is called,
+the notebook will wrap back to the first page. Likewise, if the
+NoteBook
+is on the first page, and prev_page() is called, the
+notebook will wrap to the last page.<br>
+      <br>
+This next method sets the 'active' page. If you wish the notebook to be
+opened to page 5 for example, you would use this method. Without using
+this method the notebook defaults to the first page.<br>
+      <br>
+      <div class="fbox"><code>void
+set_current_page(int page_num);</code></div>
+      <br>
+The next two methods add or remove the notebook page border and the
+notebook tabs respectively.<br>
+      <br>
+      <div class="fbox"><code>void
+set_show_border(bool show_border);<br>
+      <br>
+void set_show_tabs(bool show_tabs);</code></div>
+      <br>
+The next method is useful when the you have a large number of pages,
+and the tabs don't fit on the page. It allows the tabs to be scrolled
+through using two arrow buttons.<br>
+      <br>
+      <div class="fbox"><code>void
+set_scrollable(bool scrollable);</code></div>
+      <br>
+      <h2><a name="example"></a>Notebook
+Example</h2>
+Let's take a look at an example. This small program creates a window
+with
+a notebook and six buttons. The notebook contains 11 pages, added in
+three different ways, appended, inserted, and prepended. The buttons
+allow you rotate the tab positions, add/remove the tabs and border,
+remove a page, change pages in both a forward and backward manner, and
+exit the program.<br>
+      <br>
+      <div align="left">The header file for the Notebook example is
+&lt;notebook.hh&gt;:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/notebook.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class Notebook : public Gtk::Notebook<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; Notebook();<br>
+&nbsp;&nbsp;&nbsp; virtual ~Notebook();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; void on_rotate_book();<br>
+&nbsp;&nbsp;&nbsp; void
+on_tabsborder_book();<br>
+&nbsp;&nbsp;&nbsp; void on_remove_book();<br>
+};<br>
+      <br>
+class NotebookWindow : public Gtk::Window<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; NotebookWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual
+~NotebookWindow();<br>
+};</code></div>
+      <br>
+and the source file is &lt;notebook.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "notebook.hh"<br>
+#include &lt;xfc/gtk/checkbutton.hh&gt;<br>
+#include &lt;xfc/gtk/frame.hh&gt;<br>
+#include &lt;xfc/gtk/label.hh&gt;<br>
+#include &lt;xfc/gtk/table.hh&gt;<br>
+      <br>
+// Notebook<br>
+      <br>
+Notebook::Notebook()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_tab_pos(Gtk::POS_TOP);<br>
+&nbsp;&nbsp;&nbsp; show();<br>
+}<br>
+      <br>
+Notebook::~Notebook()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+Notebook::on_rotate_book()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; // This function
+rotates
+the position of the tabs<br>
+&nbsp;&nbsp;&nbsp;
+set_tab_pos((Gtk::PositionType)((gtk_notebook()-&gt;tab_pos + 1) % 4));<br>
+}<br>
+      <br>
+void<br>
+Notebook::on_tabsborder_book()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; // Add/Remove the
+page
+tabs and the borders<br>
+&nbsp;&nbsp;&nbsp; int
+tval
+= false;<br>
+&nbsp;&nbsp;&nbsp; int bval = false;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; if (!get_show_tabs())<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; tval = true;<br>
+&nbsp;&nbsp;&nbsp; if (!get_show_border())<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; bval = true;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; set_show_tabs(tval);<br>
+&nbsp;&nbsp;&nbsp; set_show_border(bval);<br>
+}<br>
+      <br>
+void<br>
+Notebook::on_remove_book()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; // Remove a page
+from
+the notebook<br>
+&nbsp;&nbsp;&nbsp; int
+page
+=
+get_current_page();<br>
+&nbsp;&nbsp;&nbsp; remove_page(page);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Need to refresh
+the
+widget -- This forces the widget to redraw itself.<br>
+&nbsp;&nbsp;&nbsp; queue_draw();<br>
+}<br>
+      <br>
+// NotebookWindow<br>
+      <br>
+NotebookWindow::NotebookWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_border_width(10);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::Table *table = new
+Gtk::Table(3, 6);<br>
+&nbsp;&nbsp;&nbsp; add(*table);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create a new
+notebook, place the position of the tabs<br>
+&nbsp;&nbsp;&nbsp; Notebook *notebook = new Notebook;<br>
+&nbsp;&nbsp;&nbsp; table-&gt;attach(*notebook, 0, 6, 0, 1);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Let's append a
+bunch
+of pages to the notebook<br>
+&nbsp;&nbsp;&nbsp; Gtk::Label *label;<br>
+&nbsp;&nbsp;&nbsp; for (int i = 0; i &lt; 5; i++)<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; String s1 =
+String::format("Append Frame %d", i +
+1);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; String s2
+= String::format("Page %d", i + 1);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Gtk::Frame *frame = new
+Gtk::Frame(s1);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; frame-&gt;set_border_width(10);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; frame-&gt;set_size_request(100,
+75);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; label = new
+Gtk::Label(s1);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; frame-&gt;add(*label);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; label = new
+Gtk::Label(s2);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; notebook-&gt;append_page(*frame,
+label);<br>
+&nbsp;&nbsp;&nbsp; }<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Now let's add a page to a specific spot<br>
+&nbsp;&nbsp;&nbsp; Gtk::CheckButton *checkbutton = new
+Gtk::CheckButton("Check me please!");<br>
+&nbsp;&nbsp;&nbsp; checkbutton-&gt;set_size_request(100, 75);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; label = new
+Gtk::Label("Add page");<br>
+&nbsp;&nbsp;&nbsp; notebook-&gt;insert_page(*checkbutton, 2, label);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Now finally
+let's
+prepend pages to the notebook<br>
+&nbsp;&nbsp;&nbsp; for
+(int i = 0; i &lt; 5; i++)<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; String s1 =
+String::format("Prepend Frame %d", i +
+1);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; String s2 = String::format("PPage
+%d", i + 1);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Gtk::Frame *frame = new
+Gtk::Frame(s1);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; frame-&gt;set_border_width(10);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; frame-&gt;set_size_request(100,
+75);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; label = new
+Gtk::Label(s1);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; frame-&gt;add(*label);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; label = new
+Gtk::Label(s2);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; notebook-&gt;prepend_page(*frame,
+label);<br>
+&nbsp;&nbsp;&nbsp; }<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Set what page
+to
+start at (page 4)<br>
+&nbsp;&nbsp;&nbsp; notebook-&gt;set_current_page(3);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create a bunch
+of
+buttons<br>
+&nbsp;&nbsp;&nbsp; Gtk::Button *button = new Gtk::Button("close");<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;NotebookWindow::dispose));<br>
+&nbsp;&nbsp;&nbsp; table-&gt;attach(*button, 0, 1, 1, 2);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; button = new
+Gtk::Button("next page");<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::mem_fun(notebook,
+&amp;Notebook::next_page));<br>
+&nbsp;&nbsp;&nbsp; table-&gt;attach(*button, 1, 2, 1, 2);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; button = new
+Gtk::Button("prev page");<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::mem_fun(notebook,
+&amp;Notebook::prev_page));<br>
+&nbsp;&nbsp;&nbsp; table-&gt;attach(*button, 2, 3, 1, 2);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; button = new
+Gtk::Button("tab position");<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::mem_fun(notebook,
+&amp;Notebook::on_rotate_book));<br>
+&nbsp;&nbsp;&nbsp; table-&gt;attach(*button, 3, 4, 1, 2);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; button = new
+Gtk::Button("tabs/border on/off");<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::mem_fun(notebook,
+&amp;Notebook::on_tabsborder_book));<br>
+&nbsp;&nbsp;&nbsp; table-&gt;attach(*button, 4, 5, 1, 2);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; button = new
+Gtk::Button("remove page");<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::mem_fun(notebook,
+&amp;Notebook::on_remove_book));<br>
+&nbsp;&nbsp;&nbsp; table-&gt;attach(*button, 5, 6, 1, 2);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; table-&gt;show_all();<br>
+}<br>
+      <br>
+NotebookWindow::~NotebookWindow()<br>
+{<br>
+}<br>
+      <br>
+int main (int
+argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; NotebookWindow window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp;&nbsp; window.show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return 0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling Notebook<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Notebook in the
+&lt;examples/howto/notebook&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/notebook&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Notebook, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+notebook: notebook.cc notebook.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) notebook.cc -o notebook $(CFLAGS) `pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o notebook</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 644px; height: 192px;" alt=""
+ src="../../images/notebook.png"><br>
+      </div>
+      <br>
+Clicking on a button in the window will set the corresponding notebook
+property and update the notebook accordingly.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="notebooks.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

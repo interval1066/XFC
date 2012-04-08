@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Project xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:foaf="http://xmlns.com/foaf/0.1/"
+         xmlns:gnome="http://api.gnome.org/doap-extensions#"
+         xmlns="http://usefulinc.com/ns/doap#">
+         
+    <name xml:lang="en">XFC</name>
+    <shortdesc xml:lang="en">Xfce C++ foundation class library</shortdesc>
+    <homepage rdf:resource="http://xfc.xfce.org"/>
+    <mailing-list rdf:resource="http://foo-projects.org/mailman/listinfo/xfc-dev"/>
+
+    <maintainer>
+        <foaf:Person>
+            <foaf:name>Bo Lorentsen</foaf:name>
+            <foaf:mbox>mailto:bl@lue.dk</foaf:mbox>
+            <gnome:userid>bl</gnome:userid>
+        </foaf:Person>
+    </maintainer>
+</Project>

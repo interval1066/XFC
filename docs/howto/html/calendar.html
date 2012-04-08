@@ -1,0 +1,628 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Calendar" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><br>
+      <h1>Calendar</h1>
+      <br>
+The Calendar widget is an effective way to display and retrieve monthly
+date related information. It is a very simple widget to create and work
+with. You create a Calendar widget with the constructor:<br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify"> <br>
+      <div class="fbox"><code>Calendar();</code></div>
+      <br>
+There might be times where you need to change a lot of information
+within this widget and the following methods allow you to make multiple
+changes to a Calendar widget without the user seeing multiple on-screen
+updates.<br>
+      <br>
+      <div class="fbox"><code>void
+freeze();<br>
+      <br>
+void thaw();</code></div>
+      <br>
+      <div style="text-align: left;">They work just like the
+freeze/thaw methods of every other widget. The
+Calendar widget has a few options that allow you to change the way
+the widget both looks and operates by using the method:<br>
+      <br>
+      <div class="fbox"><code>void
+display_options(Gtk::CalendarDisplayOptionsField flags);</code></div>
+      <br>
+The 'flags' argument can be formed by combining either of the following
+five options using the logical bitwise OR (|) operation:<br>
+      <br>
+      <table
+ style="background-color: rgb(133, 147, 179); width: 100%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellpadding="4" cellspacing="1">
+        <tbody>
+          <tr>
+            <td
+ style="background-color: rgb(248, 249, 253); vertical-align: top;">CALENDAR_SHOW_HEADING&nbsp;</td>
+            <td
+ style="background-color: rgb(248, 249, 253); vertical-align: top;">this
+option specifies that the month and year
+should be shown when drawing the calendar.</td>
+          </tr>
+          <tr>
+            <td
+ style="background-color: rgb(248, 249, 253); vertical-align: top;">CALENDAR_SHOW_DAY_NAMES</td>
+            <td
+ style="background-color: rgb(248, 249, 253); vertical-align: top;">this
+option specifies that the three letter
+descriptions should be displayed for each day (e.g. Mon,Tue, etc.).</td>
+          </tr>
+          <tr>
+            <td
+ style="background-color: rgb(248, 249, 253); vertical-align: top;">CALENDAR_NO_MONTH_CHANGE</td>
+            <td
+ style="background-color: rgb(248, 249, 253); vertical-align: top;">this
+option states that the user should not and
+can not change the currently displayed month. This can be good if you
+only need to display a particular month such as if you are displaying
+12
+calendar widgets for every month in a particular year.</td>
+          </tr>
+          <tr>
+            <td
+ style="background-color: rgb(248, 249, 253); vertical-align: top;">CALENDAR_SHOW_WEEK_NUMBERS</td>
+            <td
+ style="background-color: rgb(248, 249, 253); vertical-align: top;">this
+option specifies that the number for each
+week should be displayed down the left side of the calendar. (e.g. Jan
+1
+= Week 1,Dec 31 = Week 52).</td>
+          </tr>
+          <tr>
+            <td
+ style="background-color: rgb(248, 249, 253); vertical-align: top;">CALENDAR_WEEK_START_MONDAY</td>
+            <td
+ style="background-color: rgb(248, 249, 253); vertical-align: top;">this
+option states that the calendar week will
+start on Monday instead of Sunday which is the default. This only
+affects the order in which days are displayed from left to right.</td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+The following methods are used to set the currently displayed date:<br>
+      <br>
+      <div class="fbox"><code>bool
+select_month(int month, int year);<br>
+      <br>
+void select_day(int
+day);</code> </div>
+      <br>
+The return value from select_month() is a bool value
+indicating whether the selection was successful. With select_day() the
+specified day number is selected
+within the current month, if that is possible. A day value of 0 will
+deselect any current selection.<br>
+      <br>
+In addition to having a day selected, any number of days in the month
+may be 'marked'. A marked day is highlighted within the calendar
+display. The following methods are provided to manipulate marked days:<br>
+      <br>
+      <div class="fbox"><code>bool
+mark_day(int day);<br>
+      <br>
+bool unmark_day(int day);<br>
+      <br>
+void clear_marks();</code></div>
+      <br>
+The currently marked days are stored in an array within the wrapped
+GtkCalendar structure and can be accessed using the marked_date()
+accessor:<br>
+      <br>
+      <div class="fbox"><code>std::vector&lt;bool&gt; marked_date()
+const;</code></div>
+      <br>
+The returned vector is 31 elements long so to test whether a particular
+day is currently marked, you need to access the corresponding element
+of
+the vector (don't forget that vector elements are numbered 0 to n-1).
+For example:<br>
+      <br>
+      <div class="fbox"><code>Gtk::Calendar *calendar
+= new Gtk::Calendar;<br>
+...<br>
+      <br>
+// Is day 7 marked? <br>
+if (calendar-&gt;marked_date()[7-1])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; // day is marked<br>
+}</code></div>
+      <br>
+Note that marks are persistent across month and year changes. The final
+Calendar widget method is used to retrieve the currently
+selected date, month and/or year.<br>
+      <br>
+      <div class="fbox"><code>void
+get_date(int *year, int
+*month, int *day) const;</code></div>
+      <br>
+This method requires you to pass the addresses of int
+variables, into which the result will be placed. Passing null to an
+argument results in the corresponding value not being returned.<br>
+      <br>
+The Calendar widget can generate a number of signals indicating date
+selection and change. You can connect a slot to any of these signals by
+using the corresponding proxy signal function:<br>
+      <ul style="list-style-type: square;">
+        <li>signal_month_changed()</li>
+        <li>signal_day_selected()</li>
+        <li>signal_day_selected_double_click()</li>
+        <li>signal_prev_month()</li>
+        <li>signal_next_month()</li>
+        <li>signal_prev_year()</li>
+        <li>signal_next_year()</li>
+      </ul>
+      <br>
+      <h2><a name="example"></a><span style="color: rgb(21, 67, 116);">Calendar
+Example</span></h2>
+This example displays a window containing a Calendar widget. There are
+several check buttons that can be checked and unchecked to toggle the
+five display options on and off. The font used to draw the calendar can
+also be changed. <br>
+      <br>
+The header file for the XFC Calendar Example is &lt;calendar.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/calendar.hh&gt;<br>
+#include &lt;xfc/gtk/checkbutton.hh&gt;<br>
+#include &lt;xfc/gtk/fontselection.hh&gt;<br>
+#include &lt;xfc/gtk/label.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class CalendarWindow : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp;&nbsp; static const int
+DEF_PAD = 10;<br>
+&nbsp;&nbsp;&nbsp; static const int
+DEF_PAD_SMALL = 5;<br>
+&nbsp;&nbsp;&nbsp; static const int
+TM_YEAR_BASE = 1900;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Pointer&lt;Gtk::Calendar&gt; calendar;<br>
+&nbsp;&nbsp;&nbsp; Pointer&lt;Gtk::Label&gt; last_signal;<br>
+&nbsp;&nbsp;&nbsp; Pointer&lt;Gtk::Label&gt; previous_signal;<br>
+&nbsp;&nbsp;&nbsp; Pointer&lt;Gtk::Label&gt; previous2_signal;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; std::vector&lt;Gtk::CheckButton*&gt; checkboxes;<br>
+&nbsp;&nbsp;&nbsp; std::vector&lt;bool&gt;
+settings;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; void set_flags();<br>
+&nbsp;&nbsp;&nbsp; String date_to_string();<br>
+&nbsp;&nbsp;&nbsp; void
+set_signal_strings(const char *str);<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; void
+on_toggle_flag(Gtk::CheckButton *toggle);<br>
+&nbsp;&nbsp;&nbsp; void on_select_font();<br>
+&nbsp;&nbsp;&nbsp; void
+on_font_selection_ok(Gtk::FontSelectionDialog *font_dialog);<br>
+&nbsp;&nbsp;&nbsp; void
+on_day_selected_double_click();<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; CalendarWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual
+~CalendarWindow();<br>
+};</code></div>
+      <br>
+and the source file is &lt;calendar.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "calendar.hh"<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+#include &lt;xfc/gtk/buttonbox.hh&gt;<br>
+#include &lt;xfc/gtk/frame.hh&gt;<br>
+#include &lt;xfc/gtk/separator.hh&gt;<br>
+#include &lt;xfc/pango/font.hh&gt;<br>
+      <br>
+const int
+CalendarWindow::DEF_PAD;<br>
+const int
+CalendarWindow::DEF_PAD_SMALL;<br>
+const int
+CalendarWindow::TM_YEAR_BASE;<br>
+      <br>
+CalendarWindow::CalendarWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace
+sigc;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; for (int i = 0; i &lt; 5; i++)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; settings.push_back(false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; set_title("XFC Calendar Example");<br>
+&nbsp;&nbsp;&nbsp; set_border_width(5);<br>
+&nbsp;&nbsp;&nbsp; set_resizable(false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::VBox *vbox = new
+Gtk::VBox(false, DEF_PAD);<br>
+&nbsp;&nbsp;&nbsp; add(*vbox);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // The top part of
+the
+window, Calendar, flags and fontsel.<br>
+&nbsp;&nbsp;&nbsp; Gtk::HBox *hbox = new
+Gtk::HBox(false, DEF_PAD);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*hbox, true, true, DEF_PAD);<br>
+&nbsp;&nbsp;&nbsp; Gtk::HButtonBox *hbbox = new
+Gtk::HButtonBox;<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*hbbox, false, false, DEF_PAD);<br>
+&nbsp;&nbsp;&nbsp; hbbox-&gt;set_layout(Gtk::BUTTONBOX_SPREAD);<br>
+&nbsp;&nbsp;&nbsp; hbbox-&gt;set_spacing(5);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Calendar widget<br>
+&nbsp;&nbsp;&nbsp; Gtk::Frame *frame = new Gtk::Frame("Calendar");<br>
+&nbsp;&nbsp;&nbsp; hbbox-&gt;pack_start(*frame, false, true, DEF_PAD);<br>
+&nbsp;&nbsp;&nbsp; calendar = new
+Gtk::Calendar;<br>
+&nbsp;&nbsp;&nbsp; set_flags();<br>
+&nbsp;&nbsp;&nbsp; calendar-&gt;mark_day(19);<br>
+&nbsp;&nbsp;&nbsp; frame-&gt;add(*calendar);<br>
+&nbsp;&nbsp;&nbsp;
+calendar-&gt;signal_month_changed().connect(bind(mem_fun(this,
+&amp;CalendarWindow::set_signal_strings),
+"month_changed: "));<br>
+&nbsp;&nbsp;&nbsp;
+calendar-&gt;signal_day_selected().connect(bind(mem_fun(this,
+&amp;CalendarWindow::set_signal_strings),
+"day_selected: "));<br>
+&nbsp;&nbsp;&nbsp;
+calendar-&gt;signal_day_selected_double_click().connect(mem_fun(this,
+&amp;CalendarWindow::on_day_selected_double_click));<br>
+&nbsp;&nbsp;&nbsp;
+calendar-&gt;signal_prev_month().connect(bind(mem_fun(this,
+&amp;CalendarWindow::set_signal_strings),
+"prev_month: "));<br>
+&nbsp;&nbsp;&nbsp;
+calendar-&gt;signal_next_month().connect(bind(mem_fun(this,
+&amp;CalendarWindow::set_signal_strings),
+"next_month: "));<br>
+&nbsp;&nbsp;&nbsp;
+calendar-&gt;signal_prev_year().connect(bind(mem_fun(this,
+&amp;CalendarWindow::set_signal_strings),
+"prev_year: "));<br>
+&nbsp;&nbsp;&nbsp;
+calendar-&gt;signal_next_year().connect(bind(mem_fun(this,
+&amp;CalendarWindow::set_signal_strings),
+"next_year: "));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::VSeparator *separator = new
+Gtk::VSeparator;<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*separator, false, true);<br>
+&nbsp;&nbsp;&nbsp; Gtk::VBox *vbox2 = new
+Gtk::VBox(false, DEF_PAD);<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*vbox2, DEF_PAD);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Build the Right
+frame
+with the flags in<br>
+&nbsp;&nbsp;&nbsp; frame = new Gtk::Frame("Flags");<br>
+&nbsp;&nbsp;&nbsp; vbox2-&gt;pack_start(*frame, true, true, DEF_PAD);<br>
+&nbsp;&nbsp;&nbsp; Gtk::VBox *vbox3 = new
+Gtk::VBox(true, DEF_PAD_SMALL);<br>
+&nbsp;&nbsp;&nbsp; frame-&gt;add(*vbox3);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; struct { char *label;
+}
+flags[] = {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; { "Show Heading" },<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; { "Show Day Names" },<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; { "No Month Change" },<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; { "Show Week Numbers" },<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; { "Week Start Monday" }<br>
+&nbsp;&nbsp;&nbsp; };<br>
+      <br>
+&nbsp;&nbsp;&nbsp; for (int i = 0; i &lt; 5; i++)<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Gtk::CheckButton *toggle = new
+Gtk::CheckButton(flags[i].label);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+toggle-&gt;signal_toggled().connect(bind(mem_fun(this,
+&amp;CalendarWindow::on_toggle_flag), toggle));<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; vbox3-&gt;pack_start(*toggle);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; checkboxes.push_back(toggle);<br>
+&nbsp;&nbsp;&nbsp; }<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Build the right
+font-button<br>
+&nbsp;&nbsp;&nbsp; Gtk::Button *button = new Gtk::Button("Font...");<br>
+&nbsp;&nbsp;&nbsp; button-&gt;signal_clicked().connect(mem_fun(this,
+&amp;CalendarWindow::on_select_font));<br>
+&nbsp;&nbsp;&nbsp; vbox2-&gt;pack_start(*button, false, false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Build the Signal-event part.<br>
+&nbsp;&nbsp;&nbsp; frame = new Gtk::Frame("Signal
+events");<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*frame, true,true, DEF_PAD);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; vbox2 = new Gtk::VBox(true, DEF_PAD_SMALL);<br>
+&nbsp;&nbsp;&nbsp; frame-&gt;add(*vbox2);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; hbox = new Gtk::HBox(false, 3);<br>
+&nbsp;&nbsp;&nbsp; vbox2-&gt;pack_start(*hbox, false);<br>
+&nbsp;&nbsp;&nbsp; Gtk::Label *label = new
+Gtk::Label("Signal:");<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*label, false);<br>
+&nbsp;&nbsp;&nbsp; last_signal = new
+Gtk::Label("");<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*last_signal, false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; hbox = new Gtk::HBox(false, 3);<br>
+&nbsp;&nbsp;&nbsp; vbox2-&gt;pack_start(*hbox, false);<br>
+&nbsp;&nbsp;&nbsp; label = new
+Gtk::Label("Previous signal:");<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*label, false);<br>
+&nbsp;&nbsp;&nbsp; previous_signal = new
+Gtk::Label("");<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*previous_signal, false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; hbox = new Gtk::HBox(false, 3);<br>
+&nbsp;&nbsp;&nbsp; vbox2-&gt;pack_start(*hbox, false);<br>
+&nbsp;&nbsp;&nbsp; label = new Gtk::Label("Second
+previous signal:");<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*label, false);<br>
+&nbsp;&nbsp;&nbsp; previous2_signal = new
+Gtk::Label("");<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*previous2_signal, false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; hbbox = new
+Gtk::HButtonBox;<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*hbbox, false,false);<br>
+&nbsp;&nbsp;&nbsp; hbbox-&gt;set_layout(Gtk::BUTTONBOX_END);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; button = new
+Gtk::Button("Close");<br>
+&nbsp;&nbsp;&nbsp; button-&gt;signal_clicked().connect(mem_fun(this,
+&amp;CalendarWindow::dispose));<br>
+&nbsp;&nbsp;&nbsp; hbbox-&gt;add(*button);<br>
+&nbsp;&nbsp;&nbsp; button-&gt;set_flags(Gtk::CAN_DEFAULT);<br>
+&nbsp;&nbsp;&nbsp; button-&gt;grab_default();<br>
+&nbsp;&nbsp;&nbsp; show_all();<br>
+}<br>
+      <br>
+CalendarWindow::~CalendarWindow()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+CalendarWindow::set_flags()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; int options = 0;<br>
+&nbsp;&nbsp;&nbsp; for (int i = 0; i &lt; 5; i++)<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if
+(settings[i])<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; options =
+options + (1 &lt;&lt; i);<br>
+&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp; if (calendar)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+calendar-&gt;display_options(options);<br>
+}<br>
+      <br>
+void<br>
+CalendarWindow::on_toggle_flag(Gtk::CheckButton *toggle)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; int j = 0;<br>
+&nbsp;&nbsp;&nbsp; for (int i = 0; i &lt; 5; i++)<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if
+(checkboxes[i] == toggle)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; j = i;<br>
+&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp; settings[j] = !settings[j];<br>
+&nbsp;&nbsp;&nbsp; set_flags();<br>
+}<br>
+      <br>
+void<br>
+CalendarWindow::on_select_font()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; static
+Gtk::FontSelectionDialog *font_dialog = 0;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; if (!font_dialog)<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; font_dialog = new
+Gtk::FontSelectionDialog("Font Selection
+Dialog");<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+font_dialog-&gt;set_position(Gtk::WIN_POS_MOUSE);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+signal_destroy().connect(sigc::mem_fun(font_dialog,
+&amp;Gtk::FontSelectionDialog::dispose));<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+font_dialog-&gt;ok_button()-&gt;signal_clicked().connect(sigc::bind(sigc::mem_fun(this,
+&amp;CalendarWindow::on_font_selection_ok), font_dialog));<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+font_dialog-&gt;cancel_button()-&gt;signal_clicked().connect(sigc::mem_fun(*font_dialog,
+&amp;Gtk::FontSelectionDialog::hide));<br>
+&nbsp;&nbsp;&nbsp; }<br>
+      <br>
+&nbsp;&nbsp;&nbsp; if
+(!font_dialog-&gt;is_visible())<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; font_dialog-&gt;show();<br>
+&nbsp;&nbsp;&nbsp; else<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; font_dialog-&gt;hide();<br>
+}<br>
+      <br>
+void<br>
+CalendarWindow::on_font_selection_ok(Gtk::FontSelectionDialog
+*font_dialog)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; String font_name = font_dialog-&gt;get_font_name();<br>
+&nbsp;&nbsp;&nbsp; if (calendar)<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Pango::FontDescription
+font_desc(font_name);<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+calendar-&gt;modify_font(font_desc);<br>
+&nbsp;&nbsp;&nbsp; }<br>
+}<br>
+      <br>
+void<br>
+CalendarWindow::on_day_selected_double_click()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_signal_strings("day_selected_double_click: ");<br>
+      <br>
+&nbsp;&nbsp;&nbsp; struct tm tm;<br>
+&nbsp;&nbsp;&nbsp; memset(&amp;tm, 0, sizeof
+(tm));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; calendar-&gt;get_date(&amp;tm.tm_year,
+&amp;tm.tm_mon, &amp;tm.tm_mday);<br>
+&nbsp;&nbsp;&nbsp; tm.tm_year -= TM_YEAR_BASE;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; if
+(calendar-&gt;marked_date()[tm.tm_mday - 1] == 0)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; calendar-&gt;mark_day(tm.tm_mday);<br>
+&nbsp;&nbsp;&nbsp; else<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+calendar-&gt;unmark_day(tm.tm_mday);<br>
+}<br>
+      <br>
+String<br>
+CalendarWindow::date_to_string()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; struct tm tm;<br>
+&nbsp;&nbsp;&nbsp; memset(&amp;tm, 0, sizeof
+(tm));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; calendar-&gt;get_date(&amp;tm.tm_year,
+&amp;tm.tm_mon, &amp;tm.tm_mday);<br>
+&nbsp;&nbsp;&nbsp; tm.tm_year -= TM_YEAR_BASE;<br>
+&nbsp;&nbsp;&nbsp; time_t time = mktime(&amp;tm);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; char buffer[256];<br>
+&nbsp;&nbsp;&nbsp; strftime(buffer, 255, "%x", gmtime(&amp;time));<br>
+&nbsp;&nbsp;&nbsp; return buffer;<br>
+}<br>
+      <br>
+void<br>
+CalendarWindow::set_signal_strings(const char
+*str)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; String text = previous_signal-&gt;get_text();<br>
+&nbsp;&nbsp;&nbsp; previous2_signal-&gt;set_text(text);<br>
+&nbsp;&nbsp;&nbsp; text = last_signal-&gt;get_text();<br>
+&nbsp;&nbsp;&nbsp; previous_signal-&gt;set_text(text);<br>
+&nbsp;&nbsp;&nbsp; text = str;<br>
+&nbsp;&nbsp;&nbsp; text.append(date_to_string());<br>
+&nbsp;&nbsp;&nbsp; last_signal-&gt;set_text(text);<br>
+}<br>
+      <br>
+int main (int
+argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; CalendarWindow window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return 0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling Calendar<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Calendar in the
+&lt;examples/howto/calendar&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/calendar&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Calendar, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+calendar: calendar.cc calendar.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) calendar.cc -o calendar $(CFLAGS) `pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f calendar</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 382px; height: 419px;" alt=""
+ src="../../images/calendar.png"><br>
+      </div>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="calendar.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

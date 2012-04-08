@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Tutorial: Basic XFC Application" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="greybluestripe" colspan="1" rowspan="1"
+ style="background-color: rgb(153, 169, 192); height: 25px;">
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="0" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="white-space: nowrap; width: 50%;">&nbsp;&laquo; <a
+ class="qindexH" href="index.html">Index</a><span class="qindexH"></span>
+            </td>
+            <td
+ style="white-space: nowrap; text-align: right; width: 50px;"><a
+ href="pretend"><span class="qindexF"></span><span class="qindexF"></span></a><a
+ class="qindexH" href="chapter02.html">Hello World</a> &raquo; <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Chapter
+1: Basic XFC Application</h1>
+      <br>
+      <div style="text-align: left;">Every application starts out as an
+empty main window consisting of
+nothing more
+than a frame, a title bar and a client area. In XFC, the most
+basic application can be written in just 35 lines of code. I
+have called this application 'XfcApp' but you can call it anything
+you
+like. <br>
+      <br>
+The header file for XfcApp is &lt;xfcapp.hh&gt;:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class XfcApp : public Gtk::Window<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; XfcApp();<br>
+&nbsp;&nbsp;&nbsp; virtual ~XfcApp();<br>
+};<br>
+      </code> </div>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+and the source file is &lt;xfcapp.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "xfcapp.hh"<br>
+      <br>
+XfcApp::XfcApp()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_title("XfcApp");<br>
+}<br>
+      <br>
+XfcApp::~XfcApp()<br>
+{<br>
+}<br>
+      <br>
+int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace Main;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;XfcApp window;<br>
+&nbsp;&nbsp;
+&nbsp;window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp;&nbsp; window.show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;run();<br>
+&nbsp;&nbsp; &nbsp;return 0;<br>
+}</code><br>
+      </div>
+      <br>
+      <h2>Compiling XfcApp</h2>
+If you compiled and installed XFC yourself, you will find the source
+code for XfcApp in the
+&lt;examples/tutorial/chapter01&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/tutorial/chapter01&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for XfcApp, add the following lines to a new text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+xfcapp: xfcapp.cc xfcapp.hh<br>
+&nbsp;&nbsp; &nbsp;$(CC) xfcapp.cc -o xfcapp $(</code><code>CFLAGS) </code><code>`pkg-config
+xfcui-X.X
+--cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp; &nbsp;rm -f *.o xfcapp</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 222px; height: 242px;" alt=""
+ src="../../images/chapter01.png"><br>
+      </div>
+      <br>
+If you look will notice that
+the size
+of
+the binary file is 26.3 kbytes. This is much larger than the comparable
+C program which is only 5.6 kbytes. Don't let this worry you. You have
+to remember that in C++ you get all the object-oriented features
+(encapsulation, inheritance and polymorphism) built-in.
+In C, you have to add everything yourself. Eventually though, any real
+functional C program gets large enough that the difference between it
+and a comparable C++ program is in the order of 5%. In todays world of
+fast CPUs and large hard disks this difference is insignificant but the
+benefits can be great! Convenience, easy code reuse, polymorphic
+classes,
+increased type safety, better program design and multiple programming
+paradigms (generic, object orientated, procedural); I could go on.<br>
+      <br>
+      <h2>Stepping through the source code</h2>
+Looking at the header file first, &lt;xfcapp.hh&gt; includes 2
+other header files:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;</code> </div>
+      <br>
+The first include &lt;xfc/main.hh&gt; is the main application header
+file. It contains all the library initialization functions declared in
+the
+Main:: namespace. Every application must include this
+header file. <br>
+      <br>
+The next include &lt;xfc/gtk/window.hh&gt; is the Gtk::Window header
+file. Application main windows usually derive from Gtk::Window but they
+may derive from Gtk::Dialog. If you include &lt;xfc/gtk/dialog.hh&gt;
+you don't need to include &lt;xfc/gtk/window.hh&gt; as well because
+Gtk::Dialog derives from Gtk::Window and automatically includes its
+header file.<br>
+      <br>
+The next line opens the Xfc:: namespace so you don't have to prefix
+every
+type name with Xfc::<br>
+      <br>
+      <div class="fbox"><code>using namespace Xfc;</code></div>
+      <br>
+Don't be afraid to use namespaces in your application development.
+They're the best way to partition a large program and to avoid the over
+use
+of type name prefixes to prevent name clashes.<br>
+      <br>
+The next few lines of code declare the XfcApp class:<br>
+      <br>
+      <div class="fbox"><code>class XfcApp : public Gtk::Window<br>
+{<br>
+public:<br>
+&nbsp;&nbsp; &nbsp;XfcApp();<br>
+&nbsp;&nbsp; &nbsp;virtual ~XfcApp();<br>
+};</code></div>
+      <br>
+As you can see XfcApp derives Gtk::Window. It has a constructor
+that takes no arguments and it has a virtual destructor. The XFC object
+hierarchy is polymorphic because its classes contain virtual functions,
+so derived classes must have a virtual destructor.&nbsp; The primary
+base class Xfc::Trackable declares its destructor virtual, so all
+classes derived
+from it, including XfcApp, automatically have a virtual destructor.
+A virtual destructor just ensures that all derived classes deleted
+through a
+base class pointer are properly destructed.<br>
+      <br>
+Looking at the source file, &lt;xfcapp.cc&gt; first includes the XfcApp
+header file. Then the XfcApp constructor is defined:<br>
+      <br>
+      <div class="fbox"><code>XfcApp::XfcApp()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_title("XfcApp");<br>
+}</code><br>
+      </div>
+      <br>
+The XfcApp constructor calls one function: set_title(),
+which sets the name of the window in title bar to "XfcApp".
+The set_title() function is declared in Gtk::Window. <br>
+      <br>
+The XfcApp destructor doesn't do anything so it is left empty. The
+last function, main(), is the entry point for the application and is
+declared the same in both C and C++. An XFC application's main()
+function is where an instance of the main application window is created.<br>
+      <br>
+As previously stated, the namespace declaration opens the 'Main::'
+namespace so that type names don't need to be prefixed with Main::<br>
+      <br>
+      <div class="fbox"><code>using namespace Main;</code></div>
+      <br>
+The init() function must be called before using any other XFC methods
+in your application. init() initializes everything needed to operate
+the library and parses some standard command line options. argc and
+argv are adjusted accordingly so your own code will never see those
+standard arguments.<br>
+      <br>
+      <div class="fbox"><code>init(&amp;argc, &amp;argv);</code></div>
+      <br>
+In the next two lines an instance of XfcApp is created on the stack
+and its destroy signal is connected to the application's quit() method:<br>
+      <br>
+      <div class="fbox"><code>XfcApp window;<br>
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));</code><br>
+      </div>
+      <br>
+XfcApp could have been created with operator new but if it was you
+would not call operator delete. XFC memory management uses
+reference counting which requires you to call ref() to hold onto a
+reference to an object and to call unref() to release it. When an
+object's
+reference count reaches zero XFC automatically calls operator delete.<br>
+      <br>
+Having said that, if you create XfcApp with operator new you must
+only call unref() if you first call ref(). This is because Gtk::Window
+is an exception. GTK+ owns all top level windows and creates them with
+a
+reference count of one which GTK+ owns. So for a Gtk::Window if you
+don't call ref() you don't need to call unref(). Instead the correct
+way to destroy a top level window is to call its dispose() method,
+which is declared in Gtk::Object.<br>
+      <br>
+Getting back to our application, if you create XfcApp with operator
+new you don't need to call unref() or dispose(). The window's 'destroy'
+signal is connected to the application's quit() method so that when the
+main window is closed or destroyed, quit() automatically gets called.
+The
+proxy object returned by the call to signal_destroy() is used to make
+this
+connection. signal_destroy() is known as a proxy signal function and is
+declared in Gtk::Object. sigc::ptr_fun() is a libsigc++ function call
+that takes a pointer to a global function and returns a function slot.
+Slots are type-safe C++ representations of callback methods and
+functions.<br>
+      <br>
+The next line in the main() function calls show() to
+display XfcApp's main window on screen, so that it is visible. The
+show()
+function is declared
+in Gtk::Widget along with a complimentary hide() function that
+makes a
+widget invisible.<br>
+      <br>
+      <div class="fbox"><code>window.show();</code></div>
+      <br>
+The next line calls run() which runs the application's main event
+loop. The main loop will run until quit() is called. You can nest calls
+to
+run(). In that case quit() will make the innermost invocation of the
+main loop return.<br>
+      <br>
+      <div class="fbox"><code>run();</code></div>
+      <br>
+The last line is the main() function's return statement.&nbsp; The
+return value doesn't do anything so zero is returned.<br>
+      <br>
+      <div class="fbox"><code>return 0;</code></div>
+      <br>
+Well that was easy. The <a href="chapter02.html">next chapter</a>
+takes you through building another
+simple XFC application: Hello World, which adds a button widget to a
+main window and
+connects it to a signal handler. In chapter 4 we will come back to
+XfcApp again when we start building it into a functional main window
+and fully compliant GNU autotools project. <br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><big><span class="qindexF"></span></big><a
+ class="qindexF" href="chapter01.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><a class="qindexF"
+ href="index.html">Index</a><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

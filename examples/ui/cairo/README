@@ -1,0 +1,8 @@
+Make a small test application that shows how to use cairo in XFC, by
+making a analog clock and drawing this on a scalable window.
+
+The example are a modifyed version of the example code in Cairomm.
+
+Hope this covers how to use the cairo system in XFC.
+
+Note that printing also uses cairo.

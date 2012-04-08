@@ -1,0 +1,352 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Menu Items" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Menu
+Items</h1>
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a class="mhl" href="menuitems.html#MI01">Check Menu Items</a></li>
+        <li><a class="mhl" href="menuitems.html#MI02">Image Menu Items</a></li>
+        <li><a class="mhl" href="menuitems.html#MI03">Radio Menu Items</a></li>
+        <li><a class="mhl" href="menuitems.html#MI04">Separator Menu
+Items</a><br>
+        </li>
+        <li><a class="mhl" href="menuitems.html#MI05">Tearoff Menu Items</a></li>
+      </ol>
+      <br>
+      <div style="text-align: left;">Gtk::MenuItem and its derived
+widgets
+are
+the only valid children for menus. Their function is to correctly
+handle
+highlighting, alignment, events and submenus. As MenuItem derives from
+Gtk::Bin, a menu item can hold any valid child widget, although only a
+few are really useful.<br>
+      </div>
+      <br>
+You can create a MenuItem with one of the following constructors:<br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <div class="fbox"><code>MenuItem();<br>
+      <br>
+MenuItem(const String&amp; label, bool
+use_underline = false);<br>
+      <br>
+MenuItem(const String&amp; label,
+Gtk::Menu&amp; submenu, bool
+use_underline
+= false</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">The 'label' argument is a text
+string to use
+for the label. The 'submenu' argument is a popup menu to
+display
+when the menu item is activated. If 'use_underline'<em> </em>is true
+the label
+string is parsed for an underscore preceding the mnemonic character. <br>
+      </div>
+      <div style="text-align: left;">
+      <div style="text-align: left;"> <br>
+The menu item label can be set at any time with this method:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>void
+set_label(const String&amp; label, bool use_underline = false);</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">A popup submenu can be set,
+retrieved and removed by calling the
+following methods respectively:<br>
+      </div>
+      <div style="text-align: left;"> <br>
+      <div class="fbox"><code>void
+set_submenu(Gtk::Menu&amp; submenu);<br>
+      <br>
+Gtk::Menu* get_submenu() const;<br>
+      <br>
+void
+remove_submenu();</code></div>
+      <br>
+To have a menu item appear justified at the right side of a menu bar
+call:<br>
+      <br>
+      <div class="fbox"><code>void
+set_right_justified(bool right_justified);</code></div>
+      <br>
+This was traditionally done for "Help" menu items,
+but is now considered a bad idea. (If the widget layout is reversed for
+a right-to-left language like Hebrew or Arabic,
+right-justified-menu-items appear at the left.)<br>
+      <br>
+Menu items emit four signals: activate, activate_item,
+toggle_size_request and toggle_size_allocate. The main signal
+applications use is the 'activate' signal. You can connect to
+the
+activate signal like this:<br>
+      <br>
+      <div class="fbox"><code>menu_item-&gt;signal_activate().connect(sigc::mem_fun(this,
+&amp;MyClass::activate_handler));</code></div>
+      <br>
+where the 'activate_handler' has the following prototype:<br>
+      <br>
+      <div class="fbox"><code>void
+MyClass::activate_handler();</code></div>
+      <br>
+Most of the time you wont need to connect to the activate
+signal as this gets done for you when you call one of the
+Gtk::MenuShell
+methods: append, prepend or insert and pass it a slot, like this:<br>
+      <br>
+      <div class="fbox"><code>menu-&gt;append(*menu_item,
+sigc::mem_fun(this,
+&amp;MyClass::menu_item_handler));</code></div>
+      <br>
+      <h2><a name="MI01"></a>Check
+Menu Items</h2>
+A check menu item is a menu item that maintains
+the state of a bool value in addition to a MenuItem's usual role in
+activating application code. A small check box indicating the state of
+the bool value is displayed at the left side of the menu item.
+Activating the menu item toggles the value off and on.<br>
+      <br>
+You can create a CheckMenuItem with one of the following constructors:<br>
+      <br>
+      <div class="fbox"><code>CheckMenuItem();<br>
+      <br>
+CheckMenuItem(const String&amp; label, bool
+use_underline = false);</code></div>
+      <br>
+You will need to set and get the active state of the menu item. This
+can be done with the following methods respectively:<br>
+      <br>
+      <div class="fbox"><code>void
+set_active(bool is_active);<br>
+      <br>
+bool get_active() const;</code></div>
+      <br>
+The get_active() method returns true if the check menu item
+is
+currently in its active state.<br>
+      <br>
+If you want to indicate to the user an intermediate state, neither off
+nor on, you have to do it manually by calling:<br>
+      <br>
+      <div class="fbox"><code>void set_inconsistent(bool setting);<br>
+      <br>
+bool get_inconsistent() const;</code></div>
+      <br>
+The get_inconsistent() method returns true if the check menu
+item is currently in an intermediate state.<br>
+      <br>
+The 'toggled' signal is emitted when the state of the check box
+is changed. You can connect to the toggled signal like this:<br>
+      <br>
+      <div class="fbox"><code>check_menu_item-&gt;signal_toggled().connect(sigc::mem_fun(this,
+&amp;MyClass::toggled_handler));</code></div>
+      <br>
+where 'toggled_handler' has the following prototype:<br>
+      <br>
+      <div class="fbox"><code>void
+MyClass::toggled_handler();</code></div>
+      <br>
+      <h2><a name="MI02"></a>Image
+Menu Items</h2>
+An image menu item displays an image next to it's label. You can create
+an ImageMenuItem by calling one of the following constructors:<br>
+      <u><font><u><font color="#003755"><br>
+      </font></u></font></u>
+      <div class="fbox"><code>ImageMenuItem();<br>
+      <br>
+ImageMenuItem(const String&amp; label, bool
+use_underline = false);<br>
+      <br>
+ImageMenuItem(Gtk::Widget&amp; image, const String&amp;
+label, bool use_underline = false);<br>
+      <br>
+ImageMenuItem(Gtk::Widget&amp; image, const
+String&amp; label, Gtk::Menu&amp; submenu, bool use_underline
+= false);<br>
+      <br>
+ImageMenuItem(const
+StockId&amp; stock_id, AccelGroup *accel_group = 0);</code></div>
+      <br>
+The 'image' argument is the image widget for the menu item. The
+'stock_id' argument is the stock item to use to set the menu item image
+and text. The 'accel_group' argument is the accelerator group to add
+the stock item's accelerator to. The
+other arguments are the same as those for the menu items above:<br>
+      <br>
+You can set and retrieve the image for an ImageMenuItem with the
+following methods respectively:<br>
+      <br>
+      <div class="fbox"><code>void
+set_image(Gtk::Widget&amp; image);<br>
+      <br>
+Gtk::Widget* get_image()
+const;</code></div>
+      <br>
+      <h2><a name="MI03"></a>Radio
+Menu Items</h2>
+A radio menu item is a check menu item that belongs to a group. At each
+instant only one radio menu item from a group is selected.<br>
+      <br>
+You can create a RadioMenuItem by calling one of the following
+constructors:<br>
+      <br>
+      <div class="fbox"><code> RadioMenuItem();<br>
+      <br>
+RadioMenuItem(const
+RadioMenuItem *group);<br>
+      <br>
+RadioMenuItem(const
+RadioMenuItem *group, const
+String&amp; label, bool
+use_underline = false);</code> </div>
+      <br>
+The first constructor creates an empty radio menu item that starts a
+new group. The second constructor creates an empty radio menu item that
+is a member of the specified group. The last constructor creates a
+radio menu item that is a member of the specified group and displays
+'label' as its text. If 'use_underline'<em> </em>is true
+the label
+string is parsed for an underscore preceding the mnemonic character. <br>
+      <br>
+If the 'group' argument is null a new group will be created for the
+radio menu item. This should be the case for the first radio menu item
+created in a group. Then for subsequent radio menu items you pass a
+pointer to the previous radio menu item created. This allows a chain of
+radio menu items to be established. The example below
+should make this clear.<br>
+      <br>
+      <div class="fbox"><code>Gtk::Menu *menu; // created elsewhere<br>
+Gtk::RadioMenuItem *menu_item = 0;<br>
+      <br>
+menu_item = new
+Gtk::RadioMenuItem(menu_item, "Item1");<br>
+menu-&gt;append(*menu_item, item1_slot);<br>
+menu_item-&gt;show();<br>
+      <br>
+menu_item = new
+Gtk::RadioMenuItem(menu_item, "Item2");<br>
+menu-&gt;append(*menu_item, item2_slot);<br>
+menu_item-&gt;show();<br>
+      <br>
+menu_item = new
+Gtk::RadioMenuItem(menu_item, "Item3");<br>
+menu-&gt;append(*menu_item, item3_slot);<br>
+menu_item-&gt;show();</code></div>
+      <br>
+You can set and get the group a radio menu item belongs to by calling
+the following methods respectively:<br>
+      <br>
+      <div class="fbox"><code>void set_group(Group
+*group);<br>
+      <br>
+Group* get_group() const;</code> </div>
+      <br>
+The 'group' argument is a pointer to a<em> </em>Group<em>, </em>which<em></em>
+is just a typedef for a GSList.<br>
+      <br>
+It is also a good idea to explicitly set which radio menu item should
+be the active menu item for the group:<br>
+      <br>
+      <div class="fbox"><code>void
+set_active(bool is_active);</code></div>
+      <br>
+If 'is_active' is true the menu item will be active and the previously
+active menu tiem will become inactive.<br>
+      <br>
+      <h2><a name="MI04"></a>Separator
+Menu Items</h2>
+The SeparatorMenuItem widget is a separator used
+to group items within a menu. It displays a horizontal line with a
+shadow to make it appear sunken into the interface.<br>
+      <br>
+You can create a separator menu item with the following constructor:<br>
+      <br>
+      <div class="fbox"><code> SeparatorMenuItem();</code></div>
+      <br>
+      <h2><span style="color: rgb(21, 67, 116);"><a name="MI05"></a></span>Tearoff
+Menu Items</h2>
+A tearoff menu item is a special menu item which is
+used to tear off and reattach its menu. When it's menu is shown
+normally, the TearoffMenuItem is drawn as a
+dotted line indicating that the menu can be torn off. Activating it
+causes it's menu to be torn off and displayed in its own window as a
+tearoff menu. When its menu is shown as a tearoff menu, the
+TearoffMenuItem is drawn
+as a dotted line which has a left pointing arrow graphic indicating
+that
+the tearoff menu can be reattached. Activating it will erase the
+tearoff
+menu window and reattach the menu.<br>
+      <br>
+You can create a tearoff menu item with the following constructor:<br>
+      <br>
+      <div class="fbox"><code>TearoffMenuItem();</code></div>
+      <br>
+To determine if a tearoff menu item is in its torn off state call:<br>
+      <br>
+      <div class="fbox"><code>bool
+is_torn_off() const;</code></div>
+      <br>
+The return value is true if the menu item has been torn off.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="menuitems.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

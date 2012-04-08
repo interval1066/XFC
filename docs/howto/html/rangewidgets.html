@@ -1,0 +1,752 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Range Widgets" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Range
+Widgets</h1>
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a class="mhl" href="rangewidgets.html#RW01">Scrollbar
+Widgets</a></li>
+        <li><a class="mhl" href="rangewidgets.html#RW02">Scale
+Widgets</a></li>
+        <li><a class="mhl" href="rangewidgets.html#RW03">Common
+Range Functions</a></li>
+        <li><a class="mhl" href="rangewidgets.html#RW04">Key and
+Mouse bindings</a></li>
+        <li><a class="mhl" href="rangewidgets.html#example">Range
+Widget Example</a><br>
+        </li>
+      </ol>
+      <br>
+      <div style="text-align: left;">The category of range widgets
+includes the
+ubiquitous scrollbar widget and the less common scale widget. Though
+these two types of widgets are generally used for different purposes,
+they are quite similar in function and implementation. All range
+widgets
+share a set of common graphic elements, each of which has its own X
+window and receives events. They all contain a "trough" and a "slider"
+(what is sometimes called a "thumb wheel" in other GUI environments).
+Dragging the slider with the pointer moves it back and forth within the
+trough, while clicking in the trough advances the slider towards the
+location of the click, either completely, or by a designated amount,
+depending on which mouse button is used.<br>
+      <br>
+As mentioned in <a href="adjustments.html">Adjustments</a>,
+all range
+widgets are associated with an adjustment object, from which they
+calculate the length of the slider and its position within the trough.
+When the user manipulates the slider, the range widget will change the
+value of the adjustment.<br>
+      </div>
+      <br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">
+      <div style="text-align: left;">
+      <h2><a name="RW01"></a>Scrollbar
+Widgets</h2>
+These are your standard, run-of-the-mill
+scrollbars. These should be used only for scrolling some other widget,
+such as a list, a text box, or a viewport (and it's generally easier to
+use the scrolled window widget in most cases). For other purposes, you
+should use scale widgets, as they are friendlier and more feature full.<br>
+      <br>
+There are separate types for horizontal and vertical scrollbars. There
+really isn't much to say about these. You create horizontal scrollbars
+with these constructors:<br>
+      <br>
+      <div class="fbox"><code>HScrollbar();<br>
+      <br>
+HScrollbar(Gtk::Adjustment&amp; adjustment); </code></div>
+      <br>
+      </div>
+and you create vertical scrollbars with these constructors:<br>
+      <div style="text-align: left;"> <br>
+      <div class="fbox"><code>VScrollbar();<br>
+      <br>
+VScrollbar(Gtk::Adjustment&amp; adjustment);</code></div>
+      <br>
+      <div style="text-align: left;">HScrollbar() and VScrollbar()
+create
+an&nbsp;anonymous Adjustment&nbsp;with all of its values set to 0.0.
+You
+can access this adjustment by calling the Gtk::Range's get_adjustment()
+method:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>Gtk::Adjustment*
+get_adjustment() const; </code></div>
+      <br>
+That's about it (if you don't believe me, look in
+the header files!). The<em> </em>'adjustment' argument is a reference
+to an
+existing Adjustment. If you call the first constructor an Adjustment
+will be created for you. This might actually be useful if you wish to
+pass the newly-created adjustment to the constructor of some other
+widget which will configure it for you, such as a TextView widget.<br>
+      <br>
+      <h2><a name="RW02"></a>Scale
+Widgets</h2>
+Scale widgets are used to allow the user to
+visually select and manipulate a value within a specific range. You
+might want to use a scale widget, for example, to adjust the
+magnification level on a zoomed preview of a picture, or to control the
+brightness of a color, or to specify the number of minutes of
+inactivity
+before a screensaver takes over the screen.<br>
+      <br>
+As with scrollbars, there are separate widget types for horizontal and
+vertical scale widgets. (Most programmers seem to favour horizontal
+scale widgets.)&nbsp; The following constructors create horizontal
+scale widgets:<br>
+      <br>
+      <div class="fbox"><code>HScale();<br>
+      <br>
+HScale(Gtk::Adjustment&amp;
+adjustment);<br>
+      <br>
+HScale(double min, double
+max, double step = 1.0);</code></div>
+      <br>
+and the following constructors create vertical scale widgets:<br>
+      <br>
+      <div class="fbox"><code>VScale();<br>
+      <br>
+VScale(Gtk::Adjustment&amp;
+adjustment);<br>
+      <br>
+VScale(double min, double
+max, double step = 1.0); </code></div>
+      <br>
+      </div>
+VScale() and HScale() create
+an&nbsp;anonymous
+Adjustment&nbsp;with all of its values set to 0.0 (which isn't very
+useful in this case). In order to avoid confusing yourself, you
+probably
+want to create your adjustment with a 'page_size' of 0.0 so that its
+upper
+value actually corresponds to the highest value the user can select.
+The last constructor takes care of creating a suitable adjustment. (If
+you're already thoroughly confused, read the section on <a
+ href="adjustments.html">Adjustments</a> again for an explanation of
+what exactly adjustments do and how to create and manipulate them.)<br>
+      <div style="text-align: left;"> <br>
+Scale widgets can display their current value as a number beside the
+trough. The default behaviour is to show the value, but you can change
+this with this method:<br>
+      <br>
+      <div class="fbox"><code>void
+set_draw_value(bool draw_value);</code></div>
+      <br>
+As you might have guessed, 'draw_value' is
+either true<em> </em>or false, with predictable consequences
+for either one. The value displayed by a scale widget is rounded to one
+decimal point by default, as is the value field in its Adjustment. You
+can change this with method:<br>
+      <br>
+      <div class="fbox"><code>void
+set_digits(int digits);</code></div>
+      <br>
+      <div align="justify">where 'digits' is the number of decimal
+places you want. You can set digits to anything you like, but no more
+than 13 decimal places will actually be drawn on screen.<br>
+      </div>
+      <br>
+Finally, the value can be drawn in different positions relative to the
+trough:<br>
+      <br>
+      <div class="fbox"><code>void
+set_value_pos(Gtk::PositionType pos);</code></div>
+      <br>
+The 'pos' argument can be one of the following values from the
+Gtk::PositionType enum:<br>
+      <ul style="list-style-type: square;">
+        <li>POS_LEFT</li>
+        <li>POS_TOP</li>
+        <li>POS_RIGHT</li>
+        <li>POS_BOTTOM</li>
+      </ul>
+If you position the value on the "side" of
+the
+trough (e.g., on the top or bottom of a horizontal scale widget), then
+it will follow the slider up and down the trough. <br>
+      <br>
+      <h2><a name="RW03"></a>Common
+Range
+Methods</h2>
+The Gtk::Range widget class is fairly complicated
+internally, but, like all the "base class" widgets, most of its
+complexity is only interesting if you want to hack on it. Also, almost
+all of the methods and signals it defines are only really used in
+writing derived widgets. There are, however, a few useful methods that
+are defined in &lt;xfc/gtk/range.hh&gt; and will work on
+all range widgets.<br>
+      <div align="justify">
+      <h3>Setting the Update Policy</h3>
+The
+'update
+policy' of a range widget defines at what points during user
+interaction
+it will change the value field of its Adjustment and emit the
+'value_changed'
+signal on this Adjustment. The update policies are defined in the
+Gtk::UpdateType enum in &lt;xfc/gtk/enums.hh&gt;:</div>
+      <ul>
+        <li>UPDATE_CONTINUOUS &nbsp;- This is the default. The
+value_changed
+signal is emitted continuously, i.e., whenever the slider is moved by
+even the tiniest amount.</li>
+        <li>UPDATE_DISCONTINUOUS - The value_changed signal is only
+emitted once the slider has stopped moving and the user has released
+the
+mouse button.</li>
+        <li>UPDATE_DELAYED - The value_changed signal is emitted
+when the user releases the mouse button, or if the slider stops moving
+for a short period of time.</li>
+      </ul>
+The update policy of a range widget can be set by calling this
+Gtk::Range method:<br>
+      <br>
+      <div class="fbox"><code>void
+set_update_policy(Gtk::UpdateType policy);</code></div>
+      <br>
+      <h3>Getting and Setting Adjustments</h3>
+Getting and setting the
+adjustment for a range widget 'on the fly' is done, predictably, with
+these Gtk::Range methods:<br>
+      <br>
+      <div class="fbox"><code>Gtk::Adjustment*
+get_adjustment() const;</code></div>
+      <br>
+which returns a pointer to the adjustment to which range is connected,
+and:<br>
+      <br>
+      <div class="fbox"><code>void
+set_adjustment(Gtk::Adjustment *adjustment);</code></div>
+      <br>
+which does absolutely nothing if you pass it the
+adjustment that range is already using, regardless of whether you
+changed any of its fields or not. If you pass it a new Adjustment, it
+will unreference the old one if it exists (possibly destroying it),
+connect the appropriate signals to the new one, and call the private
+function gtk_range_adjustment_changed(), which will (or at least, is
+supposed to...) recalculate the size and/or position of the slider and
+redraw if necessary. As mentioned in the section on adjustments, if you
+wish to reuse the same Adjustment, when you modify its values directly,
+you should emit the 'changed' signal on it, like this:<br>
+      <br>
+      <div class="fbox"><code>adjustment-&gt;emit_by_name
+("changed"); <br>
+      </code></div>
+      <br>
+      <h2><a name="RW04"></a>Key
+and Mouse
+bindings</h2>
+All of the GTK range widgets react to mouse clicks
+in more or less the same way. Clicking button-1 in the trough will
+cause
+its adjustment's page_increment to be added or subtracted from its
+value, and the slider to be moved accordingly. Clicking mouse button-2
+in the trough will jump the slider to the point at which the button was
+clicked. Clicking button-3 in the trough of a range or any button on a
+scrollbar's arrows will cause its adjustment's value to change by
+step_increment at a time.<br>
+      <br>
+Scrollbars are not focusable, thus have no key bindings. The key
+bindings for the other range widgets (which are, of course, only active
+when the widget has focus) are do not differentiate between horizontal
+and vertical range widgets.<br>
+      <br>
+All range widgets can be operated with the left, right, up and down
+arrow keys, as well as with the Page Up and Page Down keys. The arrows
+move the slider up and down by step_increment, while Page Up and Page
+Down move it by page_increment. The user can also move the slider all
+the way to one end or the other
+of the trough using the keyboard. This is done with the Home and End
+keys.<br>
+      <br>
+      <h2><span style="color: rgb(21, 67, 116); font-weight: bold;"><a
+ name="example"></a></span>Range Widget Example</h2>
+      <h2><span style="color: rgb(21, 67, 116); font-weight: bold;"></span></h2>
+      <span style="color: rgb(21, 67, 116); font-weight: bold;"></span>This
+example displays a window
+with three range
+widgets all connected to the same adjustment, and a couple of controls
+for adjusting some of their parameters so you can see how they affect
+the way these widgets
+work for the user.<br>
+      <br>
+The header file for the Range Widgets example is
+&lt;rangewidgets.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include
+&lt;xfc/main.hh&gt;<br style="color: rgb(0, 102, 0);">
+#include
+&lt;xfc/gtk/adjustment.hh&gt;<br style="color: rgb(0, 102, 0);">
+#include
+&lt;xfc/gtk/checkbutton.hh&gt;<br style="color: rgb(0, 102, 0);">
+#include
+&lt;xfc/gtk/combobox.hh&gt;<br style="color: rgb(0, 102, 0);">
+#include
+&lt;xfc/gtk/scale.hh&gt;<br style="color: rgb(0, 102, 0);">
+#include
+&lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class RangeWidgets : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Gtk::Adjustment *adj1;<br>
+&nbsp;&nbsp;&nbsp; Gtk::HScale *hscale;<br>
+&nbsp;&nbsp;&nbsp; Gtk::VScale *vscale;<br>
+&nbsp;&nbsp;&nbsp; Gtk::CheckButton *check_button;<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; void on_draw_value();<br>
+&nbsp;&nbsp;&nbsp; void on_pos_menu_select(Gtk::PositionType pos);<br>
+&nbsp;&nbsp;&nbsp; void on_update_menu_select(Gtk::UpdateType policy);<br>
+&nbsp;&nbsp;&nbsp; void on_digits_scale(Gtk::Adjustment *adj);<br>
+&nbsp;&nbsp;&nbsp; void on_page_size(Gtk::Adjustment *adj);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; RangeWidgets();<br>
+&nbsp;&nbsp;&nbsp; ~RangeWidgets();<br>
+};</code> </div>
+      <br>
+and the source file is &lt;rangewidgets.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "rangewidgets.hh"<br
+ style="color: rgb(0, 102, 0);">
+#include &lt;xfc/gtk/box.hh&gt;<br style="color: rgb(0, 102, 0);">
+#include
+&lt;xfc/gtk/label.hh&gt;<br style="color: rgb(0, 102, 0);">
+#include
+&lt;xfc/gtk/menu.hh&gt;<br style="color: rgb(0, 102, 0);">
+#include
+&lt;xfc/gtk/menuitem.hh&gt;<br style="color: rgb(0, 102, 0);">
+#include
+&lt;xfc/gtk/scrollbar.hh&gt;<br style="color: rgb(0, 102, 0);">
+#include
+&lt;xfc/gtk/separator.hh&gt;<br>
+      <br>
+RangeWidgets::RangeWidgets()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace
+Gtk;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; set_title("range controls");<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Box *box1 = new
+VBox;<br>
+&nbsp;&nbsp;&nbsp; add(*box1);<br>
+&nbsp;&nbsp;&nbsp; box1-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Box *box2 = new
+HBox(false, 10);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;set_border_width(10);<br>
+&nbsp;&nbsp;&nbsp; box1-&gt;pack_start(*box2);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+Gtk::Adjustment args: value, lower, upper, step_increment,
+page_increment, page_size.<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; //
+Note that the page_size value only makes a difference for scrollbar
+widgets, and the<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; //
+highest value you'll get is actually (upper - page_size).<br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; adj1 = new
+Adjustment(0.0, 0.0, 101.0, 0.1, 1.0, 1.0);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; vscale = new
+VScale(*adj1);<br>
+&nbsp;&nbsp;&nbsp; vscale-&gt;set_update_policy(UPDATE_CONTINUOUS);<br>
+&nbsp;&nbsp;&nbsp; vscale-&gt;set_digits(1);<br>
+&nbsp;&nbsp;&nbsp; vscale-&gt;set_value_pos(POS_TOP);<br>
+&nbsp;&nbsp;&nbsp; vscale-&gt;set_draw_value(true);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;pack_start(*vscale);<br>
+&nbsp;&nbsp;&nbsp; vscale-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Box *box3 = new
+VBox(false, 10);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;pack_start(*box3);<br>
+&nbsp;&nbsp;&nbsp; box3-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+Reuse the same adjustment<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; hscale = new
+HScale(*adj1);<br>
+&nbsp;&nbsp;&nbsp; hscale-&gt;set_size_request(200, -1);<br>
+&nbsp;&nbsp;&nbsp; hscale-&gt;set_update_policy(UPDATE_CONTINUOUS);<br>
+&nbsp;&nbsp;&nbsp; hscale-&gt;set_digits(1);<br>
+&nbsp;&nbsp;&nbsp; hscale-&gt;set_value_pos(POS_TOP);<br>
+&nbsp;&nbsp;&nbsp; hscale-&gt;set_draw_value(true);<br>
+&nbsp;&nbsp;&nbsp; box3-&gt;pack_start(*hscale);<br>
+&nbsp;&nbsp;&nbsp; hscale-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+Reuse the same adjustment again<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; HScrollbar *scrollbar = new HScrollbar(*adj1);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+Notice how this causes the scales to always be updated continuously
+when the scrollbar is moved<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; scrollbar-&gt;set_update_policy(UPDATE_CONTINUOUS);<br>
+&nbsp;&nbsp;&nbsp; box3-&gt;pack_start(*scrollbar);<br>
+&nbsp;&nbsp;&nbsp; scrollbar-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; box2 = new
+HBox(false, 10);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;set_border_width(10);<br>
+&nbsp;&nbsp;&nbsp; box1-&gt;pack_start(*box2);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+A checkbutton to control whether the value is displayed or not<br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; check_button = new
+CheckButton("Display value on scale widgets");<br>
+&nbsp;&nbsp;&nbsp; check_button-&gt;set_active(true);<br>
+&nbsp;&nbsp;&nbsp;
+check_button-&gt;signal_toggled().connect(sigc::mem_fun(this,
+&amp;RangeWidgets::on_draw_value));<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;pack_start(*check_button);<br>
+&nbsp;&nbsp;&nbsp; check_button-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; box2 = new
+HBox(false, 10);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;set_border_width(10);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+An option menu to change the position of the value<br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; Label *label = new
+Label("Scale Value Position:");<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;pack_start(*label, false, false);<br>
+&nbsp;&nbsp;&nbsp; label-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+Gtk::ComboBoxText replaces GtkOptionMenu used in the corresponding GTK+
+example.&nbsp;&nbsp;&nbsp; <br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; Gtk::ComboBox *combobox = new Gtk::ComboBoxText;<br>
+&nbsp;&nbsp;&nbsp;
+combobox-&gt;signal_changed().connect(sigc::bind(sigc::mem_fun(this,
+&amp;RangeWidgets::on_pos_menu_select), combobox));<br>
+&nbsp;&nbsp;&nbsp; combobox-&gt;append_text("Left");&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; combobox-&gt;append_text("Right");&nbsp;&nbsp;&nbsp;
+      <br>
+&nbsp;&nbsp;&nbsp; combobox-&gt;append_text("Top");&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; combobox-&gt;append_text("Bottom");<br>
+&nbsp;&nbsp;&nbsp; combobox-&gt;set_active(2);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;pack_start(*combobox);<br>
+&nbsp;&nbsp;&nbsp; combobox-&gt;show();<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; box1-&gt;pack_start(*box2);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; box2 = new
+HBox(false, 10);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;set_border_width(10);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+Second option menu, this time for the update policy of the scale widgets<br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; label = new
+Label("Scale Update Policy:");<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;pack_start(*label, false, false);<br>
+&nbsp;&nbsp;&nbsp; label-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+Gtk::ComboBoxText replaces GtkOptionMenu used in the corresponding GTK+
+example.&nbsp;&nbsp;&nbsp; <br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; combobox = new
+Gtk::ComboBoxText;<br>
+&nbsp;&nbsp;&nbsp;
+combobox-&gt;signal_changed().connect(sigc::bind(sigc::mem_fun(this,
+&amp;RangeWidgets::on_update_menu_select), combobox));<br>
+&nbsp;&nbsp;&nbsp;
+combobox-&gt;append_text("Continuous");&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;
+combobox-&gt;append_text("Discontinuous");&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;
+combobox-&gt;append_text("Delayed");&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; combobox-&gt;set_active(0);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;pack_start(*combobox);<br>
+&nbsp;&nbsp;&nbsp; combobox-&gt;show();<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; box1-&gt;pack_start(*box2);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;show();<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; box2 = new
+HBox(false, 10);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;set_border_width(10);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+An HScale widget for adjusting the number of digits on the sample
+scales.<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; label = new
+Label("Scale Digits:");<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;pack_start(*label, false, false);<br>
+&nbsp;&nbsp;&nbsp; label-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Adjustment *adj2 = new Adjustment(1.0, 0.0, 5.0,
+1.0, 1.0, 0.0);<br>
+&nbsp;&nbsp;&nbsp;
+adj2-&gt;signal_value_changed().connect(sigc::bind(sigc::mem_fun(this,
+&amp;RangeWidgets::on_digits_scale), adj2));<br>
+&nbsp;&nbsp;&nbsp; HScale *scale = new
+HScale(*adj2);<br>
+&nbsp;&nbsp;&nbsp; scale-&gt;set_digits(0);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;pack_start(*scale);<br>
+&nbsp;&nbsp;&nbsp; scale-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; box1-&gt;pack_start(*box2);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; box2 = new
+HBox(false, 10);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;set_border_width(10);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+And, one last HScale widget for adjusting the page size of the
+scrollbar.<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; label = new
+Label("Scrollbar Page Size:");<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;pack_start(*label, false, false);<br>
+&nbsp;&nbsp;&nbsp; label-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; adj2 = new
+Adjustment(1.0, 1.0, 101.0, 1.0, 1.0, 0.0);<br>
+&nbsp;&nbsp;&nbsp;
+adj2-&gt;signal_value_changed().connect(sigc::bind(sigc::mem_fun(this,
+&amp;RangeWidgets::on_page_size), adj2));<br>
+&nbsp;&nbsp;&nbsp; scale = new
+HScale(*adj2);<br>
+&nbsp;&nbsp;&nbsp; scale-&gt;set_digits(0);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;pack_start(*scale);<br>
+&nbsp;&nbsp;&nbsp; scale-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; box1-&gt;pack_start(*box2);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; HSeparator *separator = new HSeparator;<br>
+&nbsp;&nbsp;&nbsp; box1-&gt;pack_start(*separator, false);<br>
+&nbsp;&nbsp;&nbsp; separator-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; box2 = new
+VBox(false, 10);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;set_border_width(10);<br>
+&nbsp;&nbsp;&nbsp; box1-&gt;pack_start(*box2, false);<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::Button *button = new Button("Quit");<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;RangeWidgets::dispose));<br>
+&nbsp;&nbsp;&nbsp; box2-&gt;pack_start(*button);<br>
+&nbsp;&nbsp;&nbsp; button-&gt;set_flags(Gtk::CAN_DEFAULT);<br>
+&nbsp;&nbsp;&nbsp; button-&gt;grab_default();<br>
+&nbsp;&nbsp;&nbsp; button-&gt;show();<br>
+}<br>
+      <br>
+RangeWidgets::~RangeWidgets()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+RangeWidgets::on_draw_value()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; //
+Turn the value display on the scale widgets off or on depending on the
+state of the checkbutton<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp;
+hscale-&gt;set_draw_value(check_button-&gt;get_active());<br>
+&nbsp;&nbsp;&nbsp;
+vscale-&gt;set_draw_value(check_button-&gt;get_active());<br>
+}<br>
+      <br>
+void<br>
+RangeWidgets::on_pos_menu_select(Gtk::ComboBox *combobox)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Gtk::PositionType pos =
+static_cast&lt;Gtk::PositionType&gt;(combobox-&gt;get_active());&nbsp;&nbsp;&nbsp;
+      <br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; //
+Set the value position on both scale widgets<br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; hscale-&gt;set_value_pos(pos);<br>
+&nbsp;&nbsp;&nbsp; vscale-&gt;set_value_pos(pos);<br>
+}<br>
+      <br>
+void<br>
+RangeWidgets::on_update_menu_select(Gtk::ComboBox *combobox)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Gtk::UpdateType policy =
+static_cast&lt;Gtk::UpdateType&gt;(combobox-&gt;get_active());&nbsp;&nbsp;&nbsp;
+      <br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; //
+Set the update policy for both scale widgets<br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; hscale-&gt;set_update_policy(policy);<br>
+&nbsp;&nbsp;&nbsp; vscale-&gt;set_update_policy(policy);<br>
+}<br>
+      <br>
+void<br>
+RangeWidgets::on_digits_scale(Gtk::Adjustment *adj)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; //
+Set the number of decimal places to which adj-&gt;value is rounded<br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; hscale-&gt;set_digits((int)adj-&gt;get_value());<br>
+&nbsp;&nbsp;&nbsp; vscale-&gt;set_digits((int)adj-&gt;get_value());<br>
+}<br>
+      <br>
+void<br>
+RangeWidgets::on_page_size(Gtk::Adjustment *adj)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; //
+Set the page size and page increment size of the sample adjustment<br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; //
+to the value specified by the "Page Size" scale<br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; adj1-&gt;gtk_adjustment()-&gt;page_size =
+adj-&gt;get_value();<br>
+&nbsp;&nbsp;&nbsp; adj1-&gt;gtk_adjustment()-&gt;page_increment =
+adj-&gt;get_value();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+This sets the adjustment and makes it emit the "changed" signal to<br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; //
+reconfigure all the widgets that are attached to this signal.<br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; adj1-&gt;set_value(CLAMP(adj1-&gt;get_value(),
+adj1-&gt;lower(), (adj1-&gt;upper() - adj1-&gt;page_size())));<br>
+}<br>
+      <br>
+int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace
+Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; RangeWidgets window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;XFC::Main::quit));<br>
+&nbsp;&nbsp;&nbsp; window.show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return
+0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling Range Widget<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Range Widget in the
+&lt;examples/howto/rangewidgets&gt; source directory along with a Makefile.
+If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/rangewidgets&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Range Widget, add the following lines to a
+new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+rangewidgets: rangewidgets.cc rangewidgets.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) rangewidgets.cc -o rangewidgets $(CFLAGS)
+`pkg-config xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o rangewidgets</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 293px; height: 428px;" alt=""
+ src="../../images/rangewidgets.png"><br>
+      </div>
+&nbsp; <br>
+You will notice in main() that the
+program does
+not connect a slot to the 'delete_event', only to the 'destroy'
+signal. This will still perform the desired function, because an
+unhandled delete_event will result in a destroy signal being emitted.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="rangewidgets.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

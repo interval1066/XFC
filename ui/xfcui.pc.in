@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: XFC UI
+Description: The Xfce Foundation Classes user interface library
+Version: @XFC_VERSION@
+Requires: gtk+-2.0 xfccore-@XFC_VERSION@
+Libs: -L${libdir} -lxfc_ui
+Cflags: -I${includedir}/@XFCEDIR@

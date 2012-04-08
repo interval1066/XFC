@@ -1,0 +1,403 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Tables" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1"> &laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1" style="text-align: left;">
+      <div style="text-align: left;"><br>
+      <h1>Tables</h1>
+      <br>
+      </div>
+Apart
+from boxes, the other
+container commonly used to pack widgets is
+a table.
+Tables, like boxes are 'no window' widgets so they are invisible. You
+can use a table to arrange widgets in rows and columns, making it easy
+to align many widgets next to each other, horizontally and vertically. <br>
+      <br>
+An instance of Gtk::Table can be created with the following constructor:<br>
+      <br>
+      <div class="fbox"><code>Table(unsigned
+int rows, unsigned
+int columns, bool
+homogeneous = false);</code></div>
+      <br>
+The 'rows' argument is the
+number of rows the new table should have and 'columns' is the number of
+columns. The 'homogeneous'
+argument sets whether all cells in the table should be resized to the
+size of the largest cell. The default value is false. <br>
+      <br>
+      <div style="text-align: left;">The
+rows and columns are laid out
+from 0 to n,
+where n was the number specified in the Gtk::Table constructor.
+So,
+if you specify rows = 2 and columns = 2, the layout would look
+like this:<br>
+      <br>
+      <div style="margin: 0px auto; text-align: left;" class="fbox"><code>0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+2<br>
+0+----------+----------+<br>
+&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
+1+----------+----------+<br>
+&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
+2+----------+----------+</code></div>
+      </div>
+      <br>
+      <div style="text-align: left;">Note that the coordinate system
+starts in the
+upper left hand corner.
+Widgets can be placed in a table using the table's attach method:<br>
+      <br>
+      <div class="fbox"><code>void
+attach<br>
+(<br>
+&nbsp;&nbsp;&nbsp; Widget&amp; child, <br>
+&nbsp;&nbsp;&nbsp; unsigned
+int
+left_attach,<br>
+&nbsp;&nbsp;&nbsp; unsigned
+int
+right_attach, <br>
+&nbsp;&nbsp;&nbsp; unsigned
+int
+top_attach, <br>
+&nbsp;&nbsp;&nbsp; unsigned
+int
+bottom_attach,<br>
+&nbsp;&nbsp;&nbsp; AttachOptionsField xoptions = EXPAND |
+FILL,<br>
+&nbsp;&nbsp;&nbsp; AttachOptionsField yoptions = EXPAND |
+FILL,<br>
+&nbsp;&nbsp;&nbsp; unsigned
+int
+xpadding = 0, <br>
+&nbsp;&nbsp;&nbsp; unsigned
+int
+ypadding = 0<br>
+);</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">The 'child' argument is a
+widget to add to the table. The 'left_attach'
+and 'right_attach' arguments
+are the column numbers to attach to the left and right side of the
+widget respectively. The 'top_attach'
+and 'bottom_attach' arguments
+are the column numbers to attach to the top and bottom of the
+widget respectively. The 'xoptions'
+and 'yoptions' arguments
+specify how the widget is resized, horizontally and vertically
+respectively,&nbsp; when the table is resized. They can be one or
+more
+values from the Gtk::AttachOptions enum: <br>
+      </div>
+      <ul style="list-style-type: square; text-align: left;">
+        <li>Gtk::EXPAND - the
+widget should expand to take up any extra
+space allocated to its table. </li>
+        <li>Gtk::SHRINK - the
+widget should shrink with the table when
+possible.<br>
+        </li>
+        <li>Gtk::FILL - if the
+table is larger than the widget the
+widget should expand to use all the room
+available.</li>
+      </ul>
+      <div style="text-align: left;">The
+default values are Gtk::EXPAND and Gtk::FILL. The 'xpadding'
+argument is an integer
+value that specifies the padding on the left and right side of
+the widget being added to the table. The 'ypadding' argument is an
+integer
+value that specifies the padding above and below the widget being
+added to the table. The default value for both is zero.<br>
+      <br>
+      <h2><a name="example"></a>Table
+Example<span style="color: rgb(21, 67, 116);"></span></h2>
+      <span style="color: rgb(21, 67, 116);"> </span><span
+ style="color: rgb(21, 67, 116);"></span>This
+example
+creates a window with
+three buttons in a 2x2
+table. The first two buttons are placed in the upper row. The third,
+a quit button, is placed in the lower row, spanning both columns. <br>
+      <br>
+The header file for the Table example is &lt;table.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include
+&lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using
+namespace Xfc;<br>
+      <br>
+class
+TableWindow : public
+Gtk::Window<br>
+{<br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; void
+on_button_clicked(const
+char *text);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; TableWindow();<br>
+&nbsp;&nbsp;&nbsp; ~TableWindow();<br>
+}; </code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">and the source file is
+&lt;table.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "table.hh"<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+#include &lt;xfc/gtk/table.hh&gt;<br>
+#include &lt;xfc/gtk/button.hh&gt;<br>
+#include &lt;iostream&gt;<br>
+      <br>
+TableWindow::TableWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp;
+// Set the window
+title<br>
+&nbsp;&nbsp;&nbsp;
+set_title("Table");<br>
+      <br>
+&nbsp;&nbsp;&nbsp;
+// Set the border
+width
+of the window.<br>
+&nbsp;&nbsp;&nbsp;
+set_border_width( 20);<br>
+      <br>
+&nbsp;&nbsp;&nbsp;
+// Create a 2x2
+table<br>
+&nbsp;&nbsp;&nbsp;
+Gtk::Table *table = new
+Gtk::Table(2, 2, true);<br>
+      <br>
+&nbsp;&nbsp;&nbsp;
+// Put the table
+in the
+main window<br>
+&nbsp;&nbsp;&nbsp;
+add(*table);<br>
+      <br>
+&nbsp;&nbsp;&nbsp;
+// Create first
+button<br>
+&nbsp;&nbsp;&nbsp;
+Gtk::Button *button = new
+Gtk::Button("button 1");<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;
+// When the button
+is
+clicked, we call the "slot" function with a pointer to "button 1" as
+its
+argument.<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::bind(sigc::mem_fun(this,
+&amp;TableWindow::on_button_clicked), "button 1"));<br>
+      <br>
+&nbsp;&nbsp;&nbsp;
+// Insert button 1
+into
+the upper left quadrant of the table<br>
+&nbsp;&nbsp;&nbsp;
+table-&gt;attach(*button, 0, 1,
+0, 1);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; button-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp;
+// Create second
+button<br>
+&nbsp;&nbsp;&nbsp;
+button = new
+Gtk::Button("button 2");<br>
+      <br>
+&nbsp;&nbsp;&nbsp;
+// When the button
+is
+clicked, we call the "slot" function with a pointer to "button 2" as
+its
+argument.<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::bind(sigc::mem_fun(this,
+&amp;TableWindow::on_button_clicked), "button 2"));<br>
+      <br>
+&nbsp;&nbsp;&nbsp;
+// Insert button 2
+into
+the upper right quadrant of the table<br>
+&nbsp;&nbsp;&nbsp;
+table-&gt;attach(*button, 1, 2,
+0, 1);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; button-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp;
+// Create "Quit"
+button<br>
+&nbsp;&nbsp;&nbsp;
+button = new
+Gtk::Button("Quit");<br>
+      <br>
+&nbsp;&nbsp;&nbsp;
+// When the button
+is
+clicked, we call the main window's dispose() function and the program
+exits.<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;TableWindow::dispose));<br>
+      <br>
+&nbsp;&nbsp;&nbsp;
+// Insert the quit
+button into the both lower quadrants of the table<br>
+&nbsp;&nbsp;&nbsp;
+table-&gt;attach(*button, 0, 2,
+1, 2);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; button-&gt;show();<br>
+&nbsp;&nbsp;&nbsp; table-&gt;show();<br>
+}<br>
+      <br>
+TableWindow::~TableWindow()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+TableWindow::on_button_clicked(const
+char
+*text)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; std::cout &lt;&lt; "Hello again
+- " &lt;&lt; text
+&lt;&lt; " was pressed" &lt;&lt; '\n';<br>
+}<br>
+      <br>
+int
+main (int
+argc, char
+*argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using
+namespace Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; TableWindow window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp;&nbsp; window.show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return
+0;<br>
+}</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">
+      <h2>Compiling Table</h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Table in the
+&lt;examples/howto/table&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/table&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Table, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+table: table.cc table.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) table.cc -o table&nbsp; $(CFLAGS) `pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o table</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      </div>
+      <span style="color: rgb(21, 67, 116);"><br>
+      </span>
+      <div style="text-align: center;"><img
+ style="width: 187px; height: 133px;" alt=""
+ src="../../images/table.png"><br>
+      </div>
+      <div style="text-align: left;"><br>
+      </div>
+      <hr style="width: 100%; height: 1px;">
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a
+ style="font-weight: normal;" class="qindexF" href="tables.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

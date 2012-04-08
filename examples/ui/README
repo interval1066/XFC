@@ -1,0 +1,10 @@
+Example User Interface Programs.
+================================ 
+The <examples/ui> directory contains several example programs that
+show you how to use the newer GTK+ widgets, including action-based
+menubars and toolbars, combo boxes, the entry completion widget and
+the file chooser widget. The mergemenu program shows you how to merge
+menu and toolbar items dynamically in your applications. 
+
+The example programs are compiled by default but you can disable this by 
+passing the "--disable-examples" option to configure. 

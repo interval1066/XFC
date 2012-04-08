@@ -1,0 +1,14 @@
+AM_CXXFLAGS = @CXXFLAGS@ @XFC_UI_CFLAGS@ @XFC_SOURCEVIEW_CFLAGS@
+
+INCLUDES = \
+ -I$(top_builddir)/libXFCcore \
+ -I$(top_builddir)/libXFCui \
+ -I$(top_builddir)/libXFCsourceview
+
+LIBS = \
+ $(top_builddir)/libXFCcore/xfc/libXFCcore-$(XFC_API_VERSION).la \
+ $(top_builddir)/libXFCui/xfc/libXFCui-$(XFC_API_VERSION).la \
+ $(top_builddir)/libXFCsourceview/xfc/libXFCsourceview-$(XFC_API_VERSION).la
+	
+include $(top_srcdir)/examples/Makefile.fragment
+	

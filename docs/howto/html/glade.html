@@ -1,0 +1,615 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Using Glade with XFC" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="Generator" content="Kate, the KDE Advanced Text Editor">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="Generator" content="Kate, the KDE Advanced Text Editor">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="Generator" content="Kate, the KDE Advanced Text Editor">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="Generator" content="Kate, the KDE Advanced Text Editor">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Using Glade with XFC</h1>
+      <div align="justify">
+      <div style="text-align: left;">
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a class="mhl" href="glade.html#G01">Designing your
+interface with Glade</a></li>
+        <li><a class="mhl" href="glade.html#G02">The Glade::Xml object</a></li>
+        <li><a class="mhl" href="glade.html#G03">Loading a .glade file
+in your main() function</a></li>
+        <li><a class="mhl" href="glade.html#G04">Example</a></li>
+      </ol>
+      <br>
+Creating a good graphical user interface for a GTK application has
+never been easy, but it's an important goal. A good user interface
+means a more functional application, and if your application is more
+functional its users will be more
+productive. <br>
+      <br>
+To create a good user interface you first have to plan its design. Then
+you have to write the source code to implement it. Often this
+involves for a few mock ups to see what the user interface will look
+like.
+Then finally you have
+to write the source code for the application itself. This
+process can take some time so anything that will help to speed things
+up is great. And that's exactly what Glade is - it's great! <br>
+      <br>
+Glade is a graphical user interface designer for creating GTK+ and
+GNOME applications visually. While Glade supports the generation of
+source code
+it's no longer recommended. Instead you should dynamically create your
+application's user
+interface from the XML description file (.glade) that Glade creates. In
+C you do this&nbsp;using the libglade API. One of the advantages of
+using Glade is that it separates user interface design from application
+development. This separation allows you to change or update the user
+interface without having to recompile the application.<br>
+      <br>
+      <h2><a name="G01"></a>Designing your interface with Glade</h2>
+When designing an application you can choose
+to create part or all of its interface with Glade. If you look at the
+example programs in the
+&lt;tests/glade&gt; subdirectory you will see that the entire
+interface for each is designed with
+Glade. Depending on your application's needs you could create the main
+window manually and any pop-up dialogs and secondary windows
+with Glade. One reason you might want to do this is to override one or
+more of your
+main window's virtual signal handlers instead of connecting to its
+proxy signal functions. Virtual signal handlers can override default
+signal behavior, proxy signal functions cannot.<br>
+      <br>
+The easiest way to learn how to use Glade is to just start using it. To
+launch glade, run the command 'glade-2'. When you do three windows will
+appear: the main window, the widget palette, and the property editor.
+When you try to create a new project Glade will ask you whether you
+want to make a GTK+ project or a GNOME project. Do not choose
+the&nbsp;GNOME option because XFC does not support the GNOME libraries.
+      <br>
+      <br>
+When designing an interface with Glade you need to apply the same
+principles you would use when designing an interface manually. For
+example,
+placing your<span style="text-decoration: underline;"></span> widgets
+inside a <a href="boxes.html">packing widget</a> will facilitate
+dynamic resizing. When you save your glade project the only entry
+field you need worry about under the 'General' tab is the project
+directory name. When you change this directory name all other entry
+fields are automatically updated to reflect the change, including the
+glade file name.<br>
+      <br>
+The property editor displays five tabbed windows. The first four are
+labeled Widgets, Packing, Common and Signals. The Widget tab groups
+together widget specific properties. If a widget is placed inside a
+packing widget, the Packing tab will display the widget's packing
+properties. The Common tab groups together those properties common to
+all widgets. The last tab which is labeled with a wheelchair icon
+displays a widget's accessibility properties.<br>
+      <br>
+The Signals tab lists all the signals emitted by a widget and provides
+an entry field where the name of the signal handler to connect to can
+be entered. These are for C signal handlers and should not used in a
+XFC application. XFC provides proxy signal functions and libsigc++
+slots
+which should be used instead, just as you would if you were creating
+the user interface manually. So just ignore the Signal tab.<br>
+      <br>
+Before moving on, now would be a good time to have a look a few Glade
+tutorials if you have not use Glade before. IBM developer works has a
+good <a
+ href="http://www-106.ibm.com/developerworks/library/l-gnome-glade">tutorial</a>
+that takes you step-by-step through creating a glade interface and
+application. Extensive online documentation for Glade-2 can be found <a
+ href="http://www.kplug.org/glade_tutorial/glade2_tutorial/glade2_introduction.html">here</a>
+and GNOME provides a good development <a
+ href="http://www.gnome.org/%7Enewren/tutorials/developing-with-gnome">guide</a>
+which covers the use of Glade and libglade.<br>
+      <br>
+      <h2><a name="G02"></a>The Glade::Xml object</h2>
+Essentially libXFCglade is a C++ binding for only one libglade object:
+GladeXML. The wrapper class Glade::Xml implements most of the
+GladeXML API but not the signal connection functions. These
+functions are not easily wrapped in C++, and they're not needed anyway
+because XFC implements its own libsigc++
+signal connection functions.<br>
+      <br>
+The Glade::Xml object represents the instantiation of a glade XML
+interface
+description. When an instance Glade::Xml is created it reads the
+specified XML file
+and creates the described user interface. Glade::Xml also provides
+convenient methods for accessing the widgets in the user interface.
+Widgets can only be accessed by the name
+you assigned to them in the XML description.<br>
+      <br>
+Either of the following methods can be called to create a Glade::Xml
+object:<br>
+      <br>
+      <div class="fbox"><code>static Pointer&lt;Xml&gt; create(const
+std::string&amp; filename, const String&amp; root = 0, const
+String&amp; domain = 0);<br>
+      <br>
+static Pointer&lt;Xml&gt; create(const char *buffer, int size, const
+String&amp; root = 0, const String&amp; domain = 0);&nbsp;</code></div>
+      <br>
+The first method creates a new Xml object from the file named 'filename'<em></em>.
+The second method creates a new Xml object from a memory 'buffer' that
+contains a XML interface description. The 'size' argument is
+the size
+of the memory buffer, 'root' is the root widget to
+start building the interface from, or null for the entire interface,
+and 'domain'
+is the translation domain, or null to use the default domain.<br>
+      <br>
+Once you have created a Xml object you can then call one of its
+get_widget() methods to retrieve a pointer to a standard widget:<br>
+      <br>
+      <div class="fbox"> <code> Gtk::Widget* get_widget(const
+String&amp; name) const;<br>
+      <br>
+template&lt;typename WidgetType&gt;<br>
+bool get_widget(const String&amp; name, WidgetType *&amp;widget) const;<br>
+      </code></div>
+      <br>
+The first method returns a generic Gtk::Widget pointer. The second
+method is a template function that on return sets&nbsp;'widget' to
+point to a widget of WidgetType, where WidgetType is one of the
+standard XFC
+widgets. The return value is true if successful. The 'name' argument is
+the name given to the widget in
+the XML interface description. <br>
+      <br>
+Alternatively, you can call get_widget_derived() to retrieve a pointer
+to a user defined widget that derives from one of the standard XFC
+widgets:<br>
+      <br>
+      <div class="fbox"><code>template&lt;typename DerivedType&gt;<br>
+bool get_widget_derived(const String&amp; name, DerivedType
+*&amp;widget) const;</code></div>
+      <br>
+The arguments and return value for this method are the same as for
+get_widget(), except that on return 'widget' is set to point to a
+widget of DerivedType, where DerivedType is a user defined type that
+derives from one of the standard XFC
+widgets. Because this method creates an instance of the specified
+DerivedType its class declaration must declare a constructor with the
+following syntax:<br>
+      <br>
+      <div class="fbox"><code>DerivedType(CObjectType *object, const
+Glade::Xml&amp; xml);</code></div>
+      <br>
+CObjectType is a typedef for a XFC widget's corresponding GTK widget
+type. Every XFC widget class defines a CObjectType. For a
+Gtk::Window it's GtkWindow and for a Gtk::Button it's GtkButton.
+&nbsp;The 'xml' argument is a reference to the Glade::Xml object you
+created. It's passed to the DerivedType constructor so it can be used
+to retrieve pointers to the other widgets described in the XML
+interface description.<br>
+      <br>
+      <h2><a name="G03"></a>Loading a .glade file in your main()
+function</h2>
+After designing you application's user interface and saving it, Glade
+creates a .glade file in your project directory using the file name
+entered into the Project Options "Project File" entry field. By
+default, the file name used is the name of the project directory but
+this can be changed. If you create your main application window with
+Glade, the&nbsp;.glade file must be loaded in the main() function. If
+you only create secondary windows or popup dialogs with Glade you can
+load the .glade file elsewhere. A good place would be in your main
+window constructor.<br>
+      <br>
+To use Glade::Xml in your application add the following
+include statement:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/glade/xml.hh&gt;</code></div>
+      <br>
+Then load your application's .glade file in your main()
+function,
+like this:<br>
+      <span style="font-family: monospace;"><br>
+      </span>
+      <div class="fbox"><code>int <br>
+main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace Main;<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;init(&amp;argc, &amp;argv);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;Pointer&lt;Glade::Xml&gt; xml =
+Glade::Xml::create("name.glade");<br>
+&nbsp;&nbsp; &nbsp;if (!xml)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;return 1;<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;MainWindow *window;<br>
+&nbsp;&nbsp; &nbsp;if (xml-&gt;get_widget_derived("MainWindow", window))<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;run(window);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;return 0;<br>
+}</code></div>
+&nbsp;<br>
+You should be familiar with the 'using' declaration by now. Here it
+opens the Xfc::Main namespace so that namespace types don't have to be
+prefixed with the Main:: specifier. In the next line the call to init()
+initializes the GTK+ libraries.<br>
+      <br>
+The next line creates an instance of a Glade::Xml object. The create()
+method is a
+static function that returns a null pointer if an error occurs, in
+which
+case main() returns 1 and exits. The file name "name.glade" is name of
+the glade XML
+file created when you first saved your glade interface. <br>
+      <br>
+      <div class="fbox"><code>Pointer&lt;Glade::Xml&gt; xml =
+Glade::Xml::create("name.glade");<br>
+if (!xml)<br>
+      </code><code>&nbsp;&nbsp; &nbsp;return 1;</code></div>
+      <br>
+In the next three lines a MainWindow pointer is declared. This pointer
+is then passed to get_widget_derived() to retrieve a pointer to a newly
+created instance of MainWindow. If get_widget_derived() is successful,
+the window pointer is passed to Main::run() to run the application and
+display the main window.<br>
+      <br>
+      <div class="fbox"><code>MainWindow *window;<br>
+if (xml-&gt;get_widget_derived("MainWindow", window))<br>
+      </code><code>&nbsp;&nbsp; &nbsp;</code><code>run(window);</code></div>
+      <br>
+Note calling:&nbsp;<br>
+      <br>
+      <div class="fbox"><code>run(window);</code></div>
+      <br>
+is equivalent to calling:<br>
+      <br>
+      <div class="fbox"><code>window-&gt;signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+window-&gt;show();<br>
+run();<br>
+      </code></div>
+      <br>
+      <h2><a name="G04"></a>Example</h2>
+Let's have a look a simple example that will show you how easy it is to
+give a
+XFC application a Glade interface. Example-2 in
+the&nbsp;&lt;tests/glade/example-2&gt; subdirectory creates a window
+that displays two widgets: a progress bar in activity mode and a label.
+A timeout function is used to calculate how much time you wasted
+looking at the progress bar. When the program terminates the time
+you wasted is printed to stdout. The window looks like this:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 280px; height: 118px;" alt=""
+ src="../../images/example-2.png"><br>
+      <div style="text-align: left;"><br>
+The XML file generated by Glade for this window layout is
+&lt;example-2.glade&gt;:<br>
+      <br>
+      <div class="fbox"><code>&lt;?xml version="1.0"
+standalone="no"?&gt; &lt;!--*- mode: xml -*--&gt;<br>
+&lt;!DOCTYPE glade-interface SYSTEM
+"http://glade.gnome.org/glade-2.0.dtd"&gt;<br>
+      <br>
+&lt;glade-interface&gt;<br>
+      <br>
+&lt;widget class="GtkWindow" id="WasteTimeWindow"&gt;<br>
+&nbsp; &lt;property name="border_width"&gt;12&lt;/property&gt;<br>
+&nbsp; &lt;property name="visible"&gt;True&lt;/property&gt;<br>
+&nbsp; &lt;property name="title" translatable="yes"&gt;Wasting your
+time&lt;/property&gt;<br>
+&nbsp; &lt;property name="type"&gt;GTK_WINDOW_TOPLEVEL&lt;/property&gt;<br>
+&nbsp; &lt;property
+name="window_position"&gt;GTK_WIN_POS_NONE&lt;/property&gt;<br>
+&nbsp; &lt;property name="modal"&gt;False&lt;/property&gt;<br>
+&nbsp; &lt;property name="resizable"&gt;True&lt;/property&gt;<br>
+&nbsp; &lt;property name="destroy_with_parent"&gt;False&lt;/property&gt;<br>
+&nbsp; &lt;signal name="delete_event"
+handler="inform_user_of_time_wasted" last_modification_time="Thu, 18
+Mar 2004 03:07:48 GMT"/&gt;<br>
+      <br>
+&nbsp; &lt;child&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;widget class="GtkVBox"
+id="TheProgressStuffies"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="visible"&gt;True&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="homogeneous"&gt;False&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="spacing"&gt;12&lt;/property&gt;<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;child&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;widget
+class="GtkProgressBar" id="Progress Bar"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="visible"&gt;True&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="orientation"&gt;GTK_PROGRESS_LEFT_TO_RIGHT&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="fraction"&gt;0&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="pulse_step"&gt;0.1&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="text" translatable="yes"&gt;&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/widget&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;packing&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="padding"&gt;0&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="expand"&gt;False&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="fill"&gt;False&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/packing&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/child&gt;<br>
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;child&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;widget class="GtkLabel"
+id="ProgressInfo"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="visible"&gt;True&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="label" translatable="yes"&gt;Please wait while your time is
+wasted...&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="use_underline"&gt;False&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="use_markup"&gt;False&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="justify"&gt;GTK_JUSTIFY_LEFT&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="wrap"&gt;False&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="selectable"&gt;False&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="xalign"&gt;0.5&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="yalign"&gt;0.5&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="xpad"&gt;0&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="ypad"&gt;0&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/widget&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;packing&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="padding"&gt;0&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="expand"&gt;False&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;property
+name="fill"&gt;False&lt;/property&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/packing&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;/child&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;/widget&gt;<br>
+&nbsp; &lt;/child&gt;<br>
+&lt;/widget&gt;<br>
+      <br>
+&lt;/glade-interface&gt;</code></div>
+      <br>
+Note the string identifier "WasteTimeWindow" given to the GtkWindow
+near the top. This is the identifier that is used
+to&nbsp;retrieve a pointer to the corresponding Gtk::Window, which is
+our main window.<br>
+      <br>
+The header file for Example-2 is &lt;example-2.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/progressbar.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+#include &lt;xfc/glib/timer.hh&gt;<br>
+#include &lt;xfc/glade/xml.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class WasteTimeWindow : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp; &nbsp;Pointer&lt;G::Timer&gt;
+wasted_time_tracker;&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;Gtk::ProgressBar *progress_bar;<br>
+&nbsp;&nbsp; &nbsp;sigc::connection timeout_connection;<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp; &nbsp;bool on_delete_event(const Gdk::EventAny&amp; event);<br>
+&nbsp;&nbsp; &nbsp;bool on_timeout();<br>
+      <br>
+public:<br>
+&nbsp;&nbsp; &nbsp;WasteTimeWindow(CObjectType *object, const
+Glade::Xml&amp; xml);<br>
+&nbsp;&nbsp; &nbsp;virtual ~WasteTimeWindow();<br>
+};</code></div>
+      </div>
+      </div>
+      <br>
+WasteTimeWindow is a widget that derives from Gtk::Window so it
+must define a constructor with the required syntax:<br>
+      <code></code><br>
+      <div class="fbox"><code>WasteTimeWindow(CObjectType *object,
+const Glade::Xml&amp; xml);</code></div>
+      <br>
+The source file for Example-2 is &lt;example-2.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "example-2.hh"<br>
+#include &lt;xfc/glib/main.hh&gt;<br>
+#include &lt;iostream&gt;<br>
+      <br>
+WasteTimeWindow::WasteTimeWindow(CObjectType *object, const
+Glade::Xml&amp; xml)<br>
+: Gtk::Window(object)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;// Connect a slot to the "delete_event" so we can
+calculate the time wasted.&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;signal_delete_event().connect(sigc::mem_fun(this,
+&amp;WasteTimeWindow::on_delete_event));<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// Retrieve a pointer to the progress_bar and set
+it's activity mode to "pulse".&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;xml.get_widget("Progress Bar", progress_bar);
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;if (progress_bar)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;progress_bar-&gt;pulse();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Add a timeout to update the progress bar every
+100 milliseconds or so.<br>
+&nbsp;&nbsp; &nbsp;timeout_connection =
+G::timeout_signal.connect(sigc::mem_fun(this,
+&amp;WasteTimeWindow::on_timeout), 100);<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// Start the wasted_time_tracker timer, and connect
+it to the callback.<br>
+&nbsp;&nbsp; &nbsp;wasted_time_tracker = new G::Timer();&nbsp;&nbsp;
+&nbsp;<br>
+}<br>
+      <br>
+WasteTimeWindow::~WasteTimeWindow()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;// Don't forget to disconnect the timeout
+function.&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;timeout_connection.disconnect();<br>
+}<br>
+      <br>
+bool <br>
+WasteTimeWindow::on_delete_event(const Gdk::EventAny&amp; event)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;// Get the elapsed time since the timer was started.<br>
+&nbsp;&nbsp; &nbsp;double time_elapsed =
+wasted_time_tracker-&gt;elapsed();&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// Tell the user how much time they wasted.<br>
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "You wasted " &lt;&lt;
+time_elapsed &lt;&lt; " seconds with this program." &lt;&lt; std::endl;<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// Stop the timer<br>
+&nbsp;&nbsp; &nbsp;wasted_time_tracker-&gt;stop();<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// Return false to quit the program.<br>
+&nbsp;&nbsp; &nbsp;return false;<br>
+}<br>
+      <br>
+bool<br>
+WasteTimeWindow::on_timeout()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;// Just pulse the progress bar back and
+forth.&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;progress_bar-&gt;pulse();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Return true so that the timeout function
+continues to get called (returning false removes the timeout). <br>
+&nbsp;&nbsp; &nbsp;return true;<br>
+}<br>
+      <br>
+int <br>
+main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace Main;<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// Initalize GTK+ first&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;init(&amp;argc, &amp;argv);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// Create a Xml object from the file
+example-2.glade. &nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;Pointer&lt;Glade::Xml&gt; xml =
+Glade::Xml::create("example-2.glade");<br>
+&nbsp;&nbsp; &nbsp;if (!xml)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;return 1;<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// Retrieve a pointer to the main
+window.&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;WasteTimeWindow *window;<br>
+&nbsp;&nbsp; &nbsp;if (xml-&gt;get_widget_derived("WasteTimeWindow",
+window))<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;// Connect the main window's
+"destroy" signal to the quit() function.&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;window-&gt;signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;// Show the main window.<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;window-&gt;show();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;// Run the program<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;run();<br>
+&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;return 0;<br>
+}</code></div>
+      <br>
+First, the WasteTimeWindow constructor connects
+the&nbsp;on_delete_event() signal handler to the window's
+"delete_event" signal. We use the proxy signal function
+signal_delete_event() to do this. Remember,
+you can't use widget signal classes&nbsp;with glade widgets, only
+with native
+XFC widgets, so we can't override the inherited virtual
+on_delete_event() handler. When the user closes the WasteTimeWindow,
+on_delete_event()
+calculates the time wasted and prints this information to stdout using
+the C++ std::cout operator.<br>
+      <br>
+Next, the constructor retrieves a pointer to the progress bar widget
+identified by the string "TheProgressStuffies" and initiates its
+activity
+mode by calling Gtk::ProgressBar::pulse(). Note that because the
+progress bar is a standard XFC widget and not a derived widget, we call
+get_widget()&nbsp;not get_widget_derived().<br>
+      <br>
+There are three other Glade examples in the &lt;tests/glade&gt;
+subdirectory: example-1, example-3 and example-4. All these examples
+are translations of the examples that come the <a
+ href="http://www.gnome.org/%7Enewren/tutorials/developing-with-gnome">Developing
+with Gnome</a> guide. Each example is a little more complex than the
+last so you should have a look at all three examples and work through
+the source code.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="glade.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: Xfc-DesktopEnvironment
+Description: The Xfce Foundation Classes desktop environment library
+Version: @VERSION@
+Requires: glib-2.0 gobject-2.0 sigc++-2.0 gthread-2.0 libxfconf-0 libxfce4util-1.0 libxfce4panel-1.0 xfccore-@XFC_VERSION@ xfcui-@XFC_VERSION@
+Libs: -L${libdir} -lxfc_core -lxfc_ui -lxfc_de
+Cflags: -I${includedir}/@XFCEDIR@

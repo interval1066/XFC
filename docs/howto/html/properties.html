@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="XFC Object Properties" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"></span> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>XFC
+Object Properties</h1>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+Object properties are data members
+that define the internal state of an object. The GLib object system
+implements a generic mechanism to get and set
+object properties. When an object is
+instantiated, the object's 'class_init'
+handler is called to register any object properties and provide default
+values. GTK+ provides several functions that can get and set one or
+more
+object properties at a time, like g_object_get() and g_object_set(). As
+well most objects provides a getter and setter function for each
+property. For example, GtkWindow has a property called "gravity" and
+provides the functions gtk_window_get_gravity() and
+gtk_window_set_gravity() to get and set a window's gravity value. <br>
+      <br>
+GTK+ implements the getting and setting of object properties in terms
+of an object's individual getter and setter functions. When you set an
+object property via the generic set function g_object_set(), it's
+actually the property's setter function that gets called to set the
+value. While it's important in GTK+ to be able to get and set
+properties both generically and specifically using the getter and
+setter functions, it's not in C++. The use of variable arguments lists
+is frowned upon in C++ because they're not typesafe, but they're still
+legal.<br>
+      <br>
+In a C++ language binding it's overkill and unnecessary to provide both
+generic and specific wrappers to get and set properties, and it offers
+no real benefits. So why does XFC provide wrappers for some object
+properties? Because not all GTK+ objects provide getter and setter
+functions. Specifically the following objects don't: <br>
+      <ul style="list-style-type: square;">
+        <li>GtkAction</li>
+        <li>GtkCellRenderer</li>
+        <li>GtkCellRendererPixbuf</li>
+        <li>GtkCellRendererText</li>
+        <li>GtkCellRendererToggle</li>
+        <li>GtkSettings</li>
+        <li>GtkTextTag</li>
+      </ul>
+XFC adds C++ wrappers for their object properties to the corresponding
+XFC classes:<br>
+      <ul style="list-style-type: square;">
+        <li>Gtk::Action</li>
+        <li>Gtk::CellRenderer</li>
+        <li>Gtk::CellRendererPixbuf</li>
+        <li>Gtk::CellRendererText</li>
+        <li>Gtk::CellRendererToggle</li>
+        <li>Gtk::Settings</li>
+        <li>Gtk::TextTag</li>
+      </ul>
+Currently these are the only XFC objects that provide wrappers for GTK+
+object properties. Getting and setting property values on these objects
+is the only way to read or alter their internal state. The template
+classes used to implement object properties can be found
+in the file &lt;xfc/glib/properties.hh&gt;. There are 3
+template
+classes:<br>
+      <ul style="list-style-type: square;">
+        <li><span style="font-weight: bold;">G::Property</span><span
+ style="font-style: italic;">
+- </span>wraps
+properties that are both readable and writable.<br>
+        </li>
+        <li><span style="font-weight: bold;">G::ReadableProperty</span><span
+ style="font-style: italic;">
+- </span>wraps properties that are
+readable only.</li>
+        <li><span style="font-weight: bold;">G::WritableProperty</span><span
+ style="font-style: italic;">
+- </span>wraps properties that are
+writable only.</li>
+      </ul>
+Object properties are protected data members and are declared static.
+Lets look at Gtk::TextTag's 'size_property' declaration as an example:<br>
+&nbsp; <br>
+      <div class="fbox"><code>typedef
+G::Property&lt;int&gt;
+SizePropertyType;<br>
+typedef
+G::PropertyProxy&lt;G::Object, SizePropertyType&gt;
+SizePropertyProxy;<br>
+static const SizePropertyType
+size_property;</code> </div>
+      <br>
+For convenience the first line typedefs the size_property type
+G::Property&lt;int&gt; which is both a readable and writable
+property.
+The
+third line declares the static const variable size_property. You can
+use this variable to get and set the text tag's font size but only in
+dervied classes because it's declared protected. The functions used to
+get and set a property are:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>void
+G::Property::get(const
+G::Object *object,
+DataType&amp; data) const;<br>
+void
+G::Property::set(const
+G::Object *object, const
+DataType&amp; data) const;</code></div>
+      <br>
+      <div style="text-align: left;">These functions take a pointer to
+the object whose property is
+being
+accessed and a variable of type 'DataType'.
+DataType is the template argument and in the case of
+Gtk::TextTag::size_property it is an int. <br>
+      </div>
+      <br>
+You would get a tag's font size like this:<span
+ style="font-style: italic;"></span><br>
+      <br>
+      <div class="fbox"><code>int
+font_size;<br>
+size_property.get(this,
+font_size);</code></div>
+      <br>
+and you would set a tag's font size like this: <br>
+      <br>
+      <div class="fbox"><code>size_property.set(this,
+20
+* PANGO_SCALE);</code></div>
+      <br>
+      <div style="text-align: left;">You wont set properties in derived
+classes very often. Instead you will
+use a property's public proxy function. That's what the second line in
+the size_property declaration is for. It typedefs a proxy object for
+size_property:<code></code><br>
+      <code></code></div>
+      <code> <br>
+      </code>
+      <div class="fbox"><code>typedef
+G::PropertyProxy&lt;G::Object, SizePropertyType&gt;
+SizePropertyProxy;</code></div>
+      <br>
+      <div style="text-align: left;">G::PropertyProxy is an inline
+proxy object that is used to access a
+protected property's get() and set() methods. Its constructor
+takes an object pointer and the address of the protected property as
+arguments. G::PropertyProxy has its own get() and set() methods that
+take only the property data type as an argument. These methods then
+call the protected property's get() and set() methods, passing as the
+object pointer the pointer passed to the G::PropertyProxy constructor. <br>
+      <br>
+The public proxy property for Gtk::TextTag's size_property is declared
+and defined inline like this: <br>
+      </div>
+      <br>
+      <div class="fbox"><code>inline
+const
+Xfc::Gtk::TextTag::SizePropertyProxy<br>
+Xfc::Gtk::TextTag::property_size()<br>
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp; return
+SizePropertyProxy(this,
+&amp;size_property);<br>
+}</code></div>
+      <br>
+Using size_property's public proxy function, you could get a tag's font
+size like this:<br>
+      <br>
+      <div class="fbox"><code>int
+font_size;<br>
+tag-&gt;property_size().get(font_size);</code> </div>
+      <code></code><br>
+and you could set a tag's font size like this:<br>
+      <br>
+      <div class="fbox"><code>tag-&gt;property_size().set(20
+* PANGO_SCALE);</code></div>
+      <br>
+Or alternatively, you could simply use assignment which is a lot easier:<br>
+      <br>
+      <div class="fbox"><code>int
+font_size =
+tag-&gt;property_size(); // gets font
+size<br>
+      <br>
+tag-&gt;property_size() = 20 * PANGO_SCALE; // sets font size</code></div>
+      <br>
+      <div style="text-align: left;">If you look at the property
+declarations in the header files you will
+see some property typedefs have two template arguments. Take a look at
+the declaration for the Gtk::TextTag 'weight_property'.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>typedef
+G::Property&lt;Pango::Weight, int&gt;
+WeightPropertyType;<br>
+typedef
+G::PropertyProxy&lt;G::Object, WeightPropertyType&gt;
+WeightPropertyProxy;<br>
+static const WeightPropertyType
+weight_property;</code> </div>
+      <br>
+      <div style="text-align: left;">Here G::Property has two template
+arguments, Pango::Weight and int.
+Properties are accessed internally using a G::Value. G::Value handles
+an enum value as an integer, so Pango::Weight which is an enum value
+needs to be cast to an int. The first template argument is always the
+property data type and the second template argument is the standard
+data type G::Value needs to cast the property data type to. You can
+just ignore the second template argument because it's an implementation
+detail for internal use only.<br>
+      </div>
+      <br>
+      <hr style="width: 100%; height: 1px;"></div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="properties.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

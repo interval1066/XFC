@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Viewports" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Viewports</h1>
+      <br>
+      <div align="justify">It
+is unlikely that you will ever need to
+use the
+Viewport widget directly. You are much more likely to use the
+ScrolledWindow widget which itself uses the Viewport. A viewport widget
+allows
+you to place a larger widget within it such that you can view a part of
+it at a time. It uses Adjustment widgets to define the area that is
+currently
+in view.<br>
+      </div>
+      <br>
+A Viewport can be created with one of the following constructors:<br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <div class="fbox">Viewport();<br>
+      <br>
+Viewport(Gtk::Adjustment *hadjustment, Gtk::Adjustment *vadjustment);</div>
+      <br>
+      </div>
+The first constructor creates its own default Adjustments. The second
+constructor lets you specify the horizontal and
+vertical Adjustments that the Viewport should use. <br>
+      <div style="text-align: left;"> <br>
+You can set and get the adjustments after the viewport has been created
+using the following four methods:<br>
+      <br>
+      <div class="fbox"><code>void
+set_hadjustment(Gtk::Adjustment *adjustment);<br>
+      <br>
+void set_vadjustment(Gtk::Adjustment *adjustment);<br>
+      <br>
+Gtk::Adjustment* get_hadjustment() const;<br>
+      <br>
+Gtk::Adjustment* get_vadjustment() const;</code></div>
+      <br>
+      </div>
+The only other viewport method is used to alter its appearance:<br>
+      <div style="text-align: left;"> <br>
+      <div class="fbox"><code>void
+set_shadow_type(Gtk::ShadowType type);</code></div>
+      <br>
+The 'type' parameter can be one of the values from the Gtk::ShadowType
+enum:<br>
+      <ul style="list-style-type: square;">
+        <li>SHADOW_NONE,</li>
+        <li>SHADOW_IN,</li>
+        <li>SHADOW_OUT,</li>
+        <li>SHADOW_ETCHED_IN,</li>
+        <li>SHADOW_ETCHED_OUT</li>
+      </ul>
+See also the <a href="scrolledwindows.html#example">ScrolledWindow</a>
+example.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="viewports.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

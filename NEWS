@@ -1,0 +1,4 @@
+Initial Release of XFC.
+=======================
+This is the initial release of XFC, the Xfce Foundation Classes.
+XFC is a C++ language binding for the Xfce and GTK libraries.

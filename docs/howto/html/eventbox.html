@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: EventBox" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>EventBox</h1>
+      <br>
+      <div align="justify">
+      <div style="text-align: left;">Some widgets don't have an
+associated X
+window, so
+they just draw on their parents. Because of this, they cannot receive
+events and if they are incorrectly sized, they don't clip so you can
+get
+messy overwriting. If you require more from these widgets, the
+EventBox is for you. At first glance, the EventBox widget might appear
+to be totally
+useless. It draws nothing on the screen and responds to no events.
+However, it does serve a function - it provides an X window for its
+child widget. <br>
+      </div>
+      <br>
+The following widgets do not have an
+associated X window:<br>
+      </div>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify"> <br>
+      <div style="text-align: left;">
+      <div style="text-align: center;"> </div>
+      <table
+ style="background-color: rgb(133, 147, 179); width: 591px; height: 124px; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellpadding="4" cellspacing="1">
+        <tbody>
+          <tr>
+            <td
+ style="background-color: rgb(248, 249, 253); width: 25%;">Gtk::Alignment<br>
+Gtk::Arrow<br>
+Gtk::AspectFrame<br>
+Gtk::Bin<br>
+Gtk::Box<br>
+Gtk::Button<br>
+            </td>
+            <td
+ style="background-color: rgb(248, 249, 253); width: 25%;">Gtk::CheckButton<br>
+Gtk::Fixed<br>
+Gtk::Frame<br>
+Gtk::Image<br>
+Gtk::Label<br>
+Gtk::MenuItem<br>
+            </td>
+            <td
+ style="background-color: rgb(248, 249, 253); width: 25%;">Gtk::Notebook<br>
+Gtk::Paned<br>
+Gtk::RadioButton<br>
+Gtk::Range<br>
+Gtk::ScrolledWindow<br>
+Gtk::Separator<br>
+            </td>
+            <td
+ style="background-color: rgb(248, 249, 253); width: 25%;"><samp></samp>
+            <samp></samp><samp></samp>Gtk::Table<br>
+Gtk::Toolbar<br>
+Gtk::VBox<br>
+Gtk::HBox<br>
+Gtk::VSeparator<br>
+Gtk::HSeparator </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><small
+ style="color: rgb(17, 55, 95);">Widgets with no GDK window</small><br>
+      </div>
+      <br>
+Not having an X window saves memory and improves
+performance, but also has some drawbacks. A widget without an X window
+cannot receive events, and does not perform any clipping on its
+contents. Although the name EventBox emphasizes the event-handling
+function, the widget can also be used for clipping. (and more, see the
+example below).<br>
+      <br>
+To create a new EventBox widget use the following constructor:<br>
+      <br>
+      <div class="fbox"><code>EventBox();</code></div>
+      <br>
+A child widget can then be added to this EventBox:<br>
+      <br>
+      <div class="fbox"><code>eventbox-&gt;add(*child_widget);</code></div>
+      <br>
+      </div>
+You will need to call the following Gtk::Widget method to set which
+events the EventBox should receive:<br>
+      <div style="text-align: left;"> <br>
+      <div class="fbox"><code> void
+set_events(Gdk::EventMaskField events);</code></div>
+      <br>
+The 'events' argument is a mask that determines which events the
+EventBox will receive. It can be one or more values from the
+Gdk::EventMask enum:<br>
+      <div align="justify">
+      <ul style="list-style-type: square;">
+        <li>EXPOSURE_MASK - maps to the expose-event.</li>
+        <li>POINTER_MOTION_MASK - maps to the motion-notify-event.</li>
+        <li>POINTER_MOTION_HINT_MASK - decreases the number of
+motion-notify events.</li>
+        <li>BUTTON_MOTION_MASK - maps to the motion-notify-event.</li>
+        <li>BUTTON1_MOTION_MASK - maps to the motion-notify-event.</li>
+        <li>BUTTON2_MOTION_MASK - maps to the motion-notify-event.</li>
+        <li>BUTTON3_MOTION_MASK - maps to the motion-notify-event.</li>
+        <li>BUTTON_PRESS_MASK - maps to the button-press-event.</li>
+        <li>BUTTON_RELEASE_MASK - maps to the button-press-event.</li>
+        <li>KEY_PRESS_MASK - maps to the key-press-event.</li>
+        <li>KEY_RELEASE_MASK - maps to the key-release-event.</li>
+        <li>ENTER_NOTIFY_MASK - maps to the enter-notify-event.</li>
+        <li>LEAVE_NOTIFY_MASK - maps to the leave-notify-event.</li>
+        <li>FOCUS_CHANGE_MASK - maps to the focus-change-event.</li>
+        <li>STRUCTURE_MASK- Allows map, unmap, destroy and configure
+events to be captured.</li>
+        <li>PROPERTY_CHANGE_MASK - maps to the property-notify-event.</li>
+        <li>VISIBILITY_NOTIFY_MASK - maps to the visibilty-notify-event.</li>
+        <li>PROXIMITY_IN_MASK - maps to the proximity-in-event.</li>
+        <li>PROXIMITY_OUT_MASK - maps to the proximity-out-event.</li>
+        <li>SUBSTRUCTURE_MASK - allows a window to receive
+STRUCTURE_MASK events on any child windows.</li>
+        <li>SCROLL_MASK - Maps to the scroll-event</li>
+        <li>ALL_EVENTS_MASK - Maps to the all events.</li>
+      </ul>
+      <br>
+      <h2><a name="example"></a>EventBox
+Example</h2>
+      <div style="text-align: left;">The following example demonstrates
+both uses of an
+EventBox. A label is created that is clipped to a small box, and set
+up
+so that a mouse-click on the label causes the program to exit. Resizing
+the window reveals varying amounts of the label.<br>
+      </div>
+      <br>
+The header file for the Event Box example is &lt;eventbox.hh&gt;:<em></em><br>
+      </div>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+#include &lt;xfc/gdk/cursor.hh&gt;<br>
+      <br>
+using namespace Inti;<br>
+      <br>
+class EventBoxWindow : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Pointer&lt;Gdk::Cursor&gt; hand_cursor;<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; bool
+on_button_press_event(const
+Gdk::EventButton&amp;);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; EventBoxWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual
+~EventBoxWindow();<br>
+};</code></div>
+      <br>
+and the source file is &lt;eventbox.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "eventbox.hh"<br>
+#include &lt;xfc/gtk/eventbox.hh&gt;<br>
+#include &lt;xfc/gtk/label.hh&gt;<br>
+#include &lt;xfc/gdk/window.hh&gt;<br>
+      <br>
+EventBoxWindow::EventBoxWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("Event Box");<br>
+&nbsp;&nbsp;&nbsp; set_border_width(10);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create an
+EventBox
+and add it to our toplevel window<br>
+&nbsp;&nbsp;&nbsp; Gtk::EventBox *event_box = new Gtk::EventBox;<br>
+&nbsp;&nbsp;&nbsp; add(*event_box);<br>
+&nbsp;&nbsp;&nbsp; event_box-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create a long
+label<br>
+&nbsp;&nbsp;&nbsp; Gtk::Label *label = new Gtk::Label("Click here to
+quit, quit, quit,
+quit, quit");<br>
+&nbsp;&nbsp;&nbsp; event_box-&gt;add(*label);<br>
+&nbsp;&nbsp;&nbsp; label-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Clip it short<br>
+&nbsp;&nbsp;&nbsp; label-&gt;set_size_request(110,
+20);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // And bind an
+action to
+it<br>
+&nbsp;&nbsp;&nbsp;
+event_box-&gt;set_events(Gdk::BUTTON_PRESS_MASK);<br>
+&nbsp;&nbsp;&nbsp;
+event_box-&gt;signal_button_press_event().connect(sigc::mem_fun(this,
+&amp;EventBoxWindow::on_button_press_event));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Yet one more
+thing
+you need an X window for ...<br>
+&nbsp;&nbsp;&nbsp; event_box-&gt;realize();<br>
+&nbsp;&nbsp;&nbsp; hand_cursor = new
+Gdk::Cursor(GDK_HAND1);<br>
+&nbsp;&nbsp;&nbsp;
+event_box-&gt;get_window()-&gt;set_cursor(*hand_cursor);<br>
+&nbsp;&nbsp;&nbsp; show();<br>
+}<br>
+      <br>
+EventBoxWindow::~EventBoxWindow()<br>
+{<br>
+}<br>
+      <br>
+bool<br>
+EventBoxWindow::on_button_press_event(const Gdk::EventButton&amp;)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; dispose();<br>
+&nbsp;&nbsp;&nbsp; return true;<br>
+}<br>
+      <br>
+int main (int
+argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; EventBoxWindow window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return 0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling EventBox<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for EventBox in the
+&lt;examples/howto/eventbox&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/eventbox&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for EventBox, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+eventbox: eventbox.cc eventbox.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) eventbox.cc -o eventbox $(CFLAGS) `pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o eventbox</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 178px; height: 87px;" alt=""
+ src="../../images/eventbox.png"><br>
+      <div style="text-align: left;"><br>
+      </div>
+      </div>
+If you click on the label the window will be destroyed.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="eventbox.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

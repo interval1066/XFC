@@ -1,0 +1,342 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Color Selection" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;<span style="font-family: sans-serif;"></span>&laquo;
+      <a class="qindexH" href="../../index.html">Main Page</a><span
+ class="qindexH"> | </span><a class="qindexH" href="index.html">Index</a></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><br>
+      <h1>Color
+Selection</h1>
+      <br>
+      <div style="text-align: left;">The color selection widget is, not
+surprisingly, a widget for
+interactive selection of colors. This composite widget lets the user
+select a color by manipulating RGB (Red, Green, Blue) and HSV (Hue,
+Saturation, Value) triples. This is done either by adjusting single
+values with sliders or entries, or by picking the desired color from a
+hue-saturation wheel/value bar. Optionally, the opacity of the color
+can
+also be set.<br>
+      <br>
+The color selection widget currently emits only one signal,
+color_changed<em>,</em>
+which is emitted whenever the current color in the widget changes,
+either when the user changes it or if it's set explicitly through
+Gtk::ColorSelection::set_color().<br>
+      <br>
+Lets have a look at what the color selection widget has to offer us.
+The widget comes in two flavours: Gtk::ColorSelection and
+Gtk::ColorSelectionDialog.<br>
+      <span style="color: rgb(0, 55, 85);"></span> </div>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <div class="fbox"><code>ColorSelection();</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">You'll probably not be using this
+constructor directly. It creates an
+orphan ColorSelection widget which you'll have to parent yourself. The
+ColorSelection widget inherits from the Gtk::VBox.<br>
+      </div>
+&nbsp;<br>
+      <div class="fbox"><code>ColorSelectionDialog();<br>
+      <br>
+explicit ColorSelectionDialog(const String&amp; title);</code></div>
+      <br>
+      <div style="text-align: left;">These are the most common color
+selection constructors. Both
+constructors create a ColorSelectionDialog, the first with the default
+title which is just the program name and the second with the 'title'
+specified. A ColorSelectionDialog consists of a Frame containing a
+ColorSelection widget, an HSeparator and an HBox with three buttons,
+"Ok", "Cancel" and "Help". You can reach these buttons by using one of
+the corresponding accessors:<br>
+      </div>
+      <samp></samp><br>
+      <div class="fbox"><code>Gtk::Button* ok_button() const;<br>
+      <br>
+Gtk::Button* cancel_button() const;<br>
+      <br>
+Gtk::Button* help_button() const;</code> </div>
+      <br>
+      <div style="text-align: left;">The color selection widget
+supports adjusting the opacity of a color
+(also known as the alpha channel). This is disabled by default. Calling
+the following method with 'has_opacity' set to true
+enables opacity. Likewise, has_opacity set to false
+will disable opacity.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>void
+set_has_opacity_control(bool has_opacity);</code></div>
+      <br>
+      <div style="text-align: left;">You can set the current color
+explicitly by calling
+Gtk::ColorSelection::set_current_color() with a reference to a
+Gdk::Color. Setting the opacity (alpha channel) is done with
+Gtk::ColorSelection::set_current_alpha(). The alpha value should be
+between 0 (fully transparent) and 65636 (fully opaque).<br>
+      </div>
+      <br>
+      <div class="fbox"><code>void
+set_current_color(const Gdk::Color&amp;
+color);<br>
+      <br>
+void set_current_alpha(unsigned short alpha);</code></div>
+      <br>
+When you need to query the current color, typically when you've
+received a 'color_changed' signal, you use these methods:<br>
+      <br>
+      <div class="fbox"><code>Gdk::Color
+get_current_color() const;<br>
+      <br>
+unsigned short
+get_current_alpha() const;</code> </div>
+      <br>
+      <h2><a name="example"></a>Color
+Selection Example</h2>
+      <div style="text-align: left;">Here's a simple example
+demonstrating the use of the
+ColorSelectionDialog. The program displays a window containing a
+drawing
+area. Clicking on it opens a color selection dialog, and changing the
+color in the color selection dialog changes the background color of the
+window.<br>
+      </div>
+      <br>
+      <div style="text-align: left;">The header file for the Color
+Selection example is
+&lt;colorselection.hh&gt;:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/colorselection.hh&gt;<br>
+#include &lt;xfc/gtk/drawingarea.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+#include &lt;xfc/gdk/color.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class ColorSelectionWindow : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Gdk::Color color;<br>
+&nbsp;&nbsp;&nbsp; Gtk::DrawingArea *area;<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; bool
+on_drawing_area_event(const
+Gdk::Event&amp; event);<br>
+&nbsp;&nbsp;&nbsp; void
+on_color_changed(Gtk::ColorSelection *colorsel);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; ColorSelectionWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual
+~ColorSelectionWindow();<br>
+};</code></div>
+      <br>
+and then source file is &lt;colorselection.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "colorselection.hh"<br>
+      <br>
+ColorSelectionWindow::ColorSelectionWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("Color Selection Example");<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create drawing
+area<br>
+&nbsp;&nbsp;&nbsp; area= new
+Gtk::DrawingArea(250, 200);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Set the initial
+background color&nbsp;&nbsp;&nbsp; and events to receive<br>
+&nbsp;&nbsp;&nbsp; color.set(0, 0, 65535);<br>
+&nbsp;&nbsp;&nbsp; area-&gt;modify_bg(Gtk::STATE_NORMAL, color);<br>
+&nbsp;&nbsp;&nbsp; area-&gt;set_events(Gdk::BUTTON_PRESS_MASK);<br>
+&nbsp;&nbsp;&nbsp; area-&gt;signal_event().connect(sigc::mem_fun(this,
+&amp;ColorSelectionWindow::on_drawing_area_event));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Add drawing
+area to
+main window<br>
+&nbsp;&nbsp;&nbsp; add(*area);<br>
+&nbsp;&nbsp;&nbsp; area-&gt;show();<br>
+&nbsp;&nbsp;&nbsp; show();<br>
+}<br>
+      <br>
+ColorSelectionWindow::~ColorSelectionWindow()<br>
+{<br>
+}<br>
+      <br>
+bool<br>
+ColorSelectionWindow::on_drawing_area_event(const Gdk::Event&amp; event)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace
+sigc;<br>
+&nbsp;&nbsp;&nbsp; bool handled = false;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; if (event.type() ==
+Gdk::BUTTON_PRESS)<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; handled = true;<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Gtk::ColorSelectionDialog *dialog
+= new Gtk::ColorSelectionDialog("Select
+background color");<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Gtk::ColorSelection *colorsel =
+dialog-&gt;colorsel();<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+colorsel-&gt;set_previous_color(color);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+colorsel-&gt;set_current_color(color);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+colorsel-&gt;set_has_palette(true);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; // Connect
+to the "color_changed" signal<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+colorsel-&gt;signal_color_changed().connect(bind(mem_fun(this,
+&amp;ColorSelectionWindow::on_color_changed), colorsel));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; // Show
+the dialog<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if
+(dialog-&gt;run() == Gtk::RESPONSE_OK)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; color =
+colorsel-&gt;get_current_color();<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; else<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+area-&gt;modify_bg(Gtk::STATE_NORMAL, color);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; dialog-&gt;dispose();<br>
+&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp; return handled;<br>
+}<br>
+      <br>
+void<br>
+ColorSelectionWindow::on_color_changed(Gtk::ColorSelection *colorsel)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Gdk::Color new_color =
+colorsel-&gt;get_current_color();<br>
+&nbsp;&nbsp;&nbsp; area-&gt;modify_bg(Gtk::STATE_NORMAL, new_color);<br>
+}<br>
+      <br>
+int main (int
+argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; ColorSelectionWindow window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return 0;<br>
+}</code></div>
+      <br>
+      <div style="text-align: left;">
+      <h2>Compiling Color Selection<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Color Selection in the
+&lt;examples/howto/colorselection&gt; source directory along with a Makefile.
+If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/colorselection&gt; subdirectory.
+In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Color Selection, add the following lines to a
+new text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+colorselection: colorselection.cc colorselection.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) colorselection.cc -o colorselection $(CFLAGS)
+`pkg-config xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o colorselection</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When you
+compile and run this program you will see the following window appear:<br>
+      </div>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 274px; height: 245px;" alt=""
+ src="../../images/colorselection1.png"><br>
+      </div>
+      <br>
+      <div style="text-align: left;">If you press the mouse button down
+inside the client area of this
+window a color selection dialog appears. Changing the selected color or
+hue in this dialog will update the
+background color of the parent window. Click the OK button to make the
+color selection permanent.<br>
+      </div>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 480px; height: 321px;" alt=""
+ src="../../images/colorselection2.png"><br>
+      </div>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="colorselection.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,932 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+  
+  
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+
+  
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+
+  
+  <meta content="Tutorial: Adding a statusbar" name="description">
+</head>
+
+
+<body>
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="height: 25px;" class="darkbluestripe"><br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="height: 25px;" class="greybluestripe" colspan="1" rowspan="1">
+      
+      <table style="width: 100%; text-align: left;" border="0" cellpadding="0" cellspacing="0">
+
+        <tbody>
+
+          <tr>
+
+            <td style="white-space: nowrap; width: 50%;">&nbsp;&laquo; <a class="qindexH" href="index.html">Index</a><span class="qindexH"> | </span><a class="qindexH" href="chapter05.html">Writing a composite&nbsp;
+statusbar</a><span class="qindexH"></span><span class="qindexH"></span>
+            </td>
+
+            <td style="white-space: nowrap; text-align: right; width: 50px;"><a href="pretend"><span class="qindexF"></span><span class="qindexF"></span></a><a class="qindexH" href="chapter07.html">Adding a client area and context
+menu</a> &raquo; <br>
+
+            </td>
+
+          </tr>
+
+        
+        </tbody>
+      
+      </table>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td colspan="1" rowspan="1">
+      
+      <div style="text-align: center;"><br>
+
+      </div>
+
+      
+      <h1>Chapter
+6: Adding a statusbar<br>
+
+      </h1>
+
+      <br>
+
+In this chapter we add an instance of the statusbar widget created in
+the previous chapter to XfcApp, and we add a function that will
+display an
+action's tooltip in the statusbar on menu item selection. <br>
+
+      <br>
+
+First, to the XfcApp header file we need to add an include statement
+for the statusbar header file:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>#include "statusbar.hh"</code></div>
+
+      <br>
+
+and in the XfcApp class declaration we need to add a private Statusbar
+pointer: <br>
+
+      <br>
+
+      
+      <div class="fbox"><code>Statusbar
+*statusbar;</code></div>
+
+      <br>
+
+The pointer is not a smart
+pointer because if you remember, widgets are created with a floating
+reference. When you
+add a widget to a container the container references the widget and
+clears its floating reference. As long as you hold onto a reference to
+the container you don't need to hold onto a reference to any its
+children. <br>
+
+      <span style="color: rgb(0, 55, 85);"></span>
+      
+      <div style="text-align: left;"><br>
+
+      </div>
+
+Next, we need to add the following function slot which will be called
+by
+Gtk::UIManager to link the display of an action's tooltip in the
+statusbar to menu item selection and deselection.<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>void
+install_menu_hints(Gtk::Action&amp; action, Gtk::Widget&amp; widget);</code></div>
+
+      <br>
+
+The XfcApp header file &lt;xfcapp.hh&gt; should now look like
+this:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+
+#include &lt;xfc/gtk/window.hh&gt;<br>
+
+#include &lt;xfc/gtk/uimanager.hh&gt;<br>
+
+#include "statusbar.hh"<br>
+
+      <br>
+
+using namespace Xfc;<br>
+
+      <br>
+
+class XfcApp : public Gtk::Window<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;Pointer&lt;Gtk::ActionGroup&gt; action_group;<br>
+
+&nbsp;&nbsp; &nbsp;Pointer&lt;Gtk::UIManager&gt; manager;<br>
+
+&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;Statusbar *statusbar_;<br>
+
+&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;void add_actions();<br>
+
+&nbsp;&nbsp; &nbsp;void install_menu_hints(Gtk::Action&amp; action,
+Gtk::Widget&amp; widget);<br>
+
+&nbsp;&nbsp; &nbsp;<br>
+
+public:<br>
+
+&nbsp;&nbsp; &nbsp;XfcApp();<br>
+
+&nbsp;&nbsp; &nbsp;virtual ~XfcApp();<br>
+
+&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;void on_file_new();<br>
+
+&nbsp;&nbsp; &nbsp;void on_file_open();<br>
+
+&nbsp;&nbsp; &nbsp;void on_file_save();<br>
+
+&nbsp;&nbsp; &nbsp;void on_file_save_as();<br>
+
+&nbsp;&nbsp; &nbsp;void on_file_quit();<br>
+
+&nbsp;&nbsp; &nbsp;void on_edit_cut();<br>
+
+&nbsp;&nbsp; &nbsp;void on_edit_copy();<br>
+
+&nbsp;&nbsp; &nbsp;void on_edit_paste();<br>
+
+&nbsp;&nbsp; &nbsp;void on_edit_clear();<br>
+
+&nbsp;&nbsp; &nbsp;void on_edit_preferences();<br>
+
+&nbsp;&nbsp; &nbsp;void on_help_about();<br>
+
+};</code><br>
+
+      </div>
+
+      <br>
+
+To the XfcApp constructor in &lt;xfcapp.cc&gt; we need to add
+the following line:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>manager-&gt;signal_connect_proxy().connect(sigc::mem_fun(this,
+&amp;XfcApp::install_menu_hints));</code></div>
+
+      <br>
+
+This connects the Gtk::UIManager's "connect_proxy" signal to our
+install_menu_hints() function. The "connect_proxy" signal is emitted
+each
+time an action is associated with a proxy widget, be it a widget added
+by you or a widget created by the Gtk::UIManager. <br>
+
+      <br>
+
+Next, we need to create a Statusbar instance and add it to main_vbox:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>statusbar = new Statusbar(true);<br>
+
+main_vbox-&gt;pack_end(*statusbar, false);<br>
+
+statusbar-&gt;show();</code><br>
+
+      </div>
+
+      <br>
+
+The statusbar must be created before we load the XML description so
+that Gtk::UIManager can link each action's
+tooltip to our statusbar instance when it calls install_menu_hints().<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>void<br>
+
+XfcApp::install_menu_hints(Gtk::Action&amp; action, Gtk::Widget&amp;
+widget)<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;using namespace sigc;<br>
+
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;if (!widget.is_a(GTK_TYPE_MENU_ITEM))<br>
+
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;return;<br>
+
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;Gtk::MenuItem&amp; item =
+static_cast&lt;Gtk::MenuItem&amp;&gt;(widget);<br>
+
+&nbsp;&nbsp; &nbsp;String tooltip = action.property_tooltip();<br>
+
+&nbsp;&nbsp; &nbsp;item.signal_select().connect(bind(mem_fun(statusbar,
+&amp;Statusbar::push), tooltip));<br>
+
+&nbsp;&nbsp; &nbsp;item.signal_deselect().connect(mem_fun(statusbar,
+&amp;Statusbar::pop));<br>
+
+}</code></div>
+
+      <br>
+
+First install_menu_hints() opens the 'sigc::' namespace so libsigc++
+function calls don't need to be prefixed with sigc::. Then it checks to
+see that the the widget being
+linked is a menu item. If it is, it retrieves the tooltip text and
+binds the text to the statusbar's push() function, and connects this
+function
+to the menu item's "select" signal. It also connects the statusbar's
+pop()
+function to the menu item's "deselect" signal. Now, whenever a menu
+item is
+selected its tooltip will be displayed in our statusbar, and when it is
+deselected it will be removed.<br>
+
+      <br>
+
+The XfcApp source file &lt;xfcapp.cc&gt; should now look like
+this:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>#include "xfcapp.hh"<br>
+
+#include "xfcapp.ui"<br>
+
+#include &lt;xfc/gtk/accelgroup.hh&gt;<br>
+
+#include &lt;xfc/gtk/box.hh&gt;<br>
+
+#include &lt;xfc/gtk/menubar.hh&gt;<br>
+
+#include &lt;xfc/gtk/stock.hh&gt;<br>
+
+#include &lt;xfc/gtk/toolbar.hh&gt;<br>
+
+#include &lt;xfc/glib/error.hh&gt;<br>
+
+#include &lt;gconf/gconf-client.h&gt;<br>
+
+#include &lt;iostream&gt;<br>
+
+      <br>
+
+XfcApp::XfcApp()<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;// Set the window title and default size&nbsp;&nbsp;
+&nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;set_title("XfcApp");<br>
+
+&nbsp;&nbsp; &nbsp;set_default_size(400, 300);<br>
+
+&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;// Create the action group and add the actions<br>
+
+&nbsp;&nbsp; &nbsp;action_group = new Gtk::ActionGroup("XfcAppActions");<br>
+
+&nbsp;&nbsp; &nbsp;add_actions();&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;// Create the user interface manager and insert the
+action group&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;manager = new Gtk::UIManager;<br>
+
+&nbsp;&nbsp; &nbsp;manager-&gt;insert_action_group(*action_group);<br>
+
+&nbsp;&nbsp;
+&nbsp;manager-&gt;signal_connect_proxy().connect(sigc::mem_fun(this,
+&amp;XfcApp::install_menu_hints));<br>
+
+&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;// Associate the user interface manager's AccelGroup
+with the window<br>
+
+&nbsp;&nbsp; &nbsp;add_accel_group(manager-&gt;get_accel_group());<br>
+
+&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;// Create main vertical box and add to
+window&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;Gtk::VBox *main_vbox = new Gtk::VBox;<br>
+
+&nbsp;&nbsp; &nbsp;add(*main_vbox);<br>
+
+&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;// Create custom statusbar (before loading XML
+description) and pack it at the end of main_vbox&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;statusbar = new Statusbar(true);<br>
+
+&nbsp;&nbsp; &nbsp;main_vbox-&gt;pack_end(*statusbar, false);<br>
+
+&nbsp;&nbsp; &nbsp;statusbar-&gt;show();<br>
+
+&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;// Load XML description of the menus and toolbar
+from a definition string.<br>
+
+&nbsp;&nbsp; &nbsp;G::Error error;&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;if (!manager-&gt;add_ui_from_string(ui_info, -1,
+&amp;error))<br>
+
+&nbsp;&nbsp; &nbsp;{<br>
+
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "building
+menus and toolbar failed: &lt;&lt; " &lt;&lt; error.message() &lt;&lt;
+std::endl;<br>
+
+&nbsp;&nbsp; &nbsp;}<br>
+
+      <br>
+
+&nbsp;&nbsp; &nbsp;// Get a pointer to the menubar and pack it into
+main_vbox&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;Gtk::Widget *menubar =
+manager-&gt;get_widget("/MenuBar");<br>
+
+&nbsp;&nbsp; &nbsp;main_vbox-&gt;pack_start(*menubar,
+false);&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;menubar-&gt;show();<br>
+
+&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;// Get a pointer to the toolbar and pack it into
+main_vbox&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;Gtk::Toolbar *toolbar =
+static_cast&lt;Gtk::Toolbar*&gt;(manager-&gt;get_widget("/ToolBar"));<br>
+
+&nbsp;&nbsp; &nbsp;toolbar-&gt;set_tooltips(true);<br>
+
+&nbsp;&nbsp; &nbsp;main_vbox-&gt;pack_start(*toolbar, false);<br>
+
+&nbsp;&nbsp; &nbsp;toolbar-&gt;show();<br>
+
+&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;// Use the GNOME value for 'toolbar_style' to place
+the progress bar.<br>
+
+&nbsp;&nbsp; &nbsp;GConfClient *client = gconf_client_get_default();<br>
+
+&nbsp;&nbsp; &nbsp;String text = gconf_client_get_string(client,
+"/desktop/gnome/interface/toolbar_style", 0);<br>
+
+&nbsp;&nbsp; &nbsp;Gtk::ToolbarStyle toolbar_style;<br>
+
+&nbsp;&nbsp; &nbsp;if (text.compare("text") == 0)<br>
+
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;toolbar_style = Gtk::TOOLBAR_TEXT;<br>
+
+&nbsp;&nbsp; &nbsp;else if (text.compare("both") == 0)<br>
+
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;toolbar_style = Gtk::TOOLBAR_BOTH;<br>
+
+&nbsp;&nbsp; &nbsp;else if (text.compare("both_horiz") == 0)<br>
+
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;toolbar_style =
+Gtk::TOOLBAR_BOTH_HORIZ;<br>
+
+&nbsp;&nbsp; &nbsp;else<br>
+
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;toolbar_style =
+Gtk::TOOLBAR_ICONS;<br>
+
+&nbsp;&nbsp; &nbsp;toolbar-&gt;set_style(toolbar_style);<br>
+
+      <br>
+
+&nbsp;&nbsp; &nbsp;// Show main_vbox so it's visible&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;main_vbox-&gt;show();<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // As an example, set the progress bar to
+pulse&nbsp;&nbsp;&nbsp; <br>
+
+&nbsp;&nbsp;&nbsp; statusbar_-&gt;begin_progress(100, true);<br>
+
+}<br>
+
+      <br>
+
+XfcApp::~XfcApp()<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; statusbar_-&gt;end_progress();<br>
+
+}<br>
+
+      <br>
+
+void<br>
+
+XfcApp::add_actions()<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;using namespace Gtk;<br>
+
+&nbsp;&nbsp; &nbsp;using namespace sigc;<br>
+
+      <br>
+
+&nbsp;&nbsp; &nbsp;action_group-&gt;add("FileMenu", "_File");<br>
+
+&nbsp;&nbsp; &nbsp;action_group-&gt;add("EditMenu", "_Edit");<br>
+
+&nbsp;&nbsp; &nbsp;action_group-&gt;add("HelpMenu", "_Help");<br>
+
+      <br>
+
+&nbsp;&nbsp; &nbsp;Action *action = action_group-&gt;add("New", "_New",
+StockId::NEW, AccelKey("&lt;control&gt;N"), "Create a new
+file");&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;action-&gt;signal_activate().connect(mem_fun(this,
+&amp;XfcApp::on_file_new));<br>
+
+&nbsp;&nbsp; &nbsp;action = action_group-&gt;add("Open", "_Open",
+StockId::OPEN, AccelKey("&lt;control&gt;O"), "Open a
+file");&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;action-&gt;signal_activate().connect(mem_fun(this,
+&amp;XfcApp::on_file_open));<br>
+
+&nbsp;&nbsp; &nbsp;action = action_group-&gt;add("Save", "_Save",
+StockId::SAVE, AccelKey("&lt;control&gt;S"), "Save current
+file");&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;action-&gt;signal_activate().connect(mem_fun(this,
+&amp;XfcApp::on_file_save));<br>
+
+&nbsp;&nbsp; &nbsp;action = action_group-&gt;add("SaveAs", "Save
+_As...", StockId::SAVE, "Save to a file");&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;action-&gt;signal_activate().connect(mem_fun(this,
+&amp;XfcApp::on_file_save_as));<br>
+
+&nbsp;&nbsp; &nbsp;action = action_group-&gt;add("Quit", "_Quit",
+StockId::QUIT, AccelKey("&lt;control&gt;Q"), "Quit");&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;action-&gt;signal_activate().connect(mem_fun(this,
+&amp;XfcApp::on_file_quit));<br>
+
+&nbsp;&nbsp; &nbsp;action = action_group-&gt;add("Cut", "C_ut",
+StockId::CUT, AccelKey("&lt;control&gt;X"), "Cut the
+selection");&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;action-&gt;signal_activate().connect(mem_fun(this,
+&amp;XfcApp::on_edit_cut));<br>
+
+&nbsp;&nbsp; &nbsp;action = action_group-&gt;add("Copy", "_Copy",
+StockId::COPY, AccelKey("&lt;control&gt;C"), "Copy the selection");<br>
+
+&nbsp;&nbsp; &nbsp;action-&gt;signal_activate().connect(mem_fun(this,
+&amp;XfcApp::on_edit_copy));<br>
+
+&nbsp;&nbsp; &nbsp;action = action_group-&gt;add("Paste", "_Paste",
+StockId::PASTE, AccelKey("&lt;control&gt;V"), "Paste the clipboard");<br>
+
+&nbsp;&nbsp; &nbsp;action-&gt;signal_activate().connect(mem_fun(this,
+&amp;XfcApp::on_edit_paste));<br>
+
+&nbsp;&nbsp; &nbsp;action = action_group-&gt;add("Clear", "C_lear",
+StockId::CLEAR, "Clear the selection");<br>
+
+&nbsp;&nbsp; &nbsp;action-&gt;signal_activate().connect(mem_fun(this,
+&amp;XfcApp::on_edit_clear));<br>
+
+&nbsp;&nbsp; &nbsp;action = action_group-&gt;add("Preferences",
+"Prefere_nces", StockId::PREFERENCES, "Configure the application");<br>
+
+&nbsp;&nbsp; &nbsp;action-&gt;signal_activate().connect(mem_fun(this,
+&amp;XfcApp::on_edit_preferences));<br>
+
+&nbsp;&nbsp; &nbsp;action = action_group-&gt;add("About", "_About",
+AccelKey("&lt;control&gt;A"), "About");&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;action-&gt;signal_activate().connect(mem_fun(this,
+&amp;XfcApp::on_help_about));<br>
+
+}<br>
+
+      <br>
+
+void<br>
+
+XfcApp::install_menu_hints(Gtk::Action&amp; action, Gtk::Widget&amp;
+widget)<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;using namespace sigc;<br>
+
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;if (!widget.is_a(GTK_TYPE_MENU_ITEM))<br>
+
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;return;<br>
+
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
+
+&nbsp;&nbsp; &nbsp;Gtk::MenuItem&amp; item =
+static_cast&lt;Gtk::MenuItem&amp;&gt;(widget);<br>
+
+&nbsp;&nbsp; &nbsp;String tooltip = action.property_tooltip();<br>
+
+&nbsp;&nbsp; &nbsp;item.signal_select().connect(bind(mem_fun(statusbar,
+&amp;Statusbar::push), tooltip));<br>
+
+&nbsp;&nbsp; &nbsp;item.signal_deselect().connect(mem_fun(statusbar,
+&amp;Statusbar::pop));<br>
+
+}<br>
+
+      <br>
+
+void <br>
+
+XfcApp::on_file_new()<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;statusbar-&gt;progress_bar()-&gt;hide();<br>
+
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "You activated action: New"
+&lt;&lt; std::endl;<br>
+
+}<br>
+
+      <br>
+
+void <br>
+
+XfcApp::on_file_open()<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;statusbar-&gt;progress_bar()-&gt;show();<br>
+
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "You activated action: Open"
+&lt;&lt; std::endl;<br>
+
+}<br>
+
+      <br>
+
+void <br>
+
+XfcApp::on_file_save()<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "You activated action: Save"
+&lt;&lt; std::endl;<br>
+
+}<br>
+
+      <br>
+
+void <br>
+
+XfcApp::on_file_save_as()<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "You activated action: SaveAs"
+&lt;&lt; std::endl;<br>
+
+}<br>
+
+      <br>
+
+void <br>
+
+XfcApp::on_file_quit()<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;dispose();<br>
+
+}<br>
+
+      <br>
+
+void <br>
+
+XfcApp::on_edit_cut()<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "You activated action: Cut"
+&lt;&lt; std::endl;<br>
+
+}<br>
+
+      <br>
+
+void <br>
+
+XfcApp::on_edit_copy()<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "You activated action: Copy"
+&lt;&lt; std::endl;<br>
+
+}<br>
+
+      <br>
+
+void <br>
+
+XfcApp::on_edit_paste()<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "You activated action: Paste"
+&lt;&lt; std::endl;<br>
+
+}<br>
+
+      <br>
+
+void <br>
+
+XfcApp::on_edit_clear()<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "You activated action: Clear"
+&lt;&lt; std::endl;<br>
+
+}<br>
+
+      <br>
+
+void <br>
+
+XfcApp::on_edit_preferences()<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "You activated action:
+Preferences" &lt;&lt; std::endl;<br>
+
+}<br>
+
+      <br>
+
+void <br>
+
+XfcApp::on_help_about()<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "You activated action: About"
+&lt;&lt; std::endl;<br>
+
+}<br>
+
+      <br>
+
+int main (int argc, char *argv[])<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;using namespace Main;<br>
+
+      <br>
+
+&nbsp;&nbsp; &nbsp;init(&amp;argc, &amp;argv);<br>
+
+      <br>
+
+&nbsp;&nbsp; &nbsp;XfcApp window;<br>
+
+&nbsp;&nbsp;
+&nbsp;window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+
+&nbsp;&nbsp; &nbsp;window.show();<br>
+
+      <br>
+
+&nbsp;&nbsp; &nbsp;run();<br>
+
+&nbsp;&nbsp; &nbsp;return 0;<br>
+
+}</code></div>
+
+      <br>
+
+      
+      <h2>Compiling XfcApp</h2>
+
+If you compiled and installed XFC yourself, you will find the source
+code for this version of XfcApp in the
+&lt;examples/tutorial/chapter06&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/tutorial/chapter06&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+
+      <br>
+
+To create a Makefile for XfcApp, add the following lines to a
+new
+text file
+and save it using the name "Makefile":<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>CC = g++<br>
+
+      <br>
+
+CFLAGS = -Wall -O2<br>
+
+      <br>
+
+      </code><code>xfcapp: xfcapp.cc xfcapp.hh xfcapp.ui statusbar.cc
+statusbar.hh<br>
+
+&nbsp;&nbsp;&nbsp; $(CC) xfcapp.cc statusbar.cc -o xfcapp `pkg-config
+xfcui-X.X
+gconf-2.0 --cflags --libs`<br>
+
+      <br>
+
+clean: <br>
+
+&nbsp;&nbsp; &nbsp;rm -f *.o xfcapp</code><br>
+
+      </div>
+
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. Note the addition of 'gconf-2.0' to the
+pkg-config command. This is needed because XfcApp needs to retrieve the
+current value of GNOME "toolbar_style" and
+"status_bar_meter_on_right"&nbsp;from the GConf database.&nbsp;When
+you
+compile this version XfcApp you will see the following window appear:<br>
+
+      <br>
+
+      
+      <div style="text-align: center;"><img style="width: 422px; height: 342px;" alt="" src="../../images/chapter06.png"><br>
+
+      
+      <div style="text-align: left;"><br>
+
+To show that the progress bar works, the last line in the XfcApp
+constructor calls Statusbar::begin_progress() with 'activity_mode' set
+to true. The XfcApp destructor makes the required call to
+Statusbar::end_progress().<br>
+
+      <br>
+
+In the <a href="chapter07.html">next chapter</a> we will add a client
+area and pop-up context menu to XfcApp.<br>
+
+      <br>
+
+      </div>
+
+      </div>
+
+      
+      <div align="justify">
+      
+      <div style="text-align: left;">
+      
+      <hr style="width: 100%; height: 1px;"> </div>
+
+      </div>
+
+      
+      <table style="width: 100%; text-align: left;" border="0" cellpadding="2" cellspacing="0">
+
+        <tbody>
+
+          <tr>
+
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+
+            <td style="text-align: center;"><a class="qindexF" href="chapter06.html">Top</a><br>
+
+            </td>
+
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+
+            </td>
+
+          </tr>
+
+        
+        </tbody>
+      
+      </table>
+
+      
+      <div style="text-align: center;"><a class="qindexF" href="index.html">Index</a><br>
+
+      </div>
+
+      </td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+</body>
+</html>

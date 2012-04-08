@@ -1,0 +1,337 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Paned Windows" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Paned
+Windows</h1>
+      <br>
+      <div align="justify">
+      <div style="text-align: left;">The paned window widgets are
+useful when you
+want
+to divide an area into two parts, with the relative size of the two
+parts controlled by the user. A groove is drawn between the two
+portions
+with a handle that the user can drag to change the ratio. The division
+can either be horizontal (HPaned) or vertical (VPaned).<br>
+      </div>
+      <br>
+      </div>
+To create a new paned window, call one of the following constructors:<br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <div class="fbox"><code>HPaned();<br>
+      <br>
+VPaned();</code></div>
+      <br>
+      </div>
+After creating the paned window widget, you need to add child widgets
+to its two halves. To do this, you can use these two methods:<br>
+      <div style="text-align: left;"> <br>
+      <div class="fbox"><code>void
+add1(Gtk::Widget&amp; child);<br>
+      <br>
+void add2(Gtk::Widget&amp;
+child);</code></div>
+      <br>
+      </div>
+or these two methods:<br>
+      <div style="text-align: left;"> <br>
+      <div class="fbox"><code>void pack1(Widget&amp; child, bool resize
+= false, bool shrink = true);<br>
+      <br>
+void
+pack2(Widget&amp; child, bool
+resize = true, bool shrink = true);</code></div>
+      <br>
+The pack1() method adds a child to the top or left pane and pack2()
+adds a child to the bottom or right pane. If 'resize' is true the child
+expands when the paned widget is resized. If 'shrink' is true the child
+can be made smaller than its requsition. Calling add1(child) is
+equivalent to calling pack1(child, false, true) and calling add2(child)
+is equivalent to calling pack2(child, true, true).<br>
+      <br>
+You can set the position of the handle between the two panes by calling
+this next method:<br>
+      <br>
+      <div class="fbox"><code>void set_position(int position);</code></div>
+      <br>
+The 'position' argument is the pixel position of divider. A negative
+value means that the position should be unset.<br>
+      <br>
+      <h2><a name="example"></a>Paned
+Window Example</h2>
+As an example, we will create part of the user interface of an
+imaginary email program. A window is divided into two portions
+vertically, with the top portion being a list of email messages and the
+bottom portion the text of the email message. Most of the program is
+pretty straightforward. Notice that the program also shows you how to
+use the new Gtk::ListStore and Gtk::TextView widgets.<br>
+      <br>
+      <div align="left">The header file for the Paned Window example is
+&lt;paned.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/scrolledwindow.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class MessageList : public Gtk::ScrolledWindow<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; MessageList();<br>
+&nbsp;&nbsp;&nbsp; virtual ~MessageList();<br>
+};<br>
+      <br>
+class TextWindow : public Gtk::ScrolledWindow<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; TextWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual ~TextWindow();<br>
+};<br>
+      <br>
+class PanedWindow : public Gtk::Window<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; PanedWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual ~PanedWindow();<br>
+};</code></div>
+      <br>
+      </div>
+and the source file is &lt;paned.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "paned.hh"<br>
+#include &lt;xfc/gtk/cellrenderer.hh&gt;<br>
+#include &lt;xfc/gtk/liststore.hh&gt;<br>
+#include &lt;xfc/gtk/paned.hh&gt;<br>
+#include &lt;xfc/gtk/textview.hh&gt;<br>
+#include &lt;xfc/gtk/treeview.hh&gt;<br>
+      <br>
+// MessageList<br>
+      <br>
+MessageList::MessageList()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_policy(Gtk::POLICY_AUTOMATIC,
+Gtk::POLICY_AUTOMATIC);<br>
+&nbsp;&nbsp;&nbsp; Pointer&lt;Gtk::ListStore&gt; model = new
+Gtk::ListStore(1, G_TYPE_STRING);<br>
+&nbsp;&nbsp;&nbsp; Gtk::TreeView *tree_view = new
+Gtk::TreeView(*model);<br>
+&nbsp;&nbsp;&nbsp; add_with_viewport(*tree_view);<br>
+&nbsp;&nbsp;&nbsp; tree_view-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Add some messages to the
+window<br>
+&nbsp;&nbsp;&nbsp; for (int i = 0; i &lt; 10; i++)<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; String msg =
+String::format("Message #%d", i);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Gtk::TreeIter iter =
+model-&gt;append();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; model-&gt;set_value(iter, 0,
+msg);<br>
+&nbsp;&nbsp;&nbsp; }<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::CellRendererText *cell = new
+Gtk::CellRendererText;<br>
+&nbsp;&nbsp;&nbsp; Gtk::TreeViewColumn *column = new
+Gtk::TreeViewColumn ("Messages", cell, "text", 0);<br>
+&nbsp;&nbsp;&nbsp; tree_view-&gt;append_column(*column);<br>
+}<br>
+      <br>
+MessageList::~MessageList()<br>
+{<br>
+}<br>
+      <br>
+// TextWindow<br>
+      <br>
+TextWindow::TextWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_policy(Gtk::POLICY_AUTOMATIC,
+Gtk::POLICY_AUTOMATIC);<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; Gtk::TextView *view = new
+Gtk::TextView;<br>
+&nbsp;&nbsp;&nbsp; Gtk::TextBuffer *buffer = view-&gt;get_buffer();<br>
+&nbsp;&nbsp;&nbsp; add(*view);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Add some text
+to our
+text widget<br>
+&nbsp;&nbsp;&nbsp; Gtk::TextIter iter =
+buffer-&gt;get_iter_at_offset(0);<br>
+&nbsp;&nbsp;&nbsp; buffer-&gt;insert(iter, "From: pathfinder@nasa.gov\n"<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"To: mom@nasa.gov\n"<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"Subject: Made it!\n"<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"\n"<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"We just got in this morning. The weather has been\n"<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"great - clear but cold, and there are lots of fun sights.\n"<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+"Sojourner says hi. See you soon.\n"<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+" -Path\n");<br>
+&nbsp;&nbsp;&nbsp; show_all();<br>
+}<br>
+      <br>
+TextWindow::~TextWindow()<br>
+{<br>
+}<br>
+      <br>
+// PanedWindow<br>
+      <br>
+PanedWindow::PanedWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("Paned Windows");<br>
+&nbsp;&nbsp;&nbsp; set_border_width(10);<br>
+&nbsp;&nbsp;&nbsp; set_size_request(450, 400);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create a vpaned
+widget and add it to our toplevel window<br>
+&nbsp;&nbsp;&nbsp; Gtk::VPaned *vpaned = new Gtk::VPaned;<br>
+&nbsp;&nbsp;&nbsp; add(*vpaned);<br>
+&nbsp;&nbsp;&nbsp; vpaned-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Now create the
+contents of the two halves of the window<br>
+&nbsp;&nbsp;&nbsp; MessageList *list = new MessageList;<br>
+&nbsp;&nbsp;&nbsp; vpaned-&gt;add1(*list);<br>
+&nbsp;&nbsp;&nbsp; list-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create a
+scrolled
+text area that displays a "message"<br>
+&nbsp;&nbsp;&nbsp; TextWindow *text = new TextWindow;<br>
+&nbsp;&nbsp;&nbsp; vpaned-&gt;add2(*text);<br>
+&nbsp;&nbsp;&nbsp; show();<br>
+}<br>
+      <br>
+PanedWindow::~PanedWindow()<br>
+{<br>
+}<br>
+      <br>
+int main (int
+argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; PanedWindow window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return 0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling Paned Window </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Paned Window in the
+&lt;examples/howto/paned&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/paned&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Paned Window, add the following lines to a
+new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+paned: paned.cc paned.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) paned.cc -o paned $(CFLAGS) `pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o paned</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+The source code for the Paned Window example can be found in the
+&lt;examples/howto/paned&gt; subdirectory along with a Makefile. If
+you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 474px; height: 443px;" alt=""
+ src="../../images/paned.png"><br>
+      </div>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="paned.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,994 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: User Interface Manager" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1" style="text-align: center;">
+      <div style="text-align: center;"><br>
+      </div>
+      <div style="text-align: left;">
+      <h1>User
+Interface Manager</h1>
+      </div>
+      <div style="text-align: left;">
+      <h3>Table of Contents</h3>
+      </div>
+      <ol style="text-align: left;">
+        <li><a class="mhl" href="uimanager.html#UIM01">Overview</a></li>
+        <li><a class="mhl" href="uimanager.html#UIM02">UI Merging</a><br>
+        </li>
+        <li><a class="mhl" href="uimanager.html#UIM03">Accelerators</a></li>
+        <li><a class="mhl" href="uimanager.html#UIM04">Smart Separators</a></li>
+        <li><a class="mhl" href="uimanager.html#UIM05">Empty Menus</a></li>
+        <li><a class="mhl" href="uimanager.html#UIM06">Actions</a></li>
+        <li><a class="mhl" href="uimanager.html#UIM07">Action Groups</a></li>
+        <li><a class="mhl" href="uimanager.html#example">Action Example</a></li>
+      </ol>
+      <div style="text-align: left;"> <a href="chapter03.html#UIM03"><span
+ style="color: rgb(0, 55, 85);"></span></a></div>
+      <div class="qindexF" align="justify">
+      <div style="text-align: left;"><br>
+Prior to GTK+ 2.4, there were several APIs in use to create menus and
+toolbars. GTK+ itself included GtkItemFactory, which was historically
+used in the GIMP; libgnomeui provided the gnome-ui set of macros;
+libbonoboui provided a complex mechanism to do menu merging across
+embedded components. GTK+ 2.4 includes a system for creating menus and
+toolbars, with merging of items, based around the GtkAction mechanism. <br>
+      <br>
+GtkAction represents an operation that the user can perform from the
+menus and toolbars of an application. A GtkAction has a name, which is
+its identifier, and it
+can have several widgets that represent it in the user interface. For
+example, an action for EditCopy can have a menu item as well as a
+toolbar button associated to it. If there is nothing selected in the
+document, the application can simply de-sensitize the EditCopy action;
+this will cause both the menu item and the toolbar button to be
+de-sensitized automatically. Similarly, whenever the user selects the
+menu item or the toolbar button associated to the EditCopy action, the
+corresponding GtkAction object will emit an 'activate' signal. <br>
+      <br>
+Normal actions are simply commands, such as FileSave or EditCopy.
+Toggle actions can be active or inactive, such as FormatBold or
+ViewShowRulers. Radio actions define a set of items for which one and
+only one can be active at a time, for example, { ViewHighQuality,
+ViewNormalQuality, ViewLowQuality }. <br>
+      <br>
+GtkActionGroup is simply a group of GtkAction objects. An application
+may want to have several groups: one for global actions such as "new
+document", "about", and "exit"; then one group for each open document
+with actions specific to the document, such as "cut", "copy", "paste",
+and "print". <br>
+      <br>
+GtkUIManager is an object that can construct menu and toolbar widgets
+from an XML description. These widgets are in turn associated to
+corresponding actions and action groups. GtkUIManager supports merging
+of menus and toolbars for applications that have multiple components,
+each with separate sets of commands. For example, a word processor that
+can embed images may want to have toolbar buttons for Bold and Italic
+when the cursor is on a text block, but Crop and Brightness/Contrast
+buttons when the cursor is on an image. These actions, which change
+depending on the state of the application, can be merged and de-merged
+from a GtkUIManager as appropriate. In XFC, Gtk::Action,
+Gtk::ActionGroup and Gtk::UIManager are the corresponding C++ classes
+for these GTK+ objects.<br>
+      <br>
+      <h2><a name="UIM01"></a>Overview</h2>
+The GTK+ user interface manager
+(Gtk::UIManager) constructs menus and toolbars from one or
+more user interface (UI) definitions, which reference actions from one
+or more action groups. The UI definitions are in XML format and can be
+roughly described by the following document type definitions (DTD).<br>
+      <br>
+      <div class="fbox"><code>&lt;!ELEMENT
+ui&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(menubar|toolbar|popup|accelerator)* &gt;<br>
+&lt;!ELEMENT menubar&nbsp;&nbsp;&nbsp;&nbsp;
+(menuitem|separator|placeholder|menu)* &gt;<br>
+&lt;!ELEMENT menu&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(menuitem|separator|placeholder|menu)* &gt;<br>
+&lt;!ELEMENT popup&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(menuitem|separator|placeholder|menu)* &gt;<br>
+&lt;!ELEMENT toolbar&nbsp;&nbsp;&nbsp;&nbsp;
+(toolitem|separator|placeholder)* &gt;<br>
+&lt;!ELEMENT placeholder
+(menuitem|toolitem|separator|placeholder|menu)* &gt;<br>
+&lt;!ELEMENT menuitem&nbsp;&nbsp;&nbsp;&nbsp; EMPTY &gt;<br>
+&lt;!ELEMENT toolitem&nbsp;&nbsp;&nbsp;&nbsp; EMPTY &gt;<br>
+&lt;!ELEMENT separator&nbsp;&nbsp;&nbsp; EMPTY &gt;<br>
+&lt;!ELEMENT accelerator&nbsp; EMPTY &gt;<br>
+&lt;!ATTLIST menubar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#IMPLIED <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+action&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#IMPLIED &gt;<br>
+&lt;!ATTLIST toolbar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#IMPLIED <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+action&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#IMPLIED &gt;<br>
+&lt;!ATTLIST popup&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#IMPLIED <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+action&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#IMPLIED &gt;<br>
+&lt;!ATTLIST placeholder&nbsp;
+name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#IMPLIED<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+action&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#IMPLIED &gt;<br>
+&lt;!ATTLIST separator&nbsp;&nbsp;&nbsp;
+name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#IMPLIED<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+action&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#IMPLIED &gt;<br>
+&lt;!ATTLIST menu&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#IMPLIED<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+action&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#REQUIRED<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+position (top|bot) #IMPLIED &gt;<br>
+&lt;!ATTLIST menuitem&nbsp;&nbsp;&nbsp;&nbsp;
+name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#IMPLIED<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+action&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#REQUIRED<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+position (top|bot) #IMPLIED &gt;<br>
+&lt;!ATTLIST toolitem&nbsp;&nbsp;&nbsp;&nbsp;
+name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#IMPLIED<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+action&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#REQUIRED<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+position (top|bot) #IMPLIED &gt;<br>
+&lt;!ATTLIST accelerator&nbsp;
+name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#IMPLIED<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+action&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#REQUIRED &gt;</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">There are some additional
+restrictions beyond those specified in the
+DTD. For example, every toolitem must have a toolbar in its ancestry
+and every menuitem must have a menubar or popup in its ancestry. Since
+a GMarkup parser is used to parse the UI description, it must not only
+be valid XML, but valid GMarkup. If a name is not specified, it
+defaults to the action. If an action is not specified either, the
+element name is used. <br>
+      </div>
+      <div style="text-align: left;"> <br>
+A UI definition looks like this:<br>
+      <br>
+      <div class="fbox"><code>&lt;ui&gt;<br>
+&nbsp; &lt;menubar&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;menu name="FileMenu" action="FileMenuAction"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;menuitem name="New"
+action="New2Action" /&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;placeholder name="FileMenuAdditions"
+/&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;/menu&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;menu name="JustifyMenu"
+action="JustifyMenuAction"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;menuitem name="Left"
+action="justify-left"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;menuitem name="Centre"
+action="justify-center"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;menuitem name="Right"
+action="justify-right"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;menuitem name="Fill"
+action="justify-fill"/&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;/menu&gt;<br>
+&nbsp; &lt;/menubar&gt;<br>
+&nbsp; &lt;toolbar action="toolbar1"&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;placeholder name="JustifyToolItems"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;separator/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;toolitem name="Left"
+action="justify-left"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;toolitem name="Centre"
+action="justify-center"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;toolitem name="Right"
+action="justify-right"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;toolitem name="Fill"
+action="justify-fill"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;separator/&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;/placeholder&gt;<br>
+&nbsp; &lt;/toolbar&gt;<br>
+&lt;/ui&gt; </code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">The constructed widget hierarchy
+is very similar to the element tree of
+XML, with the exception that placeholders are merged into their
+parents. The correspondence of XML elements to widgets should be almost
+obvious: <br>
+      </div>
+      <div style="text-align: left;">
+      <ul style="list-style-type: square;">
+        <li>menubar - a
+Gtk::MenuBar</li>
+        <li>toolbar - a
+Gtk::Toolbar</li>
+        <li>popup - a toplevel
+Gtk::Menu</li>
+        <li>menu - a Gtk::Menu
+attached to a menuitem</li>
+        <li>menuitem - a
+Gtk::MenuItem subclass, the exact type depends on the action</li>
+        <li>toolitem - a
+Gtk::ToolItem subclass, the exact type depends on the action</li>
+        <li>separator - a
+Gtk::SeparatorMenuItem or Gtk::SeparatorToolItem</li>
+        <li>accelerator - a
+keyboard
+accelerator</li>
+      </ul>
+The 'position' attribute
+determines where a constructed widget is positioned with respect to its
+siblings in the partially constructed tree. If it is 'top', the widget
+is prepended,
+otherwise it is appended. UI definitons can be parsed from an XML file
+or from a source string. If the UI definitions
+are stored in a disk file, the file must be installed with the
+application so it
+can be found and loaded at run time.<br>
+      <br>
+There is only one constructor to call to create a UIManager object: <br>
+      <br>
+      <div class="fbox"><code>UIManager();</code></div>
+      <br>
+To load UI definitions from an XML source file, call the following
+method:<br>
+      <br>
+      <div class="fbox"><code>unsigned int add_ui_from_file(const
+String&amp; filename,
+G::Error *error = 0);</code></div>
+      <br>
+The 'filename' argument is the name of the file to parse and 'error' is
+the return location for an error, if one occurs. An integer id is
+returned that identifies the UI definitions added or merged. This id
+can
+later be used to remove or de-merge those definitions.<br>
+      <br>
+To load UI definitions from a source string, call either of these
+methods:<br>
+      <br>
+      <div class="fbox"><code>unsigned int add_ui_from_string(const
+char *buffer, int length = -1, G::Error *error
+= 0);<br>
+      <br>
+unsigned
+int add_ui_from_string(const
+String&amp; buffer, G::Error *error = 0);</code></div>
+      <br>
+The 'buffer' argument is the source string that contains the UI
+definitions. In the first method, 'length' defaults to minus one if the
+buffer is null-terminated, otherwise it is the length of the buffer.
+The 'error' argument and return value are the same as for
+add_ui_from_file() above.<br>
+      <br>
+Once the UI definitions are loaded, the UIManager object creates the
+menus and toolbars. You can retrieve pointers to the new menubar and
+toolbar(s) by calling the following method:<br>
+      <br>
+      <div class="fbox"><code>Gtk::Widget*
+get_widget(const
+String&amp; path) const;</code></div>
+      <br>
+The 'path' argument consists of the names specified in the XML
+description of the UI separated by '/'. Elements which don't have a
+name or action attribute in the XML (e.g. \&lt;popup\&gt;) can be
+addressed by their XML element name (e.g. "popup"). The root element
+("/ui") can be omitted in the path. <br>
+      <br>
+For the example UI definition above, the following calls will retrieve
+a
+pointer to the menubar and toolbar: <br>
+      <br>
+      <div class="fbox"><code>Gtk::Widget
+*widget = manager-&gt;get_widget("/MenuBar");<br>
+      <br>
+Gtk::Widget *widget = manager-&gt;get_widget("/Toolbar1");</code></div>
+      <br>
+      <h2><a name="UIM02"></a>UI
+Merging</h2>
+The most remarkable feature of the user interface manager is that it
+can overlay a set of menu items and tool items over another one, and
+de-merge them later. Merging is done based on the names of the XML
+elements. Each element is identified by a path which consists of the
+names of its ancestors, separated by forward slashes. For example, the
+menuitem
+named "Left" in the example above has the path
+/ui/menubar/JustifyMenu/Left and the toolitem with the same name has
+path /ui/toolbar1/JustifyToolItems/Left. <br>
+      <br>
+You will find a good example of UI merging in the
+&lt;tests/mergemenus&gt; subdirectory. The example has 3 XML files each
+containing several UI definitions. When the 'mergemenus' test
+application is launched the 3 UI definition files are loaded, parsed
+and merged. You can then uncheck and check one or more check buttons to
+dynamically de-merge and merge one or more UI definitions. As you
+de-merge and merge the UI definitions you will see the menus and
+toolbar updated accordingly.<br>
+      <br>
+To merge UI definitions you can either call add_ui_from_file() or
+add_ui_from_string(), but you can also call the following method:<br>
+      <br>
+      <div class="fbox"><code>void add_ui(unsigned int merge_id, const
+String&amp; path, const String&amp; name, const String&amp; action,
+UIManagerItemType type = UI_MANAGER_AUTO, bool top = false);<br>
+      <br>
+void
+add_ui_separator(unsigned int
+merge_id, const
+String&amp; path, const
+String&amp; name, bool top
+= false);</code></div>
+      <br>
+The first method adds a UI element to the current contents of the
+UIManager and the second method adds a separator. The 'merge_id' is a
+unqiue identifier for the merged UI definitions and can be obtained by
+calling:<br>
+      <br>
+      <div class="fbox"><code>unsigned int new_merge_id();</code></div>
+      <br>
+The 'path' argument is the element's path, 'name' is its name and
+'action' is the name of the action to be proxied, or null to add a
+separator. The 'type' argument is the type of element to add and can be
+one of the following values from the Gtk::UIManagerItemType enum:<br>
+      <ul style="list-style-type: square;">
+        <li>&nbsp;UI_MANAGER_AUTO - pick the type of the UI element
+according to context. </li>
+        <li>&nbsp;UI_MANAGER_MENUBAR - create a menubar.</li>
+        <li>&nbsp;UI_MANAGER_MENU - create a menu.</li>
+        <li>&nbsp;UI_MANAGER_TOOLBAR - create a toolbar.</li>
+        <li>&nbsp;UI_MANAGER_PLACEHOLDER - insert a placeholder.</li>
+        <li>&nbsp;UI_MANAGER_POPUP - create a popup menu.</li>
+        <li>&nbsp;UI_MANAGER_MENUITEM - create a menuitem.</li>
+        <li>&nbsp;UI_MANAGER_TOOLITEM - create a toolitem.</li>
+        <li>&nbsp;UI_MANAGER_SEPARATOR - create a separator.</li>
+        <li>&nbsp;UI_MANAGER_ACCELERATOR - install an accelerator.</li>
+      </ul>
+If the 'top' argument is false the element is added after its siblings,
+otherwise it is added before.<br>
+      <br>
+      <h2><a name="UIM03"></a>Accelerators</h2>
+Every action has an accelerator path. Accelerators are installed
+together with menuitem proxies, but they can also be explicitly added
+with &lt;accelerator&gt; elements in the UI definition. This makes it
+possible to have accelerators for actions even if they have no visible
+proxies. <br>
+      <br>
+      <h2><a name="UIM04"></a>Smart
+Separators</h2>
+The separators created by the user interface manager are 'smart', that
+is, they do not show up in the user interface unless they end up
+between two visible menu or tool items. Separators which are located at
+the very beginning or end of the menu or toolbar containing them, or
+multiple separators next to each other, are hidden. This is a useful
+feature, since the merging of UI elements from multiple sources can
+make it hard or impossible to determine in advance whether a separator
+will end up in such an unfortunate position. <br>
+      <br>
+      <h2><a name="UIM05"></a>Empty
+Menus</h2>
+Submenus pose similar problems to separators in connection with
+merging. It is impossible to know in advance whether they will end up
+empty after merging. The user interface manager offers two ways to
+treat empty submenus: <br>
+      <ol>
+        <li>make them disappear by hiding the menu item they're
+attached to </li>
+        <li>add an insensitive 'Empty' item </li>
+      </ol>
+The behaviour is chosen based on the 'is_important' property of the
+action to which the submenu is associated. <br>
+      <br>
+      <h2><a name="UIM06"></a>Actions</h2>
+Actions represent operations that the user can perform, along with
+information about how it should be presented in the interface. Each
+action provides methods to create icons, menu items and toolbar items
+representing itself. <br>
+      <br>
+As well as the callback slot that is called when an action gets
+activated, the following also gets associated with an action: <br>
+      <ul style="list-style-type: square;">
+        <li>a name used for path lookup</li>
+        <li>a label used for display</li>
+        <li>an accelerator</li>
+        <li>an optional tooltip</li>
+        <li>an optional toolbar label that is shorter than the label</li>
+      </ul>
+The action will also have some state information: <br>
+      <ul style="list-style-type: square;">
+        <li>visibility<span style="font-style: italic;"> - </span>either
+shown
+or hidden</li>
+        <li>sensitive - either
+enabled or disabled</li>
+      </ul>
+Apart from regular actions (Gtk::Action) there are
+toggle actions (Gtk::ToggleAction) and radio actions
+(Gtk::RadioAction). Toggle actions can be toggled between two states
+specifying whether or not the toggle action has been checked. Radio
+actions are grouped so that only one may be active at any one time.
+Each action can have one or more proxy menu item(s), toolbar button(s)
+or other proxy widget(s). Proxies mirror the state of the action (text
+label, tooltip, icon, visible, sensitive, etc), and should change when
+the action's state changes. When the proxy is activated, it should
+activate its action. <br>
+      <br>
+Usually you wont construct new actions and add them to an action group
+separately. Instead you will call the overloaded add() methods declared
+in Gtk::ActionGroup and Gtk::RadioActions. These are convenience
+methods that create a new action for you and add it to the action
+group.&nbsp; A pointer to the newly created action is returned so you
+can connect a callback slot to the 'activate' signal, or set one or
+more action properties. <br>
+      <br>
+For example, these are two of the overloaded add() methods declared in
+Gtk::ActionGroup:<br>
+      <br>
+      <div class="fbox"><code>Gtk::Action* add(const char *name, const
+StockId&amp; stock_id, const char *tooltip = 0);<br>
+      <br>
+Gtk::ToggleAction* add(const char
+*name, const StockId&amp;
+stock_id, bool is_active, const char *tooltip = 0);</code></div>
+      <br>
+The first method creates a normal action and the second creates a
+toggle action. The 'name' argument is the unique name for the action,
+'stock_id' is the stock icon to display and 'tooltip' is the optional
+tooltip text. The 'is_active' argument specifies whether the new toggle
+action should be activated initially.<br>
+      <br>
+Radio actions are different. Their add() methods are declared in
+Gtk::RadioActions. To add radio actions to an action group, first
+create a RadioActions object on the stack. Then call one of its
+overlaoded add() methods to add a radio action to the RadioActions
+object. <br>
+      <br>
+This is the RadioActions add() method that corresponds to the above two
+add() methods:<br>
+      <br>
+      <div class="fbox"><code>Gtk::RadioAction* add(const char *name,
+const StockId&amp; stock_id, int value, const char *tooltip = 0);</code></div>
+      <br>
+The 'value' argument is the value get_current_value() should return if
+the radio action is selected. After adding all the radio actions to the
+RadioActions object you call the following method to add the radio
+actions to the action group:<br>
+      <br>
+      <div class="fbox"><code>void add_actions(const
+Gtk::RadioActions&amp;
+group, int value, const ChangedSlot&amp; slot);</code></div>
+      <br>
+The 'group' argument is the RadioActions object whose radio actions are
+to be added to the action group, 'value' is the value of the radio
+action to activate initially and 'slot' is the callback slot to connect
+to the radio action's 'changed' signal.<br>
+      <br>
+You should have a look at the Action example below and
+in the &lt;tests/actions&gt; subdirectory.
+These examples show you how to&nbsp; load the UI definitions from a
+source string and a disk file.<br>
+      <br>
+      <h2><a name="UIM07"></a>Action
+Groups</h2>
+Actions are organised into groups. An action group is essentially a map
+from names to Gtk::Action objects. All actions that would make sense to
+use in a particular context should
+be in a single group. Multiple action groups may be used for a
+particular user interface. In fact, it is expected that most nontrivial
+applications will make use of multiple groups. For example, in an
+application that can edit multiple documents, one group holding global
+actions (e.g. quit, about, new), and one group per document holding
+actions that act on that document (eg. save, cut/copy/paste, etc). Each
+window's menus would be constructed from a combination of two action
+groups. <br>
+      <br>
+Accelerators are handled by the GTK+ accelerator map. All actions are
+assigned an accelerator path (which normally has the form
+&lt;Actions&gt;/group-name/action-name) and a shortcut is associated
+with this accelerator path. All menuitems and toolitems take on this
+accelerator path. The GTK+ accelerator map code makes sure that the
+correct shortcut is displayed next to the menu item. <br>
+      <br>
+To create an action group call the floowing constructor:<br>
+      <br>
+      <div class="fbox"><code>ActionGroup(const String&amp; name);</code></div>
+      <br>
+The 'name' argument is the unique name for the action group.<br>
+      <br>
+      <h2><a name="example"></a>Action
+Example</h2>
+      <span style="color: rgb(0, 55, 85);"></span>Don't be put off by
+all that theory. The GTK+ user interface manager is
+not that hard to use, and eventually it will make sense. Not
+surprisingly, a lot of the code and UI definitions are little more than
+an exercise in 'cut-and-paste'. I recommend that you build up a set
+templates for the UI definitions you use, and reuse them.<br>
+      <br>
+To implement an action-based menu and toolbar system in your
+application do something like the following. In your main window class
+header file:<br>
+      <ul style="list-style-type: square;">
+        <li>declare a Gtk::ActionGroup smart pointer</li>
+        <li>declare a Gtk::UIManager smart pointer</li>
+        <li>declare a private 'add_actions()' method</li>
+      </ul>
+Then in the main window class source file:<br>
+      <ul style="list-style-type: square;">
+        <li>define a string containing the UI defintions for the
+menuitem and toolitem actions<br>
+        </li>
+        <li>create a Gtk::ActionGroup</li>
+        <li>create the actions in the add_actions() method and add them
+to the action group<br>
+        </li>
+        <li>create the Gtk::UIManager and insert the action group into
+it<br>
+        </li>
+        <li>load the XML UI definitions</li>
+        <li>retrieve the menubar and toolbar widgets and pack them into
+your application<br>
+        </li>
+      </ul>
+Here is an Action example that does all these things. The header file
+is &lt;actions.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br
+ style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/box.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/menu.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/toolbar.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/window.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/uimanager.hh&gt;<br>
+      <br>
+using namespace
+Xfc;<br>
+      <br>
+class
+ActionWindow : public
+Gtk::Window<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Pointer&lt;Gtk::ActionGroup&gt; group;<br>
+&nbsp;&nbsp;&nbsp; Pointer&lt;Gtk::UIManager&gt; manager;<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; void
+add_actions();<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; bool
+on_button_press(const
+Gdk::EventButton&amp; event, Gtk::Menu *menu);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; ActionWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual
+~ActionWindow();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; void
+menu_item_selected(const char
+*parent, const char *item);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; void
+on_file_new();<br>
+&nbsp;&nbsp;&nbsp; void
+on_file_open();<br>
+&nbsp;&nbsp;&nbsp; void
+on_file_save();<br>
+&nbsp;&nbsp;&nbsp; void
+on_file_save_as();<br>
+&nbsp;&nbsp;&nbsp; void
+on_file_quit();<br>
+&nbsp;&nbsp;&nbsp; void
+on_options_test();<br>
+&nbsp;&nbsp;&nbsp; void
+on_help_about();<br>
+};</code></div>
+      <br>
+and the source file is &lt;actions.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "actions.hh"<br
+ style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/accelgroup.hh&gt;<br
+ style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/eventbox.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/label.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/menubar.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/stockid.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/toolbar.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/glib/error.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;iostream&gt;<br>
+      <br>
+// XML menu and
+toolbar description<br style="color: rgb(0, 0, 102);">
+      <br>
+static const char
+*ui_info = <br>
+"&lt;ui&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp; &lt;menubar
+name='MenuBar'&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;
+&lt;menu action='File'&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;menuitem action='New'/&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;menuitem action='Open'/&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;menuitem action='Save'/&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;menuitem action='SaveAs'/&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;separator/&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;menuitem action='Quit'/&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;
+&lt;/menu&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;
+&lt;menu action='Options'&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;menuitem action='Test'/&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;
+&lt;/menu&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;
+&lt;menu action='Help'&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;menuitem action='About'/&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;
+&lt;/menu&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;
+&lt;/menubar&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;
+&lt;toolbar&nbsp; name='ToolBar'&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;
+&lt;toolitem action='New'/&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;
+&lt;toolitem action='Open'/&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;
+&lt;toolitem action='Save'/&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;
+&lt;toolitem action='SaveAs'/&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;
+&lt;separator action='Sep1'/&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;&nbsp;&nbsp;
+&lt;toolitem action='Quit'/&gt;"<br style="color: rgb(255, 0, 0);">
+"&nbsp;
+&lt;/toolbar&gt;"<br style="color: rgb(255, 0, 0);">
+"&lt;/ui&gt;";<br>
+      <br>
+ActionWindow::ActionWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("Action
+Example");<br>
+&nbsp;&nbsp;&nbsp; set_size_request(300, 200);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+Boxes don't receive button events so use an eventbox. The eventbox is
+added first<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; //
+and then all the other widgets added to it.<br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; Gtk::EventBox *eventbox = new Gtk::EventBox;<br>
+&nbsp;&nbsp;&nbsp; add(*eventbox);<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; //
+Set the events the eventbox is to receive. These can be any number of
+or'd (|) values<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; //
+from the Gdk::EventMask enumeration.<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; eventbox-&gt;set_events(Gdk::BUTTON_PRESS_MASK);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+Add the packing box to eventbox<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; Gtk::VBox *vbox = new Gtk::VBox(false, 1);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;set_border_width(1);<br>
+&nbsp;&nbsp;&nbsp; eventbox-&gt;add(*vbox);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+Create the action group and add actions to it.&nbsp;&nbsp;&nbsp; <br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; group = new
+Gtk::ActionGroup("Actions");<br>
+&nbsp;&nbsp;&nbsp; add_actions();<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; //
+Create the user interfcace anager&nbsp;&nbsp;&nbsp; <br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; manager = new
+Gtk::UIManager;<br>
+&nbsp;&nbsp;&nbsp; manager-&gt;insert_action_group(*group);<br>
+&nbsp;&nbsp;&nbsp; add_accel_group(manager-&gt;get_accel_group());<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+Load XML description of the menus from a string.<br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; G::Error error;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; if (!manager-&gt;add_ui_from_string(ui_info, -1,
+&amp;error))<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; std::cout &lt;&lt; "building
+menus failed: &lt;&lt; " &lt;&lt; error.message() &lt;&lt; std::endl;<br>
+&nbsp;&nbsp;&nbsp; }<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+Retrieve a pointer to the menubar.&nbsp;&nbsp;&nbsp; <br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; Gtk::Widget *menubar =
+manager-&gt;get_widget("/MenuBar");<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*menubar, false, false);<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; //
+Retrieve a pointer to the toolbar.&nbsp;&nbsp;&nbsp; <br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; Gtk::Toolbar *toolbar =
+static_cast&lt;Gtk::Toolbar*&gt;(manager-&gt;get_widget("/ToolBar"));<br>
+&nbsp;&nbsp;&nbsp;
+toolbar-&gt;set_style(Gtk::TOOLBAR_ICONS);&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; toolbar-&gt;set_tooltips (true);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*toolbar, false, false);<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; //
+Retrieve a pointer to the 'File' menu to use as the popup client
+menu.&nbsp;&nbsp;&nbsp; <br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; Gtk::Menu *file_menu =
+static_cast&lt;Gtk::Menu*&gt;(manager-&gt;get_widget("/MenuBar/File/New")-&gt;get_parent());<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; //
+Bind the file menu to the button_press event and use it as the popup
+menu.<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp;
+eventbox-&gt;signal_button_press_event().connect(sigc::bind(sigc::mem_fun(this,
+&amp;ActionWindow::on_button_press), file_menu));<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; //
+Add a label that tells the user to click the mouse button inside the
+client area.<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; Gtk::Label *label = new Gtk::Label("Click mouse
+button here...");<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*label);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+Show everything<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; eventbox-&gt;show_all();<br>
+}<br>
+      <br>
+ActionWindow::~ActionWindow()<br>
+{<br>
+}<br>
+      <br>
+bool<br>
+ActionWindow::on_button_press(const
+Gdk::EventButton&amp; event, Gtk::Menu *menu)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; menu-&gt;popup(event.button(), event.time());<br>
+&nbsp;&nbsp;&nbsp; return true;<br>
+}<br>
+      <br>
+void<br>
+ActionWindow::menu_item_selected(const
+char *parent, const char
+*item)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; std::cout &lt;&lt; "You activated the \"" &lt;&lt;
+parent &lt;&lt; "\" action: \"" &lt;&lt; item &lt;&lt; "\"" &lt;&lt;
+std::endl;<br>
+}<br>
+      <br>
+void<br>
+ActionWindow::on_file_new()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; menu_item_selected("File", "New");<br>
+}<br>
+      <br>
+void<br>
+ActionWindow::on_file_open()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; menu_item_selected("File", "Open");<br>
+}<br>
+      <br>
+void<br>
+ActionWindow::on_file_save()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; menu_item_selected("File", "Save");<br>
+}<br>
+      <br>
+void<br>
+ActionWindow::on_file_save_as()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; menu_item_selected("File", "Save As");<br>
+}<br>
+      <br>
+void<br>
+ActionWindow::on_file_quit()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; dispose();<br>
+}<br>
+      <br>
+void<br>
+ActionWindow::on_options_test()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; menu_item_selected("Options", "Test");<br>
+}<br>
+      <br>
+void<br>
+ActionWindow::on_help_about()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; menu_item_selected("Help", "About");<br>
+}<br>
+      <br>
+void <br>
+ActionWindow::add_actions()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace
+Gtk;<br>
+&nbsp;&nbsp;&nbsp; using namespace
+sigc;<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; //
+Create Action menu entries&nbsp;&nbsp;&nbsp; <br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; group-&gt;add("File", "_File");<br>
+&nbsp;&nbsp;&nbsp; group-&gt;add("Options", "_Options");<br>
+&nbsp;&nbsp;&nbsp; group-&gt;add("Help", "_Help");<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; Action *action = group-&gt;add("New", "_New",
+StockId::NEW, AccelKey("&lt;control&gt;N"), "Create new
+file");&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; action-&gt;signal_activate().connect(mem_fun(this,
+&amp;ActionWindow::on_file_new));<br>
+&nbsp;&nbsp;&nbsp; action = group-&gt;add("Open", "_Open",
+StockId::OPEN, AccelKey("&lt;control&gt;O"), "Open file");<br>
+&nbsp;&nbsp;&nbsp; action-&gt;signal_activate().connect(mem_fun(this,
+&amp;ActionWindow::on_file_open));<br>
+&nbsp;&nbsp;&nbsp; action = group-&gt;add("Save", "_Save",
+StockId::SAVE, AccelKey("&lt;control&gt;S"), "Save current file");<br>
+&nbsp;&nbsp;&nbsp; action-&gt;signal_activate().connect(mem_fun(this,
+&amp;ActionWindow::on_file_save));<br>
+&nbsp;&nbsp;&nbsp; action = group-&gt;add("SaveAs", "Save _As",
+StockId::SAVE, "Save to file");<br>
+&nbsp;&nbsp;&nbsp; action-&gt;signal_activate().connect(mem_fun(this,
+&amp;ActionWindow::on_file_save_as));<br>
+&nbsp;&nbsp;&nbsp; action = group-&gt;add("Quit", "_Quit",
+StockId::QUIT, AccelKey("&lt;control&gt;Q"), "Quit");&nbsp;&nbsp;&nbsp;
+      <br>
+&nbsp;&nbsp;&nbsp; action-&gt;signal_activate().connect(mem_fun(this,
+&amp;ActionWindow::on_file_quit));<br>
+&nbsp;&nbsp;&nbsp; action = group-&gt;add("Test", "Test",
+"Test");&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; action-&gt;signal_activate().connect(mem_fun(this,
+&amp;ActionWindow::on_options_test));<br>
+&nbsp;&nbsp;&nbsp; action = group-&gt;add("About", "_About",
+AccelKey("&lt;control&gt;A"), "About");&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; action-&gt;signal_activate().connect(mem_fun(this,
+&amp;ActionWindow::on_help_about));<br>
+}<br>
+      <br>
+XFC_MAIN(ActionWindow)</code></div>
+      <br>
+      <h2>Compiling Action<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Action in the
+&lt;examples/howto/actions&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/actions&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Action, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+actions: actions.cc actions.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) actions.cc -o actions $(CFLAGS) `pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean:<br>
+&nbsp;&nbsp;&nbsp; rm -f *.o actions</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 324px; height: 243px;" alt=""
+ src="../../images/action.png"><br>
+      </div>
+      <br>
+Also have a look at the two test programs, another action example in
+the &lt;tests/actions&gt; and a menu merge example in
+&lt;tests/megremenus&gt;. They implement most of the features described
+above.<br>
+      <br>
+The XFC_MAIN macro is a convenience macro that writes a simple main
+function, its only argument is the name of the main window class. The
+macro is defined in &lt;xfc/main.hh&gt; as:<br>
+      <br>
+      <div class="fbox"><code>#define XFC_MAIN(MainWidget)\<br>
+&nbsp;&nbsp;&nbsp; int main (int argc, char *argv[])\<br>
+&nbsp;&nbsp;&nbsp; {\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Xfc::Main::init(&amp;argc,
+&amp;argv);\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; MainWidget main_widget;\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+main_widget.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; main_widget.show();\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Xfc::Main::run();\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return 0;\<br>
+&nbsp;&nbsp;&nbsp; }</code></div>
+      <br>
+Most main functions in C++ are simple because all the
+creation work for the main window is done inside its constructor, not
+the main function.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="uimanager.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

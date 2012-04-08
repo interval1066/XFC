@@ -1,0 +1,3 @@
+PROJECT( XFC_DEMOS )
+
+ADD_SUBDIRECTORY( xfc-demo )

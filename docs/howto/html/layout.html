@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Layout Container" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="width: 100%; text-align: left;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="background-color: rgb(17, 55, 95);"><br>
+      </td>
+    </tr>
+    <tr>
+      <td
+ style="background-color: rgb(255, 255, 255); text-align: center;"><span
+ style="font-weight: bold; font-family: Helvetica,Arial,sans-serif; color: rgb(17, 55, 95);">Xfce
+Foundation Classes</span><br>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"
+ style="background-color: rgb(153, 169, 192);">&nbsp;&laquo; <a
+ class="qindexH" href="../../index.html">Main Page</a><span
+ class="qindexH"> | </span><a class="qindexH" href="index.html">Index</a>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Layout
+Container</h1>
+      <br>
+      <div style="text-align: left;">The Layout container is similar to
+the Fixed
+container except that it implements an infinite (where infinity is less
+than 2^32) scrolling area. The X window system has a limitation where
+windows can be at most 32767 pixels wide or tall. The Layout container
+gets around this limitation by doing some exotic stuff using window and
+bit gravities, so that you can have smooth scrolling even when you have
+many child widgets in your scrolling area.<br>
+      </div>
+      <br>
+A Layout container is created using one of the following constructors:<br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <div class="fbox"><code>Layout();<br>
+      <br>
+Layout(Gtk::Adjustment *hadjustment, Gtk::Adjustment *vadjustment);</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">The first constructor creates a
+Layout with default horizontal and
+vertical adjustments. The second constructor lets you optionally
+specify the Adjustment objects that
+the Layout widget will use for its scrolling.<br>
+      </div>
+      <div style="text-align: left;"> <br>
+You can add and move widgets in the Layout container using the
+following two methods:<br>
+      <br>
+      <div class="fbox"><code>void
+put(Gtk::Widget&amp; child_widget, int x, int y);<br>
+      <br>
+void move(Gtk::Widget&amp;
+child_widget, int x, int
+y);</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">The put() method places 'widget'
+in the container at the
+position specified by x and y. The move() method moves the specified
+widget to a new
+position.<br>
+      </div>
+      <div style="text-align: left;"> <br>
+The size of the Layout container can be set using this next method:<br>
+      <br>
+      <div class="fbox"><code>void
+set_size(unsigned int width, unsigned int height);</code></div>
+      <br>
+The final four methods for use with Layout widgets are for
+manipulating their horizontal and vertical adjustment widgets:<br>
+      <br>
+      <div class="fbox"><code>void
+set_hadjustment(Gtk::Adjustment *adjustment);<br>
+      <br>
+void
+set_vadjustment(Gtk::Adjustment
+*adjustment);<br>
+      <br>
+Gtk::Adjustment* get_hadjustment() const;<br>
+      <br>
+Gtk::Adjustment* get_vadjustment() const;</code></div>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="layout.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,487 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+  <meta content="Tutorial: Hello World" name="description">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="white-space: nowrap; height: 25px;"
+ class="darkbluestripe"> <br>
+      </td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap; text-align: center; height: 25px;"
+ class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap; height: 25px;"
+ class="greybluestripe" colspan="1" rowspan="1">
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="0" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 50%; white-space: nowrap;">&nbsp;&laquo; <a
+ class="qindexH" href="index.html">Index</a><span class="qindexH"> | </span><a
+ class="qindexH" href="chapter01.html">Basic XFC Application</a><span
+ class="qindexH"></span> </td>
+            <td
+ style="text-align: right; width: 50px; white-space: nowrap;"><a
+ href="pretend"><span class="qindexF"></span><span class="qindexF"></span></a><a
+ class="qindexH" href="chapter03.html">Hello Buttons</a> &raquo; <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Chapter
+2: Hello World<br>
+      </h1>
+      <br>
+Hello World is a simple program that contains one widget: a button.
+It's
+the classic 'hello
+world' example XFC style. The window displayed cannot be closed by the
+window manager. Instead, it can only be closed by clicking the button.<br>
+      <br>
+The header file for the Hello World program is &lt;helloworld.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+#include &lt;xfc/gtk/widgetsignals.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class HelloWorld : public Gtk::Window, protected Gtk::WidgetSignals<br>
+{<br>
+protected:<br>
+&nbsp;&nbsp; &nbsp;virtual bool on_delete_event(const
+Gdk::EventAny&amp; event);<br>
+&nbsp;&nbsp; &nbsp;void on_hello();<br>
+      <br>
+public:<br>
+&nbsp;&nbsp; &nbsp;HelloWorld();<br>
+&nbsp;&nbsp; &nbsp;~HelloWorld();<br>
+};</code></div>
+      <br>
+and the source file is &lt;helloworld.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "helloworld.hh"<br>
+#include &lt;xfc/gtk/button.hh&gt;<br>
+#include &lt;iostream&gt;<br>
+      <br>
+HelloWorld::HelloWorld()<br>
+: Gtk::WidgetSignals(this)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;// Sets the title of the window<br>
+&nbsp;&nbsp; &nbsp;set_title("Hello World");<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// Set the default size&nbsp;&nbsp; &nbsp;of the
+window <br>
+&nbsp;&nbsp; &nbsp;set_default_size(200, -1);<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp;&nbsp; // Sets the border width of the window. <br>
+&nbsp;&nbsp; &nbsp;set_border_width(10);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Creates a new button with the label "Hello World".<br>
+&nbsp;&nbsp; &nbsp;Gtk::Button *button = new Gtk::Button("Click me...");<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// When the button receives the "clicked" signal, it
+calls the on_hello() slot.<br>
+&nbsp;&nbsp;
+&nbsp;button-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;HelloWorld::on_hello));<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// This will cause the window to be destroyed by
+calling HelloWindow's inherited dispose method.<br>
+&nbsp;&nbsp;
+&nbsp;button-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;HelloWorld::dispose));<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// This packs the button into the window (a
+Gtk::Container).<br>
+&nbsp;&nbsp; &nbsp;add(*button);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// The final step is to display this newly created
+widget.<br>
+&nbsp;&nbsp; &nbsp;button-&gt;show();<br>
+}<br>
+      <br>
+HelloWorld::~HelloWorld()<br>
+{<br>
+}<br>
+      <br>
+bool<br>
+HelloWorld::on_delete_event(const Gdk::EventAny&amp; event)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;// When the window is given the "delete_event"
+signal (this is given by the window manager,<br>
+&nbsp;&nbsp; &nbsp;// usually by the "close" option, or on the
+titlebar), the on_delete_event() slot is called.<br>
+&nbsp;&nbsp; &nbsp;// If you return false a "destroy" signal is
+emitted. Returning true means you don't want<br>
+&nbsp;&nbsp; &nbsp;// the window to be destroyed. This is useful for
+popping up 'are you sure you want to quit?'<br>
+&nbsp;&nbsp; &nbsp;// type dialogs.<br>
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "delete event occurred" &lt;&lt;
+'\n';<br>
+&nbsp;&nbsp; &nbsp;return true;<br>
+}<br>
+      <br>
+void<br>
+HelloWorld::on_hello()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "Hello World" &lt;&lt; std::endl;<br>
+}<br>
+      <br>
+int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace Main;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;HelloWorld window;<br>
+&nbsp;&nbsp;
+&nbsp;window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp; &nbsp;window.show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;run();<br>
+&nbsp;&nbsp; &nbsp;return 0;<br>
+}</code><br>
+      </div>
+      <br>
+      <h2>Compiling Hello World</h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Hello World in the
+&lt;examples/tutorial/chapter02&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/tutorial/chapter02&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Hello World, add the following lines to a new
+text file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+helloworld: helloworld.cc helloworld.hh<br>
+&nbsp;&nbsp; &nbsp;$(CC) helloworld.cc -o helloworld `pkg-config
+xfcui-X.X
+--cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp; &nbsp;rm -f *.o helloworld</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 222px; height: 87px;" alt=""
+ src="../../images/helloworld.png"><br>
+      <div style="text-align: left;"><br>
+      <h2>Stepping through the source code</h2>
+The Hello World header file includes three other header files:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+#include &lt;xfc/gtk/widgetsignals.hh&gt;</code><br>
+      </div>
+      <br>
+Every program needs to include
+the first header file. It provides access to library initialization
+functions and the main event loop. The second
+header file declares the Gtk::Window object and the
+last header file declares Gtk::WidgetSignals, the virtual signal&nbsp;
+handler class for Gtk::Widget. <br>
+      <samp></samp><br>
+      <samp></samp>Next, a using statement is used to open the
+Xfc:: namespace so that type names don't need to be prefixed with Xfc::<br>
+      <br>
+      </div>
+      </div>
+      <div class="fbox"><code>using namespace Xfc;</code><br>
+      </div>
+      <br>
+The HelloWorld class is derived from Gtk::Window and
+Gtk::WidgetSignals. The
+Gtk::Window inheritance path
+looks like this:<br>
+      <br>
+      <div class="fbox"><code>G::TypeInstance
+&lt;-
+G::Object &lt;- Gtk::Object &lt;- Gtk::Widget &lt;- Gtk::Container
+&lt;- Gtk::Bin &lt;- Gtk::Window</code><samp> </samp></div>
+      <br>
+HelloWorld redeclares the Gtk::WidgetSignals<em> </em>virtual<em> </em>on_delete_event()
+handler so it can override its default
+behaviour. Next,
+it declares an on_hello() method that responds to button clicks.
+The only other methods declared are the constructor and destructor.<br>
+      <br>
+The HelloWorld source file includes the following files:<br>
+      <br>
+      <div class="fbox"><code>#include "helloworld.hh"<br>
+#include &lt;xfc/gtk/button.hh&gt;<br>
+#include &lt;iostream&gt;<br>
+      </code></div>
+      <br>
+The file &lt;xfc/gtk/button.hh&gt; declares the Gtk::Button class.
+&lt;iostream&gt; is the C++ header file that provides access to the
+standard C++ stream objects, such as 'cin' and 'cout'.<br>
+      <br>
+Looking at the HelloWorld constructor, the first line sets the window
+title to "Hello World":<br>
+      <br>
+      <div class="fbox"><code>set_title("Hello World");</code></div>
+      <br>
+Then the second line sets the initial size of the window:<br>
+      <br>
+      <div class="fbox"><code>set_default_size(200, -1);</code></div>
+      <br>
+A 'width' or 'height' value of -1 tells GTK+ to use the natural size
+for that dimension. In this case, the height.<br>
+      <br>
+The next line sets the border width of
+the window to 10. The border is a blank area around the inside edge of
+the window where no widgets will go.<br>
+      <br>
+      <div class="fbox"><code>set_border_width(10);</code></div>
+      <br>
+HelloWorld inherits set_border_width() from Gtk::Container.
+Next, we create a button with the label "Click me..." and connect it to
+the on_hello() method using a libsigc++ slot:<br>
+      <br>
+      <div class="fbox"><code>Gtk::Button *button = new
+Gtk::Button("Click me...");<br>
+button-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;HelloWorld::on_hello));</code><br>
+      </div>
+      <br>
+Obviously, the "clicked" signal is emitted when the button is clicked
+with the mouse
+pointer. signal_clicked() is the <em></em>proxy signal function for
+Gtk::Button::clicked_signal.
+You can connect more than one slot to a signal. Here we connect a
+second slot that calls the window's inherited dispose() method so that
+when the button is clicked our window is destroyed.<br>
+      <br>
+      <div class="fbox"><code>button-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;HelloWorld::dispose));</code><br>
+      </div>
+      <br>
+Just a brief word about dispose(). When you want
+to destroy a widget you call dispose(). There is no destroy
+method in XFC. The name dispose is used because it better reflects
+what happens when a widget is destroyed. In GTK+ 2.0, when you ask for
+a widget to be destroyed it may not be destroyed immediately.
+Instead, it gets marked for destruction and is disposed of later when
+its reference count drops to zero.<br>
+      <br>
+Next we make a packing call which that tells XFC that the button is to
+be
+placed
+in the window where it will be displayed. Note that HelloWorld is also
+a Gtk::Container and a container can only contain one widget. There
+are other widgets, such as boxes and tables, which are designed to
+layout multiple widgets in various ways.<br>
+      <br>
+      <div class="fbox"><code>add(*button);</code></div>
+      <br>
+      <span class="">The final step in the constructor is to display
+the newly created
+button by making it visible:</span><br>
+      <br>
+      <div class="fbox"><code>button-&gt;show();</code></div>
+      <br>
+      <div style="text-align: left;">The on_delete_event() handler is a
+bit special. It's the
+predefined<em> </em>virtual signal handler for the 'delete_event<span
+ style="font-style: italic;">' </span><em></em><em></em> signal. A<em>
+      </em>delete_event is occurs when the window manager sends this
+event to the application. <em></em>We
+have a choice here as to what to do about these events. We can
+ignore them, make some sort of response, or simply quit the
+application. The value you return from this handler lets GTK+ know what
+action to take. By returning true we let GTK+ know that we
+don't
+want to have the 'destroy_signal' emitted, keeping our
+application running. By returning false, we ask that the
+destroy_signal
+be emitted. </div>
+      <br>
+      <div class="fbox"><code>bool<br>
+HelloWorld::on_delete_event(const Gdk::EventAny&amp; event)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; std::cout &lt;&lt; "delete event occurred" &lt;&lt;
+'\n';<br>
+&nbsp;&nbsp; &nbsp;return true;<br>
+}</code><br>
+      </div>
+      <br>
+on_delete_event() uses a C++ console output statement to
+display the message "delete event occurred". It does this
+by using the output operator &lt;&lt;. The &lt;&lt; causes whatever
+expression is on its right side to be output to the device on the left.
+'cout'
+is the predefined identifier that stands for console output and refers
+to the computer screen. To use cout in your program you include the
+C++ header file &lt;iostream&gt;.<br>
+      <br>
+Next is the slot method that will be called when the button is clicked<em>.</em>
+It uses a C++ console output statement to display the message "Hello
+World" on the screen:<br>
+      <br>
+      <div class="fbox"><code>void<br>
+HelloWorld::on_hello()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "Hello World" &lt;&lt; std::endl;<br>
+}</code><br>
+      </div>
+      <br>
+I assume you know about the main() function. As with other
+applications, all XFC applications must have
+one of these:<br>
+      <br>
+      <div class="fbox"><code>int
+main(int argc, char
+*argv[]);</code></div>
+      <br>
+After the initial using statement<em> </em>the first line of
+code calls init() to initializes the toolkit:<br>
+      <br>
+      <div class="fbox">init(&amp;argc, &amp;argv);</div>
+      <br>
+This function initializes
+the library for use, sets up default signal handlers, and checks the
+arguments passed to your application on the command line, looking for
+one of the following:<br>
+      <ul compact="COMPACT" style="list-style-type: square;">
+        <li><samp><span> <tt class="LITERAL">--gtk-module</tt></span></samp></li>
+        <li><samp><span> <tt class="LITERAL">--g-fatal-warnings</tt></span></samp></li>
+        <li><samp><span> <tt class="LITERAL">--gtk-debug</tt></span></samp></li>
+        <li><samp><span> <tt class="LITERAL">--gtk-no-debug</tt></span></samp></li>
+        <li><samp><span> <tt class="LITERAL">--gdk-debug</tt></span></samp></li>
+        <li><samp><span> <tt class="LITERAL">--gdk-no-debug</tt></span></samp></li>
+        <li><samp><span> <tt class="LITERAL">--display</tt></span></samp></li>
+        <li><samp><span> <tt class="LITERAL">--sync</tt></span></samp></li>
+        <li><samp><span> <tt class="LITERAL">--name</tt></span></samp></li>
+        <li><samp><span> <tt class="LITERAL">--class</tt></span></samp></li>
+      </ul>
+Any argument it recognizes is removed from the list, and 'argc' and
+'argv' are modified to make it look like the argument never existed,
+allowing your
+application to parse the remaining arguments.<br>
+      <br>
+Next, an instance of HelloWindow is created on the stack.<br>
+      <br>
+      <div class="fbox"><code>HelloWorld
+window;</code></div>
+      <br>
+The Xfc::Main::quit()<em> </em>function causes the program to end.
+This function tells GTK+ that it is to exit from the main event loop
+when
+control is returned to it. There is no need to write a method that
+calls
+this function. Instead, we simply generate a slot for it and connect
+that slot to our main window's destroy signal. The next line
+accomplishes this:<br>
+      <br>
+      <div class="fbox"><code>window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));</code></div>
+      <br>
+      <div style="text-align: left;">The window widget is shown last so
+the whole window will pop up at
+once rather than seeing the window pop up, and then the button form
+inside of it. Although with such a simple example, you'd never notice. </div>
+      <br>
+      <div class="fbox"><code>window.show();</code></div>
+      <br>
+And of course, we call run() to start the main processing
+loop
+which then waits for events to come from the X server.<br>
+      <br>
+      <div class="fbox">run();</div>
+      <br>
+And the final return. Control returns
+here after Xfc::Main::quit() is called.<br>
+      <br>
+      <div class="fbox">return 0;</div>
+      <br>
+When you click the mouse on a XFC button, the widget emits a 'clicked'
+signal. In order for us to use this information, XFC sets up the
+Gtk::Button 'clicked_signal' signal to catch that signal and dispatch
+it
+to any connected slots. In our example, when the button we created
+is clicked, the<em> </em>on_hello() method is called first and then
+the
+window's inherited Gtk::Object::dispose()
+method which destroys the window. This causes the window to
+emit the "destroy"<em> </em>signal, which is caught by its Gtk::Object<em>
+      </em>'destroy_signal', which calls Xfc::Main::quit(), which
+simply exits.<br>
+      <br>
+Another course of events is to use the window manager to kill the
+window, which will cause the 'delete_event' to be emitted. This
+is caught by the Gtk::Window 'delete_event_signal' which calls our
+on_delete_event()
+method. If we return true here, the window will be left as is
+and nothing will happen. Returning false will cause GTK+ to
+emit
+the 'destroy' signal which of course calls Xfc::Main::quit().<br>
+      <br>
+The <a href="chapter03.html">next chapter</a>
+takes you through building another XFC application: Hello Buttons, an
+enhanced version of Hello World which uses a packing box to add two
+button widgets to a main window. <br>
+      <br>
+      <div align="justify">
+      <div style="text-align: left;">
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="chapter02.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><a class="qindexF"
+ href="index.html">Index</a><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

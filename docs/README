@@ -1,0 +1,29 @@
+The XFC Documentation.
+======================
+The <docs> directory contains all the reference and tutorial
+documentation. The easiest way to access this documentation is
+through the main HTML page, <docs/index.html>.
+
+The <docs/faq> subdirectory contains a FAQ file that answers some 
+frequently asked questions about GTK+ and XFC. 
+
+The <docs/howto> subdirectory contains a collection of useful HOWTOs,
+covering everthing from the basic structure and function of the XFC
+libraries to widget programming. There is a HOWTO for most widgets. 
+Each HOWTO first covers any important widget basics and then works
+through a widget example. The source code for these examples can be
+found in the <examples/howto> subdirectory. The HOWTOs are also
+linked to the API reference so that their information is easily 
+accessible from there.
+
+The <docs/reference> subdirectory contains a complete API reference
+manual. If you are using the SVN version of XFC, the API reference
+will be compiled by Doxygen by passing the --enable-docs option to
+configure. 
+
+The <docs/tutorial> subdirectory contains the XFC tutorial "GTK+
+Programming in C++ with XFC", which covers the basics of GTK+ 
+programming in C++ using the Xfce Foundation Classes. Whether you're
+new to GTK+ or an experienced programmer, you should find this 
+tutorial beneficial and easy to follow. The source code for the 
+tutorial examples can be found in the <examples/tutorial> subdirectory.

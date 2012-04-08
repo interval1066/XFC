@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: The Tooltips Object" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>The
+Tooltips Object</h1>
+      <br>
+Tooltips are the little text strings that pop up when
+you leave your pointer over a button or other widget for a few seconds.
+They are easy to use, so I will just explain them without giving an
+example. Widgets that do not receive events (widgets that do not have
+their own
+window) will not work with tooltips. <br>
+      <br>
+You only need to construct one Tooltip object for a set of tooltips
+because it can be used to create multiple tooltips:<br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify"><br>
+      <div class="fbox"><code>Tooltips();</code></div>
+      <br>
+Once you have created a new tooltip, and the widget you wish to use it
+on, simply use this call to set it:<br>
+      <br>
+      <div class="fbox"><code>void
+set_tip(Gtk::Widget&amp; widget, const
+String&amp; tip_text, const String&amp;
+tip_private = 0); <br>
+      </code></div>
+      <br>
+      <div style="text-align: left;"> The 'widget' argument is the
+widget you wish to have
+this tooltip pop up for. The 'tip_text' argument is the text you want
+the tooltip to display.
+The 'tip_private' argument is a text string that can be used&nbsp; to
+implement
+context sensitive help. For now, it is not enabled in GTK so you can
+just ignore it. &nbsp;<br>
+      </div>
+      <div style="text-align: left;"> <br>
+Here's a short example:<br>
+      <br>
+      <div class="fbox"><code>Gtk::Button
+*button = new Gtk::Button("button 1");<br>
+.<br>
+.<br>
+Gtk::Tooltips tooltips;<br>
+tooltips.set_tip(button, "This is button 1");</code></div>
+      <br>
+There are other calls that can be used with tooltips. I will just list
+them with a brief description of what they do.<br>
+      <br>
+      <div class="fbox"><code>void
+enable();</code></div>
+      <br>
+Enable a disabled set of tooltips.<br>
+      <br>
+      <div class="fbox"><code>void
+disable();&nbsp;</code> </div>
+      <br>
+Disable an enabled set of tooltips.<br>
+      <br>
+      <div class="fbox"><code>bool is_enabled()</code></div>
+      <br>
+Returns true if a set of tooltips is enabled.<br>
+      <br>
+      <div class="fbox"><code>void
+unset_tip(Gtk::Widget&amp; widget);</code><code><samp></samp></code></div>
+      <br>
+Unset a previously set tooltip. And that's all the functions associated
+with tooltips. More than you'll
+ever want to know.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="tooltips.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

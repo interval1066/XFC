@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Dialogs" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Dialogs</h1>
+      <br>
+      <div style="text-align: left;">The Dialog widget is very simple,
+and is
+actually
+just a window with a few things pre-packed into it for you. Simply, it
+creates a window, and then packs a vertical box called the
+"client_area"
+into the top, which contains a separator and then a horizontal box
+called the "action_area".<br>
+      <br>
+The Dialog widget can be used for pop-up messages to the user, and
+other similar tasks. There are two constructors to create a new
+Dialog:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>Dialog();<br>
+      <br>
+Dialog(const String&amp; title,
+Gtk::Window
+*parent = 0, Gtk::DialogFlagsField flags =
+Gtk::DIALOG_DESTROY_WITH_PARENT);</code></div>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify"><br>
+The first constructor creates an
+empty
+dialog,
+leaving it up to you to use it. You could pack a button in the
+action_area by doing something like this:<br>
+      <br>
+      <div class="fbox"><code>Gtk::Button *button = new
+Gtk::Button("OK");<br>
+dialog-&gt;action_area()-&gt;pack_start(*button);<br>
+button-&gt;show();</code></div>
+      <br>
+      <div style="text-align: left;">And you could add to the
+client_area by packing, for instance, a label
+in it, try something like this:<br>
+      <br>
+      <div class="fbox"><code>Gtk::Label *label = new
+Gtk::Dialog("Dialogs are groovy");<br>
+dialog-&gt;client_area()-&gt;pack_start(*label);<br>
+label-&gt;show();</code></div>
+      <br>
+As an example in using the dialog box, you could
+put two buttons in the action_area, a Cancel button and an Ok button,
+and a label in the client_area, asking the user a question or giving an
+error message. Then you could attach a different signal to each of the
+buttons and perform the operation the user selects.<br>
+      <br>
+If the simple functionality provided by the default vertical and
+horizontal boxes in the two areas doesn't give you enough control for
+your application, then you can simply pack another layout widget into
+the boxes provided. For example, you could pack a table into the
+client area.<br>
+      <br>
+The last constructor is for convenience and lets you set the 'title'
+for the dialog box, the 'parent' if the dialog box is modal,
+and
+one or more dialog 'flags':<br>
+      <div style="text-align: left;"> </div>
+      <ul style="list-style-type: square; text-align: left;">
+        <li>DIALOG_MODAL - make the dialog modal</li>
+        <li>DIALOG_DESTROY_WITH_PARENT - ensures that the dialog window
+is
+destroyed together with the specified parent.</li>
+        <li>DIALOG_NO_SEPARATOR - omits the separator between the
+client_area
+and the action_area.</li>
+      </ul>
+      <div style="text-align: left;"></div>
+&nbsp;There are three methods you can call to add a button to the
+action area of the dialog:<br>
+      <br>
+      <div class="fbox"><code> Button* add_button(const String&amp;
+button_text, int response_id);<br>
+      <br>
+Button* add_button(const
+StockId&amp; stock_id, int
+response_id);<br>
+&nbsp;&nbsp;&nbsp; <br>
+Button* add_button(StockButtonType button_type);</code></div>
+      <br>
+All three methods return a pointer to the newly created button that was
+added, but normally you wont use it. The first method takes two
+arguments, the button text and the response id. The second method takes
+one of the stock id's list in &lt;xfc/gtk/stockid.hh&gt; and the
+response id. <br>
+      <br>
+A response id can be any positive number,
+or one of the values in the Gtk::ResponseType enum:<br>
+      <div style="text-align: left;"> </div>
+      <ul style="list-style-type: square; text-align: left;">
+        <li>RESPONSE_NONE</li>
+        <li>RESPONSE_REJECT</li>
+        <li>RESPONSE_ACCEPT</li>
+        <li>RESPONSE_DELETE_EVENT</li>
+        <li>RESPONSE_OK</li>
+        <li>RESPONSE_CANCEL</li>
+        <li>RESPONSE_CLOSE</li>
+        <li>RESPONSE_YES</li>
+        <li>RESPONSE_NO</li>
+        <li>RESPONSE_APPLY</li>
+        <li>RESPONSE_HELP</li>
+      </ul>
+      <div style="text-align: left;">If the user clicks one of the
+dialog buttons,
+Gtk::Dialog will emit the 'response' signal with the
+corresponding response id. If a Gtk::Dialog receives the 'delete_event'
+signal, it will emit<samp> </samp>a response signal<em> </em>with a
+response
+ID
+of Gtk::RESPONSE_DELETE_EVENT. However, destroying a dialog does not
+emit the response signal; so be careful relying on response<em>
+&nbsp;</em>when using the Gtk::DIALOG_DESTROY_WITH_PARENT flag. <br>
+      <br>
+The last add_button() method takes a stock button type which
+corresponds the a predefined stock id and response id pair. It can be
+one of the values from the Gtk::StockButtonType enum:<br>
+      <ul style="list-style-type: square;">
+        <li>&nbsp;STOCK_BUTTON_OK - a stock OK button that returns the
+id Gtk::RESPONSE_OK.&nbsp;&nbsp;&nbsp; </li>
+        <li>&nbsp;STOCK_BUTTON_CANCEL - a stock CANCEL button that
+returns the id Gtk::RESPONSE_CANCEL.&nbsp;&nbsp;&nbsp; </li>
+        <li>&nbsp;STOCK_BUTTON_CLOSE - a stock CLOSE button that
+returns the id Gtk::RESPONSE_CLOSE.&nbsp;&nbsp;&nbsp; </li>
+        <li>&nbsp;STOCK_BUTTON_YES - a stock YES button that returns
+the id Gtk::RESPONSE_YES.&nbsp;&nbsp;&nbsp; </li>
+        <li>&nbsp;STOCK_BUTTON_NO - a stock NO button that returns the
+id Gtk::RESPONSE_NO.&nbsp;&nbsp;&nbsp; </li>
+        <li>&nbsp;STOCK_BUTTON_APPLY - stock APPLY button that returns
+the id Gtk::RESPONSE_APPLY.&nbsp;&nbsp;&nbsp; </li>
+        <li>&nbsp;STOCK_BUTTON_HELP - stock HELP button that returns
+the id Gtk::RESPONSE_HELP.</li>
+      </ul>
+      </div>
+The easiest way to display a modal dialog is to let Gtk::Dialog do it
+for you by calling its run() method:<br>
+      <br>
+      <div class="fbox"><code>int
+run();</code></div>
+      <br>
+This blocks in a recursive main loop until the
+dialog either emits the response signal, or is destroyed. If
+the dialog is destroyed, run() returns RESPONSE_NONE.
+Otherwise, it returns the response id from the response
+signal
+emission. Before entering the recursive main
+loop, run() calls Gtk::Widget::show() on the dialog
+for you. Note that you still need to show any children of the dialog
+yourself.<br>
+      <br>
+During run(), the default behavior of 'delete_event<em>' </em>is
+disabled; if the dialog receives a delete_event, it will not be
+destroyed as windows usually are, and run() will return
+RESPONSE_DELETE_EVENT. Also, during run() the dialog
+will be modal. You can force run() to return at any time
+by
+calling response() to emit a response signal.<br>
+      <br>
+      <div class="fbox"><code>void response(int response_id);</code></div>
+      <br>
+      <div style="text-align: left;">This method is used to indicate
+that the user has
+responded to the dialog in some way; typically either you or run() will
+be monitoring the response signal and
+take appropriate action. <br>
+      <br>
+You can set the last widget in the dialog's action area
+with the given response id as the default widget for the dialog:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>void
+set_default_response(int response_id);</code></div>
+      <br>
+Pressing 'Enter' normally activates the default widget. <br>
+      <br>
+The following method is a
+convenient way to sensitize/desensitize dialog buttons:<br>
+      <br>
+      <div class="fbox"><code>void
+set_response_sensitive(int response_id, bool setting)</code></div>
+      <br>
+      <code><span style="font-family: sans-serif;"></span></code>This
+calls Gtk::Widget::set_sensitive(setting) for each
+widget in the dialog's action area with the given 'response_id'.<br>
+      <br>
+Destroying the dialog during run() is a very bad idea,
+because your post-run code won't know whether the dialog was destroyed
+or not. After run() returns, you are responsible
+for hiding or destroying the dialog if you wish to do so. <br>
+      <div style="text-align: left;"> <br>
+Typical usage of the run() method might be: <br>
+      </div>
+      <br>
+      <div class="fbox"><code>int
+result = dialog-&gt;run();<br>
+switch (result)<br>
+{<br>
+case RESPONSE_ACCEPT:<br>
+&nbsp;&nbsp;&nbsp; do_application_specific_something();<br>
+&nbsp;&nbsp;&nbsp; break;<br>
+      <br>
+default:<br>
+&nbsp;&nbsp;&nbsp; do_nothing_since_dialog_was_canceled();<br>
+&nbsp;&nbsp;&nbsp; break;<br>
+}<br>
+dialog-&gt;dispose();</code></div>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="dialogs.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

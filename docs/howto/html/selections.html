@@ -1,0 +1,797 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+  <meta content="Widgets: Selections" name="description">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Data Selections</h1>
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a class="mhl" href="selections.html#S01">Overview</a></li>
+        <li><a class="mhl" href="selections.html#S02">Retrieving the
+selection</a></li>
+        <li><a class="mhl" href="selections.html#S03">Supplying the
+selection</a></li>
+        <li><a class="mhl" href="selections.html#example">Selection
+Example</a></li>
+      </ol>
+      <br>
+      <h2><a name="S01"></a>Overview</h2>
+One type of interprocess communication supported by X and GTK+ is
+selections. A selection identifies a chunk of data, for instance, a
+portion of text, selected by the user in some fashion, for instance, by
+dragging with the mouse. Only one application on a display (the owner)
+can own a particular selection at one time, so when a selection is
+claimed by one application, the previous owner must indicate to the
+user that selection has been relinquished. Other applications can
+request the contents of a selection in different forms, called targets.
+There can be any number of selections, but most X applications only
+handle one, the primary selection.<br>
+&nbsp;<br>
+In most cases, it isn't necessary for a XFC application to deal with
+selections itself. The standard widgets, such as the Entry widget,
+already have the capability to claim the selection when appropriate
+(e.g., when the user drags over text), and to retrieve the contents of
+the selection owned by another widget or another application (e.g.,
+when the user clicks the second mouse button). However, there may be
+cases in which you want to give other widgets the ability to supply the
+selection, or you wish to retrieve targets not supported by default.<br>
+&nbsp;<br>
+A fundamental concept needed to understand selection handling is that
+of the Atom. An atom is an integer that uniquely identifies a string
+(on a certain display). Certain atoms are predefined by the X server,
+and in some cases there are constants in &lt;gdk/gdkselection.h&gt;
+corresponding to these atoms. For instance the constant
+GDK_SELECTION_PRIMARY corresponds to the string "PRIMARY". In other
+cases, you should use the functions gdk_atom_intern(), to get the atom
+corresponding to a string, and gdk_atom_name(), to get the name of an
+atom. Both selections and targets are identified by atoms.<br>
+&nbsp;<br>
+      <h2><a name="S02"></a>Retrieving the selection</h2>
+Retrieving the selection is an asynchronous process. To start the
+process, you call the Gtk::Widget method:<br>
+&nbsp;<br>
+      <div class="fbox"><code>bool selection_convert(Gdk::Atom
+selection, Gdk::Atom target, unsigned int time = GDK_CURRENT_TIME);</code></div>
+&nbsp;<br>
+This converts the selection into the form specified by target. If at
+all possible, the time field should be the time from the event that
+triggered the selection. This helps make sure that events occur in the
+order that the user requested them. However, if it is not available
+(for instance, if the conversion was triggered by a "clicked" signal),
+then you can use the constant GDK_CURRENT_TIME.<br>
+&nbsp;<br>
+When the selection owner responds to the request, a
+"selection_received" signal is sent to your application. The signal
+handler for this signal receives a reference to a Gtk::SelectionData
+object which provides the following accessor functions:<br>
+&nbsp;<br>
+      <div class="fbox"><code>Gdk::Atom selection() const;<br>
+&nbsp;<br>
+Gdk::Atom target() const;<br>
+&nbsp;<br>
+Gdk::Atom type() const;<br>
+&nbsp;<br>
+int format() const;<br>
+&nbsp;<br>
+unsigned char* data() const;<br>
+&nbsp;<br>
+int length() const;</code></div>
+      <br>
+The selection() and target() functions return the values you gave in
+your Gtk::Widget::selection_convert() call. The type() function returns
+an atom that identifies the type of data returned by the selection
+owner. Some possible values are "STRING" (a string of latin-1
+characters), "ATOM" (a series of atoms), "INTEGER" (an integer), etc.
+Most
+targets can only return one type. The format() function returns the
+length of the units (8 for characters, 32 for integers) in bits.
+Usually, you
+don't care about this when receiving data. The data() function returns
+a pointer to the returned data, and length() returns the length of the
+returned data, in bytes. If length() is negative, then an error
+occurred and the selection could not be retrieved. This might happen if
+no application owned the selection, or if you requested a target that
+the application didn't support. The buffer is actually guaranteed to be
+one byte longer than length; the extra byte will always be zero, so it
+isn't necessary to make a copy of strings just to null-terminate them.<br>
+&nbsp;<br>
+For convenience, there are accessors that return the selection, target
+and type as a String:<br>
+      <br>
+      <div class="fbox"><code>String get_selection() const;<br>
+&nbsp;<br>
+String get_target() const;<br>
+&nbsp;<br>
+String get_type() const;</code></div>
+      <br>
+      <div align="justify">
+      <div style="text-align: left;">You can retrieve the
+selection_data as a vector of supported targets. This can be used to
+interpret the results of getting the standard "TARGETS" target that is
+always supplied for any selection.<br>
+&nbsp;<br>
+      <div class="fbox"><code>bool
+get_targets(std::vector&lt;Gdk::Atom&gt;&amp; targets) const;<br>
+&nbsp;<br>
+bool get_targets(std::vector&lt;String&gt;&amp; targets) const;</code> <br>
+      </div>
+      <br>
+The first get_targets() function retrieves the targets as a vector of
+Gdk::Atom. The second retrieves the target names as a vector of String.
+      <br>
+&nbsp;<br>
+The following function returns true if the length of the selection data
+is greater than 0.<br>
+      <br>
+      <div class="fbox"><code>bool is_valid() const;</code></div>
+      <br>
+You can connect directly to the "selection_received" signal with the
+following code:<br>
+      <br>
+      <div class="fbox"><code>widget-&gt;signal_selection_received().connect(sigc::mem_fun(this,
+&amp;MyClass::selection_received_handler));</code></div>
+      <br>
+where the "selection_received" signal handler has the following
+prototype:<br>
+      <br>
+      <div class="fbox"><code>void
+MyClass::selection_received_handler(const
+Gtk::SelectionData&amp; selection_data, unsigned int time);</code><br>
+      </div>
+      <br>
+      <h2><a name="S03"></a>Supplying the selection</h2>
+Being the owner of a selection is a bit more complicated and only makes
+sense when there is data for transmission. Data can exist in a variety
+of formats so first you have to define the targets that correspond to
+these formats. You are free to come up with target names yourself but
+this is only useful within the same application. Therefore, a number of
+standard targets have been agreed upon. A list of targets and
+information on their use can be found in
+the <a href="http://www.talisman.org/icccm/sec-2.html">ICCCM</a>. The
+targets MULTIPLE, TARGETS and TIMESTAMP are defined by<br>
+X11 architecture as mandatory and are automatically provided by GTK+.<br>
+&nbsp;<br>
+To define the supported target(s) for a certain selection and
+widget use one of the following Gtk::Widget methods:<br>
+&nbsp;<br>
+      <div class="fbox"><code>void selection_add_target(Gdk::Atom
+selection, Gdk::Atom target, unsigned int info);<br>
+&nbsp;<br>
+void selection_add_target(Gdk::Atom selection, const
+Gtk::TargetEntry&amp; entry);<br>
+&nbsp;<br>
+void selection_add_targets(Gdk::Atom selection, const
+std::vector&lt;Gtk::TargetEntry&gt;&amp; targets); </code><br>
+      </div>
+      <br>
+The 'selection' argument&nbsp; is the atom corresponding to the
+selection for which the target(s) will be registered, the 'target'
+argument is the atom corresponding to the target name you want to
+register and the 'info' argument is a unique integer id that will be
+passed back through signals later on.&nbsp; The first two methods
+register a single target. The second method takes a Gtk::TargetEntry
+rather than separate target and info arguments. The last method lets
+you register multiple targets at once by passing a vector of
+Gtk::TargetEntry.<br>
+&nbsp;<br>
+You can create a new TargetEntry object with one of the following
+constructors:<br>
+      <br>
+      <div class="fbox"><code>TargetEntry();<br>
+&nbsp;<br>
+TargetEntry(const String&amp; target_name, unsigned int unique_id,
+Gtk::TargetFlagsField drag_flags = 0);</code></div>
+      <br>
+The first constructor creates an empty TargetEntry. The second
+constructor creates a target entry with the specified name and unique
+id. The 'target_name' argument is a string corresponding to the target
+atom and 'unique_id' is the unique integer id. The 'drag_flags'
+argument
+is only used when implementing Drag and Drop. It restricts the validity
+of the corresponding target to the same application or the same widget.<br>
+&nbsp;<br>
+If you create an empty TargetEntry, you can set its target_name and
+unique_id by calling the Gtk::TargetEntry method:<br>
+      <br>
+      <div class="fbox"><code>void set(const String&amp; target_name,
+unsigned int unique_id, Gtk::TargetFlagsField drag_flags = 0);</code></div>
+      <br>
+The 'target_name' is the string corresponding to the target atom and
+unique_id is the unique integer id. The 'drag_flags' argument is used
+to restrict the validity of the corresponding target and can either be
+Gtk::TARGET_SAME_APP or Gtk::TARGET_SAME_WIDGET.<br>
+      <br>
+Now the targets have been registered, when prompted by the user you
+need to take ownership of a certain selection. This is done with the
+following Gtk::Widget method:<br>
+      <br>
+      <div class="fbox"><code>bool selection_owner_set(Gdk::Atom
+selection, unsigned int time, const Gdk::Display *display = 0);</code></div>
+      <br>
+The 'selection' argument is the atom corresponding the selection for
+which the owner should be changed, 'time' is a timestamp with which to
+claim the selection, or GDK_CURRENT_TIME. The 'display' is the
+Gdk::Display where the selection is set, or null for the default
+display. If the return value is true the calling widget owns the
+selection. <br>
+      <br>
+If you need to check whether a widget owns a certain selection you can
+call the Gtk::Widget accessor:<br>
+      <br>
+      <div class="fbox"><code>bool selection_owner_get(Gdk::Atom
+selection);</code></div>
+      <br>
+The 'selection' is an interned atom representing the selection to
+check. The return value is true if the calling widget owns the
+specified selection.<br>
+      <br>
+To be able to respond to a Gtk::Widget::selection_convert() request,
+you must either connect to the "selection_get" signal or derive a new
+class for the selection widget and override the
+Gtk::WidgetSignals::on_selection_get() virtual signal handler.<br>
+&nbsp;<br>
+To connect to the "selection_get" signal, use the following code:<br>
+      <br>
+      <div class="fbox"><code>widget-&gt;signal_selection_get().connect(sigc::mem_fun(this,
+&amp;MyClass::selection_get_handler));</code><br>
+      </div>
+      <br>
+The selection_get handler has the following prototype:<br>
+      <br>
+      <div class="fbox"><code>void
+MyClass::selection_get_handler(Gtk::SelectionData&amp; selection_data,
+unsigned int info, unsigned int time);</code></div>
+      <br>
+The 'selection_data' is the SelectionData object to be filled in,
+'info' is the info integer that was set when the target was registered,
+and 'time' is the time of the conversion request as set by the
+requestor with Gtk::Widget::selection_convert().<br>
+      <br>
+When the "selection_get" signal returns, the widget requesting the
+selection will receive the selection_data. You must call the following
+Gtk::SelectionData methods to set the selection_data fields:<br>
+      <br>
+      <div class="fbox"><code>void set(Gdk::Atom type, int format,
+const void *data, int length);<br>
+      <br>
+bool set_text(const String&amp; str);</code><br>
+      </div>
+      <br>
+These methods should only be called from a selection handler callback.
+The 'type' argument is an atom that describes the 'data' provided and
+the 'format' is
+the number of bits required to store one element of the target type.
+Usually it will be 8 for a character or 32 for an integer. The most
+commonly used target types are: ATOM, COMPOUND_TEXT, INTEGER and
+STRING. This method takes care of properly making a copy of the data so
+that you don't have to worry about keeping it around. The length
+argument is the data length. The data should
+be null-terminated.<br>
+      <br>
+For convenience, the set_text() method sets the contents of the
+selection from a UTF-8 encoded string. The string is converted to the
+form determined by the target and true is returned if the selection was
+successfully set. <br>
+&nbsp; <br>
+If another application claims ownership of the selection, you will
+receive a "selection_clear_event" signal. To explicitly release
+ownership of a selection call the following Gtk::Widget method:<br>
+      <br>
+      <div class="fbox"><code>bool selection_owner_unset(Gdk::Atom
+selection, unsigned int time, const Gdk::Display *display = 0);</code></div>
+      <br>
+The 'selection' argument is an interned atom representing the selection
+to release, 'time' is a timestamp, or GDK_CURRENT_TIME and 'display' is
+the Gdk::Display where the selection is set, or null for the default
+display. True is returned if the operation succeeded.<br>
+      <br>
+      <h2><a name="example"></a>Selection Example</h2>
+In the following example, we retrieve the special target "TARGETS",
+which is a list of all targets into which the selection can be
+converted. <br>
+      <br>
+The header file for the selection example is &lt;selection.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/entry.hh&gt;<br>
+#include &lt;xfc/gtk/selection.hh&gt;<br>
+#include &lt;xfc/gtk/togglebutton.hh&gt;<br>
+#include &lt;xfc/gtk/togglebuttonsignals.hh&gt;<br>
+#include &lt;xfc/gtk/invisible.hh&gt;<br>
+#include &lt;xfc/gtk/widgetsignals.hh&gt;<br>
+#include &lt;xfc/gtk/dialog.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+// RetrieveSelectionButton<br>
+      <br>
+class RetrieveSelectionButton : public Gtk::Button, protected
+Gtk::WidgetSignals<br>
+{<br>
+protected:<br>
+&nbsp;&nbsp; &nbsp;void on_get_target(Gtk::Entry *entry);<br>
+&nbsp;&nbsp; &nbsp;virtual void on_selection_received(const
+Gtk::SelectionData&amp; selection_data, unsigned int time);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp; &nbsp;RetrieveSelectionButton(Gtk::Entry *entry);<br>
+&nbsp;&nbsp; &nbsp;virtual ~RetrieveSelectionButton();<br>
+};<br>
+      <br>
+// SupplySelectionButton<br>
+      <br>
+class SupplySelectionButton : public Gtk::ToggleButton, protected
+Gtk::ToggleButtonSignals<br>
+{<br>
+&nbsp;&nbsp; &nbsp;static std::vector&lt;Gtk::TargetEntry&gt;
+target_entries;<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;Gtk::Invisible *selection_widget;<br>
+&nbsp;&nbsp; &nbsp;String target_string;<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp; &nbsp;virtual void on_toggled();<br>
+&nbsp;&nbsp; &nbsp;void selection_get(Gtk::SelectionData&amp;
+selection_data, unsigned int info, unsigned int time);<br>
+&nbsp;&nbsp; &nbsp;bool selection_clear_event(const
+Gdk::EventSelection&amp; event);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp; &nbsp;SupplySelectionButton();<br>
+&nbsp;&nbsp; &nbsp;virtual ~SupplySelectionButton();<br>
+};<br>
+      <br>
+// SelectionTest<br>
+      <br>
+class SelectionTest : public Gtk::Dialog<br>
+{<br>
+public:<br>
+&nbsp;&nbsp; &nbsp;SelectionTest();<br>
+&nbsp;&nbsp; &nbsp;virtual ~SelectionTest();<br>
+};</code><br>
+      </div>
+      <br>
+and the source file is &lt;selection.cc&gt;:<br>
+&nbsp;<br>
+      <div class="fbox"><code>#include "selection.hh"<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+#include &lt;xfc/gtk/buttonbox.hh&gt;<br>
+#include &lt;xfc/gtk/label.hh&gt;<br>
+#include &lt;iostream&gt;<br>
+      <br>
+std::vector&lt;Gtk::TargetEntry&gt;
+SupplySelectionButton::target_entries;<br>
+      <br>
+enum<br>
+{<br>
+&nbsp;&nbsp; &nbsp;STRING,<br>
+&nbsp;&nbsp; &nbsp;LENGTH<br>
+};<br>
+      <br>
+// RetrieveSelectionButton<br>
+      <br>
+RetrieveSelectionButton::RetrieveSelectionButton(Gtk::Entry *entry)<br>
+: Gtk::WidgetSignals(this)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_label("Retrieve Selection");<br>
+&nbsp;&nbsp;
+&nbsp;signal_clicked().connect(sigc::bind(sigc::mem_fun(this,
+&amp;RetrieveSelectionButton::on_get_target), entry));<br>
+}<br>
+      <br>
+RetrieveSelectionButton::~RetrieveSelectionButton()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+RetrieveSelectionButton::on_get_target(Gtk::Entry *entry)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;// Get the atom corresponding to the target string
+entered into the entry widget.<br>
+&nbsp;&nbsp; &nbsp;Gdk::Atom target_atom =
+gdk_atom_intern(entry-&gt;get_text().c_str(), FALSE);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// And request the target for the primary selection.<br>
+&nbsp;&nbsp; &nbsp;selection_convert(GDK_SELECTION_PRIMARY,
+target_atom);<br>
+}<br>
+      <br>
+void<br>
+RetrieveSelectionButton::on_selection_received(const
+Gtk::SelectionData&amp; selection_data, unsigned int time)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace std;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Print out the values of the selection_data
+members.<br>
+&nbsp;&nbsp; &nbsp;cout &lt;&lt; endl &lt;&lt; "The values returned by
+the Gtk::SelectionData members are..." &lt;&lt; endl;<br>
+&nbsp;&nbsp; &nbsp;cout &lt;&lt; " * selection() = " &lt;&lt;
+selection_data.get_selection() &lt;&lt; endl;<br>
+&nbsp;&nbsp; &nbsp;cout &lt;&lt; " * target() = " &lt;&lt;
+selection_data.get_target() &lt;&lt; endl;<br>
+&nbsp;&nbsp; &nbsp;cout &lt;&lt; " * type() = " &lt;&lt;
+selection_data.get_type() &lt;&lt; endl;<br>
+&nbsp;&nbsp; &nbsp;cout &lt;&lt; " * format() = " &lt;&lt;
+selection_data.format() &lt;&lt; endl;<br>
+&nbsp;&nbsp; &nbsp;cout.setf(ios_base::hex, ios_base::basefield);<br>
+&nbsp;&nbsp; &nbsp;cout &lt;&lt; " * data() = 0x" &lt;&lt;
+reinterpret_cast&lt;unsigned int&gt;(selection_data.data()) &lt;&lt;
+endl;<br>
+&nbsp;&nbsp; &nbsp;cout.setf(ios_base::dec, ios_base::basefield);<br>
+&nbsp;&nbsp; &nbsp;cout &lt;&lt; " * length() = " &lt;&lt;
+selection_data.length() &lt;&lt; endl &lt;&lt; endl;<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// IMPORTANT - Check to see if any data was returned.<br>
+&nbsp;&nbsp; &nbsp;if (!selection_data.is_valid())<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;cout &lt;&lt; "Couldn't get the
+target's data." &lt;&lt; endl;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;return;<br>
+&nbsp;&nbsp; &nbsp;}<br>
+      <br>
+&nbsp;&nbsp; &nbsp;if (selection_data.get_target() == "TARGETS")<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;cout &lt;&lt; "The targets
+supported by the \"" &lt;&lt; selection_data.get_selection();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;cout &lt;&lt; "\" selection
+are..." &lt;&lt; endl;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;// Retrieve the target names as a
+vector of String<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;std::vector&lt;String&gt;
+atom_names;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if
+(!selection_data.get_targets(atom_names))<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;return;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;// Print out the names<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;int count = atom_names.size();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;for (int i = 0; i &lt; count; i++)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;cout &lt;&lt;
+" * " &lt;&lt; atom_names[i] &lt;&lt; endl;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;else if (selection_data.get_target() == "STRING")<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;cout &lt;&lt; "The 'STRING' data
+= " &lt;&lt; selection_data.data() &lt;&lt; endl;<br>
+&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;else if (selection_data.get_target() == "LENGTH")<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;cout &lt;&lt; "The 'LENGTH' data
+= " &lt;&lt; static_cast&lt;int&gt;(*selection_data.data()) &lt;&lt;
+endl;<br>
+&nbsp;&nbsp; &nbsp;}<br>
+}<br>
+      <br>
+// SupplySelectionButton<br>
+      <br>
+SupplySelectionButton::SupplySelectionButton()<br>
+: Gtk::ToggleButtonSignals(this)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_label("Supply Selection");<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Add STRING and LENGTH targets to the primary
+selection.<br>
+&nbsp;&nbsp; &nbsp;target_entries.push_back(Gtk::TargetEntry("STRING",
+STRING));<br>
+&nbsp;&nbsp; &nbsp;target_entries.push_back(Gtk::TargetEntry("LENGTH",
+LENGTH));<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Create the widget that will be used as the
+selection owner;<br>
+&nbsp;&nbsp; &nbsp;selection_widget = new Gtk::Invisible;<br>
+&nbsp;&nbsp; &nbsp;selection_widget-&gt;realize();<br>
+&nbsp;&nbsp;
+&nbsp;selection_widget-&gt;signal_selection_get().connect(sigc::mem_fun(this,
+&amp;SupplySelectionButton::selection_get));<br>
+&nbsp;&nbsp;
+&nbsp;selection_widget-&gt;signal_selection_clear_event().connect(sigc::mem_fun(this,
+&amp;SupplySelectionButton::selection_clear_event));<br>
+&nbsp;&nbsp;
+&nbsp;selection_widget-&gt;selection_add_targets(GDK_SELECTION_PRIMARY,
+target_entries);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Define the content the STRING target's data.<br>
+&nbsp;&nbsp; &nbsp;target_string = "This is the data of the STRING
+target.";<br>
+}<br>
+      <br>
+SupplySelectionButton::~SupplySelectionButton()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+SupplySelectionButton::on_toggled()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace std;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;if (get_active())<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if
+(selection_widget-&gt;selection_owner_set(GDK_SELECTION_PRIMARY,
+GDK_CURRENT_TIME))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;cout
+&lt;&lt; "SUCCESSFULLY GOT OWNERSHIP." &lt;&lt; endl;<br>
+&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;else<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;// If unable
+to claim ownership of selection return button to out state.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;cout
+&lt;&lt; "FAILED TO GET OWNERSHIP." &lt;&lt; endl;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;set_active(false);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;else<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;// Before clearing the selection by calling
+selection_owner_unset(),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // we check if we are the
+actual owner.<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;if
+(selection_widget-&gt;selection_owner_get(GDK_SELECTION_PRIMARY))<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;selection_owner_unset(GDK_SELECTION_PRIMARY, GDK_CURRENT_TIME);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;cout &lt;&lt;
+"SUCCESSFULLY CLEARED OWNERSHIP." &lt;&lt; endl;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;}<br>
+}<br>
+      <br>
+void<br>
+SupplySelectionButton::selection_get(Gtk::SelectionData&amp;
+selection_data, unsigned int info, unsigned int time)<br>
+{<br>
+      <br>
+&nbsp;&nbsp; &nbsp;using namespace std;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;cout &lt;&lt; "Got request for the '" &lt;&lt;
+selection_data.get_target() &lt;&lt; "' target." &lt;&lt; endl;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Set the target data for our registered targets.<br>
+&nbsp;&nbsp; &nbsp;switch (info)<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;case STRING:<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;selection_data.set<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;(<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;gdk_atom_intern("STRING", TRUE), // type<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;8,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// format<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;target_string.c_str(),&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// data<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;target_string.size()&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// data length<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;break;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;case LENGTH:<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;int length =
+target_string.size();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;selection_data.set(gdk_atom_intern("INTEGER", TRUE), 32,
+&amp;length, sizeof(length));<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;break;<br>
+&nbsp;&nbsp; &nbsp;}<br>
+      <br>
+}<br>
+      <br>
+bool<br>
+SupplySelectionButton::selection_clear_event(const
+Gdk::EventSelection&amp; event)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;if (get_active())<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;set_active(false);<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "FORCEFULLY
+CLEARED OWNERSHIP." &lt;&lt; std::endl;<br>
+&nbsp;&nbsp; &nbsp;}<br>
+&nbsp;&nbsp; &nbsp;return false;<br>
+}<br>
+      <br>
+// SelectionTest<br>
+      <br>
+SelectionTest::SelectionTest()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_title("Selection Test");<br>
+&nbsp;&nbsp; &nbsp;set_border_width(5);<br>
+&nbsp;&nbsp; &nbsp;set_has_separator(false);<br>
+&nbsp;&nbsp; &nbsp;set_resizable(false);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Add label<br>
+&nbsp;&nbsp; &nbsp;Gtk::VBox *vbox = new Gtk::VBox;<br>
+&nbsp;&nbsp; &nbsp;Gtk::HBox *hbox = new Gtk::HBox;<br>
+&nbsp;&nbsp; &nbsp;Gtk::Label *label = new Gtk::Label("Enter target
+name");<br>
+&nbsp;&nbsp; &nbsp;label-&gt;set_justify(Gtk::JUSTIFY_LEFT);<br>
+&nbsp;&nbsp; &nbsp;hbox-&gt;pack_start(*label, false, false);<br>
+&nbsp;&nbsp; &nbsp;vbox-&gt;pack_start(*hbox);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Add entry widget<br>
+&nbsp;&nbsp; &nbsp;Gtk::Entry *entry = new Gtk::Entry;<br>
+&nbsp;&nbsp; &nbsp;entry-&gt;set_text("TARGETS");<br>
+&nbsp;&nbsp; &nbsp;vbox-&gt;pack_start(*entry);<br>
+&nbsp;&nbsp; &nbsp;client_area()-&gt;pack_start(*vbox, true, true, 5);<br>
+&nbsp;&nbsp; &nbsp;client_area()-&gt;show_all();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Create a button the user can click to get
+selection targets<br>
+&nbsp;&nbsp; &nbsp;RetrieveSelectionButton *retrieve_button = new
+RetrieveSelectionButton(entry);<br>
+&nbsp;&nbsp; &nbsp;action_area()-&gt;pack_end(*retrieve_button, false,
+false);<br>
+&nbsp;&nbsp; &nbsp;retrieve_button-&gt;show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Add a button the user can toggle to claim
+ownership of the selection<br>
+&nbsp;&nbsp; &nbsp;SupplySelectionButton *supply_button = new
+SupplySelectionButton;<br>
+&nbsp;&nbsp; &nbsp;action_area()-&gt;pack_end(*supply_button, false,
+false);<br>
+&nbsp;&nbsp; &nbsp;supply_button-&gt;show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Add a button to end the program.<br>
+&nbsp;&nbsp; &nbsp;Gtk::Button *button = new Gtk::Button("Quit");<br>
+&nbsp;&nbsp; &nbsp;action_area()-&gt;pack_end(*button, false, false);<br>
+&nbsp;&nbsp;
+&nbsp;button-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;SelectionTest::dispose));<br>
+&nbsp;&nbsp; &nbsp;button-&gt;show();<br>
+}<br>
+      <br>
+SelectionTest::~SelectionTest()<br>
+{<br>
+}<br>
+      <br>
+int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace Main;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;SelectionTest window;<br>
+&nbsp;&nbsp;
+&nbsp;window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp; &nbsp;window.show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;run();<br>
+&nbsp;&nbsp; &nbsp;return 0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling Selection<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Selection in the
+&lt;examples/howto/selection&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/selection&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Selection, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+spinbutton: spinbutton.cc spinbutton.hh <br>
+&nbsp;&nbsp;&nbsp; $(CC) spinbutton.cc -o spinbutton $(CFLAGS)
+`pkg-config xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o spinbutton</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 437px; height: 144px;" alt=""
+ src="../../images/selection.png"><br>
+      </div>
+      <br>
+When the "Retrieve Selection" button is pressed, the data of the target
+is requested from the PRIMARY selection.&nbsp; When the
+Gtk::SelectionData class has been received by the
+on_selection_received() handler the values of all the class data
+members are printed to the standard output. Note, if the PRIMARY
+selection is not owned by any client the type() will be null, the
+format and data() 0, and the length() -1. <br>
+&nbsp;<br>
+Run the program from a shell. When the dialog is first displayed the
+entry widget displays the text "TARGETS". The text is highlighted,
+which means the entry widget is the current owner of the PRIMARY
+selection. When the "Retrieve Selection" button is pressed the targets
+returned are printed to the standard output. These will be the three
+mandatory ones: TIMESTAMP, TARGETS and MULTIPLE, plus those registered
+by the Entry widget: UTF8_STRING, STRING, TEXT and COMPOUND_TEXT.<br>
+&nbsp;<br>
+The "Supply Selection" button registers two targets - STRING and
+LENGTH. When toggled in, the "Supply Selection" button takes ownership
+of the primary selection. Entering STRING or LENGTH into the entry
+widget and pressing the "Retrieve Selection" button prints the values
+returned by the Gtk::SelectionData class, including the target's data,
+to the standard output. For STRING, this data is the arbitrary string
+"This is the data of the STRING target." and for LENGTH the data is 38
+- the number of characters in the STRING data.<br>
+      <br>
+For convenience, the widget requesting the selection
+"RetrieveSelectionButton" and the widget supplying the selection
+"SupplySelectionButton" are in the same application, but they could
+have been in different applications as in the GTK+ selection example.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="selections.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+    <tr>
+      <td><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

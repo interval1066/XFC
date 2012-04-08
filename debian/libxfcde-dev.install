@@ -1,0 +1,5 @@
+#debian/tmp/usr/include/xfce4/xfc/ui/*.hh
+#debian/tmp/usr/include/xfce4/xfc/ui/inline/*.inl
+debian/tmp/usr/include/xfce4/xfc/utils/*.hh
+debian/tmp/usr/include/xfce4/xfc/utils/inline/*.inl
+debian/tmp/usr/lib/pkgconfig/xfcde-*.pc

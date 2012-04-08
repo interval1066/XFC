@@ -1,0 +1,344 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: File Chooser" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>File
+Chooser</h1>
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a class="mhl" href="filechooser.html#FC01">Selection Modes</a></li>
+        <li><a class="mhl" href="filechooser.html#FC02">Adding a
+Preview Widget</a></li>
+        <li><a class="mhl" href="filechooser.html#FC03">Adding Extra
+Widgets</a></li>
+        <li><a class="mhl" href="filechooser.html#FC04">Creating a
+FileChooserDialog</a></li>
+      </ol>
+      <br>
+Starting with GTK+ 2.4, GtkFileChooser is the new set of APIs for file
+selection widgets and dialogs. Previous versions of GTK+ used
+GtkFileSelection, which had numerous problems. GtkFileChooser overcomes
+these problems and provides the programmer with a powerful file
+selection interface that has several new features. With GtkFileChooser
+you
+can select URIs rather than just local files but you must use a
+GtkFileSystem implementation that supports this, for example the
+gnome-vfs back end. GtkFileChooser lets you present a list of
+application-specific shortcut folders to the user. For example, a paint
+program may want to add a shortcut for its clipart folder.
+GtkFileChooser also lets you define custom filters so that not all the
+files in a folder are listed. For example, you could filter out backup
+files, or show only image files. <br>
+      <br>
+GtkFileChooser is an abstract interface that can be implemented by
+widgets that perform file selection tasks. The two widgets in GTK+
+that implement this interface are GtkFileChooserDialog and
+GtkFileChooserWidget. Most applications only need to use
+GtkFileChooserDialog, which is a dialog box that allows the user to
+select existing files for opening them, or to pick new filenames for
+saving documents. GtkFileChooserWidget is for special applications that
+need to embed a file selection widget inside a larger window. In the
+context of GTK+, GtkFileChooserDialog is simply a GtkDialog box with a
+GtkFileChooserWidget inside. In XFC, Gtk::FileChooser,
+Gtk::FileChooserDialog and Gtk::FileChooserWidget are the corresponding
+C++ classes
+these GTK+ objects.<br>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <h2><a name="FC01"></a>Selection
+Modes</h2>
+FileChooser can be used in two modes, to select a single file at a
+time or to select multiple files. When the user is finished selecting
+files, your
+program can retrieve the selected names as either filenames or as URIs.
+For
+URIs, the normal escaping rules are applied if the URI contains
+non-ASCII characters. However, filenames are always returned in the
+character set specified by the G_FILENAME_ENCODING environment
+variable. For this reason, FileChooser methods that pass or return a
+filename use a
+std::string as the data type, not an Xfc::String. Please see the GLib
+documentation for more details about this
+variable. <br>
+      <br>
+In single-selection mode you
+can retrieve the name of the selected file from the
+local file system as a filename or a URI:<br>
+      <br>
+      <div class="fbox"><code>std::string get_filename() const;<br>
+      <br>
+String get_uri() const;</code></div>
+      <br>
+The first method returns the name as a filename and the second as a
+fully formed URI.<br>
+      <br>
+In multiple-selection mode you can call the following methods to fill a
+vector with a list of the selected filenames or URIs:<br>
+      <br>
+      <div class="fbox"><code>bool
+get_filenames(std::vector&lt;std::string&gt;&amp; filenames) const;<br>
+      <br>
+bool
+get_uris(std::vector&lt;String&gt;&amp; uris) const;</code></div>
+      <br>
+The first method fills a vector with the
+filenames of all the selected files and subfolders in the current
+folder of the file chooser.&nbsp; The second method fills a vector with
+the URIs of all the
+selected files and subfolders. Both methods return true if any files
+were
+selected. Note that you may not be able to directly set a filename as
+the text of a
+Gtk::Label widget unless you convert it first to UTF-8, which all GTK+
+widgets expect.<br>
+      <br>
+To convert the selected filename to UTF-8 so it can be passed to a
+widget, call the static Xfc::String method:<br>
+      <br>
+      <div class="fbox"><code>String
+from_filename(const
+std::string&amp; opsysstring, G::Error *error = 0);</code></div>
+      <br>
+This method converts 'opsysstring' from the encoding used for filenames
+into a UTF-8 string. Possible errors are those defined in
+GConvertError. <br>
+      <br>
+To convert a UTF-8 string to the encoding used for filenames, call the
+Xfc::String method:<br>
+      <br>
+      <div class="fbox"><code>std::string
+to_filename(G::Error
+*error = 0) const;</code></div>
+      <br>
+To set the selection mode of the FileChooser, use the following method:
+      <br>
+      <br>
+      <div class="fbox"><code>void set_select_multiple(bool
+select_multiple);</code></div>
+      <br>
+If 'select_multiple' is true, multiple files can be selected.<br>
+      <br>
+You can configure FileChooser to select files or folders by calling
+this method:<br>
+      <br>
+      <div class="fbox"><code>void
+set_action(FileChooserAction action);</code></div>
+      <br>
+The 'action' argument can be one of the following values from the
+Gtk::FileChooserAction enum:<br>
+      <ul style="list-style-type: square;">
+        <li>FILE_CHOOSER_ACTION_OPEN - indicates open mode; The file
+chooser will only let the user pick an existing file.</li>
+        <li>FILE_CHOOSER_ACTION_SAVE - indicates save mode; The file
+chooser will let the user pick an existing file, </li>
+        <li>FILE_CHOOSER_ACTION_SELECT_FOLDER - indicates an Open mode
+for
+selecting folders; The file chooser will let the user pick an existing
+folder. </li>
+        <li>FILE_CHOOSER_ACTION_CREATE_FOLDER - indicates a mode for
+creating
+a new folder; The file chooser will let the user name an existing or
+new folder.</li>
+      </ul>
+      <br>
+      </div>
+      <div style="text-align: left;">
+      <h2><a name="FC02"></a>Adding
+a Preview Widget</h2>
+You can add a custom preview widget to a file chooser and then get
+notification about when the preview needs to be updated. <br>
+      <br>
+To install or retrieve a preview widget, use the following methods
+respectively:<br>
+      <br>
+      <div class="fbox"><code>void
+set_preview_widget(Widget&amp; preview_widget);<br>
+      <br>
+Gtk::Widget* get_preview_widget() const;</code></div>
+      <br>
+The 'preview_widget' argument is a reference to the widget that will
+display the preview. After installing the preview widget, connect to
+the FileChooser 'update-preview' signal to get notified when you need
+to update the contents of the preview. To make the connection use the
+signal's proxy signal function:<br>
+      <br>
+      <div class="fbox"><code>const UpdatePreviewSignalProxy
+signal_update_preview();</code></div>
+      <br>
+Your callback slot should call this next method to see what needs
+previewing:<br>
+      <br>
+      <div class="fbox"><code>std::string
+get_preview_filename() const;</code></div>
+      <br>
+Once you have generated the preview for the corresponding file, you
+must indicate whether your callback slot was able to successfully
+generate a preview:<br>
+      <br>
+      <div class="fbox"><code>void set_preview_widget_active(bool
+active);</code></div>
+      <br>
+Here is an example of how to install and use a preview widget:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>MyWindow::MyWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Gtk::Image *preview = new Gtk::Image;<br>
+&nbsp;&nbsp;&nbsp; file_chooser-&gt;set_preview_widget(*preview);<br>
+&nbsp;&nbsp;&nbsp;
+file_chooser-&gt;signal_update_preview().connect(sigc::bind(sigc::mem_fun(this,
+&amp;MyWindow::on_update_preview), preview);<br>
+&nbsp;&nbsp;&nbsp; ...<br>
+}&nbsp; <br>
+      <br>
+void<br>
+MyWindow::on_update_preview(Gtk::Image *preview)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; std::string filename =
+file_chooser-&gt;get_preview_filename();<br>
+&nbsp;&nbsp;&nbsp; Pointer&lt;Gdk::Pixbuf&gt; pixbuf =
+Gdk::Pixbuf::create(filename, 128, 128);<br>
+&nbsp;&nbsp;&nbsp; preview-&gt;set(pixbuf);<br>
+&nbsp;&nbsp;&nbsp;
+file_chooser-&gt;set_preview_widget_active(!preview.null());<br>
+}</code> </div>
+      <br>
+      <div style="text-align: left;">
+      <h2><a name="FC03"></a>Adding
+Extra Widgets</h2>
+You can add extra widgets to a file chooser to provide options that are
+not present in the default design. For example, you can add a toggle
+button to give the user the option to open a file in read-only mode. <br>
+      <br>
+Use the following method to insert an additional widget in a file
+chooser: <br>
+      <br>
+      <div class="fbox"><code>void
+set_extra_widget(Widget&amp; extra_widget);</code></div>
+      <br>
+The 'extra_widget' argument is the extra widget to insert. If you want
+to insert more than one extra widget in the file chooser, you can use a
+container such as a Gtk::VBox or a Gtk::Table and pack your widgets in
+it. Then, set the container as the extra widget. <br>
+      <br>
+      <h2><a name="FC04"></a>Creating
+a FileChooserDialog</h2>
+FileChooserDialog is the base class for two convenience dialogs:
+FileChooserOpenDialog
+and FileChooserSaveAsDialog. These dialogs are simpler to create
+because they use the appropriate default values. FileChooserDialog is
+derived from Gtk::Dialog and Gtk::FileChooser so it is both a Dialog
+and a FileChooser. <br>
+      <br>
+To create a FileChooserDialog, you simply call one the following
+constructors:<br>
+      <br>
+      <div class="fbox"><code>FileChooserDialog(const String&amp;
+title,
+FileChooserAction action, const
+char *backend = 0);<br>
+&nbsp;&nbsp;&nbsp; <br>
+FileChooserDialog(const
+String&amp; title, Gtk::Window *parent, FileChooserAction action, const
+char *backend = 0);</code></div>
+      <br>
+The first constructor creates a file chooser dialog with no parent. The
+second constructor creates a file chooser dialog with the specified
+parent. The 'title' argument is the name for the dialog and 'action' is
+the dialog open or save mode. The 'backend' argument is the name of the
+specific filesystem back end to use, or null for the default, which is
+usual case. <br>
+      <br>
+To create a FileChooserOpenDialog, you can call the following
+constructors:<br>
+      <br>
+      <div class="fbox"><code>FileChooserOpenDialog(Gtk::Window
+*parent = 0);<br>
+&nbsp;&nbsp; <br>
+FileChooserOpenDialog(const
+String&amp; title, Gtk::Window *parent = 0);</code></div>
+      <br>
+The first constructor creates a 'File/Open' file chooser dialog with
+the title "Open...". The second constructor creates a file chooser
+dialog using the specified title. The 'parent' argument is the
+Gtk::Window that is the transient parent for the dialog, or null if
+there is no parent.<br>
+      <br>
+To create a FileChooserSaveAsDialog, you can call the following
+constructors:<br>
+      <br>
+      <div class="fbox"><code>FileChooserSaveAsDialog(Gtk::Window
+*parent = 0);<br>
+&nbsp;&nbsp; <br>
+FileChooserSaveAsDialog(const
+String&amp; title, Gtk::Window *parent = 0);</code></div>
+      <br>
+The first constructor creates a 'File/Save as' file chooser dialog with
+the
+title "Save as...". The second constructor creates a file chooser
+dialog using the specified title. The 'parent' argument is the
+Gtk::Window that
+is the transient parent for the dialog, or null if there is no parent.<br>
+      <br>
+To add buttons to a file chooser dialog, call one of the Gtk::<a
+ href="dialogs.html">Dialog</a> add_button() methods. To display a
+modal dialog just call Gtk::Dialog::run(). Alternatively, you could
+display the dialog as an ordinary window. There is a good test program
+in the &lt;tests/filechooser&gt; subdirectory that shows you how to
+create a FileChooserDialog that uses the various options.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="filechooser.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

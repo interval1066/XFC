@@ -1,0 +1,13 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: Xfc-Core
+Description: The Xfce Foundation Classes core library
+Version: @XFC_VERSION@
+Requires: glib-2.0 gobject-2.0 sigc++-2.0 gthread-2.0 gdk-2.0
+Libs: -L${libdir} -lxfc_core
+Cflags: -I${includedir}/@XFCEDIR@
+
+

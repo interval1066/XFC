@@ -1,0 +1,681 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+  
+  
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+
+  
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+
+  
+  <meta content="Tutorial: Writing a composite statsubar" name="description">
+</head>
+
+
+<body>
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="height: 25px;" class="darkbluestripe"><br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="height: 25px;" class="greybluestripe" colspan="1" rowspan="1">
+      
+      <table style="width: 100%; text-align: left;" border="0" cellpadding="0" cellspacing="0">
+
+        <tbody>
+
+          <tr>
+
+            <td style="white-space: nowrap; width: 50%;">&nbsp;&laquo; <a class="qindexH" href="index.html">Index</a><span class="qindexH"> | </span><a class="qindexH" href="chapter04.html">Adding a menubar and toolbar</a><span class="qindexH"></span> </td>
+
+            <td style="white-space: nowrap; text-align: right; width: 50px;"><a href="pretend"><span class="qindexF"></span><span class="qindexF"></span></a><a class="qindexH" href="chapter06.html">Adding a statusbar</a> &raquo; <br>
+
+            </td>
+
+          </tr>
+
+        
+        </tbody>
+      
+      </table>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td colspan="1" rowspan="1">
+      
+      <div style="text-align: center;"><br>
+
+      </div>
+
+      
+      <h1>Chapter
+5: Writing a composite statsubar<span style="text-decoration: underline; color: rgb(21, 67, 116);"><br>
+
+      </span></h1>
+
+      <br>
+
+By now you should know how to go about adding a statusbar to XfcApp.
+You create an instance of Gtk::Statusbar and pack
+it into main_vbox. The statusbar should appear at the bottom of the
+main window so you would call pack_end(), not pack_start(). The code
+looks like this:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>#include &lt;xfc/gtk/statusbar.hh&gt;<br>
+
+      <br>
+
+Gtk::Statusbar *statusbar = new
+Gtk::Statusbar;<br>
+
+main_vbox-&gt;pack_end(*statusbar, false);<br>
+
+statusbar-&gt;show();</code> </div>
+
+      <br>
+
+It's that easy, but that's not
+what we're going to do. Instead, we will create
+composite statusbar that displays a progress bar that looks and behaves
+just like the GNOME
+appbar. The statusbar is a new widget so it should have its own header
+file
+and
+source file. I have called this widget 'Statusbar'.<br>
+
+      <br>
+
+The header file for Statusbar is &lt;statusbar.hh&gt;:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>#include &lt;xfc/gtk/statusbar.hh&gt;<br>
+
+#include &lt;xfc/gtk/progressbar.hh&gt;<br>
+
+      <br>
+
+using namespace Xfc;<br>
+
+      <br>
+
+class Statusbar : public Gtk::Statusbar<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; Gtk::ProgressBar *progress_bar_;<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; bool activity_mode_;<br>
+
+&nbsp;&nbsp;&nbsp; sigc::connection timeout_connection;<br>
+
+&nbsp;&nbsp;&nbsp; <br>
+
+&nbsp;&nbsp;&nbsp; bool on_timeout();<br>
+
+      <br>
+
+public:<br>
+
+&nbsp;&nbsp;&nbsp; Statusbar(bool show_progress);<br>
+
+&nbsp;&nbsp;&nbsp; virtual ~Statusbar();<br>
+
+&nbsp;&nbsp;&nbsp; <br>
+
+&nbsp;&nbsp;&nbsp; Gtk::ProgressBar* progress_bar() const;<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; void push(const String&amp; text);<br>
+
+&nbsp;&nbsp;&nbsp; void pop();<br>
+
+&nbsp;&nbsp;&nbsp; <br>
+
+&nbsp;&nbsp;&nbsp; void begin_progress(unsigned int interval, bool
+activity_mode = false);<br>
+
+&nbsp;&nbsp;&nbsp; void set_progress(double percentage);<br>
+
+&nbsp;&nbsp;&nbsp; void end_progress();<br>
+
+&nbsp;&nbsp;&nbsp; <br>
+
+&nbsp;&nbsp;&nbsp; sigc::signal&lt;void&gt; update_progress_signal;<br>
+
+};</code><br>
+
+      </div>
+
+      <br>
+
+The Statusbar constructor takes one argument, a bool value
+'show_progress' that if set to true
+will show the progress bar and if set to false will hide it. Statusbar
+declares a private Gtk::ProgessBar pointer and provides the public
+function, progress_bar() to return the pointer.&nbsp; You can call this
+function to show and hide the progress bar as
+required, like this:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>statusbar-&gt;progress_bar()-&gt;show();<br>
+
+      <br>
+
+statusbar-&gt;progress_bar()-&gt;hide();</code></div>
+
+      <br>
+
+The two public functions, push() and pop(), wrap the
+Gtk::Statusbar functions of the same name in a function signature that
+can be connected to the Gtk::Item "select" and "deselect" signals (see
+later). These two functions are well documented in the
+Gtk::Statusbar API reference.<br>
+
+      <br>
+
+Statusbar declares one signal called "update_progress"&nbsp; which is
+emitted to notify the user that the progress bar needs updating. This
+signal is not emitted when the progress bar is run in activity mode.<br>
+
+      <br>
+
+The source file for Statusbar is &lt;statusbar.cc&gt;:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>#include "statusbar.hh"<br>
+
+#include &lt;xfc/glib/main.hh&gt;<br>
+
+#include &lt;gconf/gconf-client.h&gt;<br>
+
+      <br>
+
+Statusbar::Statusbar(bool show_progress)<br>
+
+: activity_mode_(false)<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; progress_bar_ = new Gtk::ProgressBar;<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Use the GNOME value for
+'status_bar_meter_on_right' to place the progress bar.<br>
+
+&nbsp;&nbsp;&nbsp; GConfClient *client = gconf_client_get_default();<br>
+
+&nbsp;&nbsp;&nbsp; if (!gconf_client_get_bool(client,
+"/desktop/gnome/interface/status_bar_meter_on_right", 0))<br>
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; insert_start(*progress_bar_, 0,
+false, false);<br>
+
+&nbsp;&nbsp;&nbsp; else<br>
+
+&nbsp;&nbsp;&nbsp; {<br>
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; pack_end(*progress_bar_, false,
+false);<br>
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; set_has_resize_grip(false);<br>
+
+&nbsp;&nbsp;&nbsp; }<br>
+
+&nbsp;&nbsp;&nbsp; <br>
+
+&nbsp;&nbsp;&nbsp; set_spacing(4);<br>
+
+&nbsp;&nbsp;&nbsp; if (show_progress)&nbsp;&nbsp;&nbsp; <br>
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; progress_bar_-&gt;show();<br>
+
+&nbsp;&nbsp;&nbsp; g_object_unref(client);<br>
+
+}<br>
+
+      <br>
+
+Statusbar::~Statusbar()<br>
+
+{<br>
+
+}<br>
+
+      <br>
+
+bool<br>
+
+Statusbar::on_timeout()<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; // If actvivity mode is true just pulse the progress
+bar, otherwise emit the "update_progress" signal.&nbsp;&nbsp;&nbsp; <br>
+
+&nbsp;&nbsp;&nbsp; if (activity_mode_)<br>
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; progress_bar_-&gt;pulse();<br>
+
+&nbsp;&nbsp;&nbsp; else<br>
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; update_progress_signal.emit();<br>
+
+&nbsp;&nbsp;&nbsp; <br>
+
+&nbsp;&nbsp;&nbsp; return true;<br>
+
+}<br>
+
+      <br>
+
+Gtk::ProgressBar*<br>
+
+Statusbar::progress_bar() const<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; return progress_bar_;<br>
+
+}<br>
+
+      <br>
+
+void <br>
+
+Statusbar::begin_progress(unsigned int interval, bool activity_mode)<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; // Add a timer callback to update the value of the
+progress bar<br>
+
+&nbsp;&nbsp;&nbsp; timeout_connection =
+G::timeout_signal.connect(sigc::mem_fun(this,
+&amp;Statusbar::on_timeout), interval);<br>
+
+&nbsp;&nbsp;&nbsp; activity_mode_ = activity_mode;<br>
+
+}<br>
+
+      <br>
+
+void<br>
+
+Statusbar::set_progress(double fraction)<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; progress_bar_-&gt;set_fraction(fraction);<br>
+
+}<br>
+
+      <br>
+
+void <br>
+
+Statusbar::end_progress()<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; // Remove timeout callback<br>
+
+&nbsp;&nbsp;&nbsp; timeout_connection.disconnect();<br>
+
+}<br>
+
+      <br>
+
+void <br>
+
+Statusbar::push(const String&amp; text)<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; Gtk::Statusbar::push(text);<br>
+
+}<br>
+
+      <br>
+
+void <br>
+
+Statusbar::pop()<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; Gtk::Statusbar::pop();<br>
+
+}</code><br>
+
+      </div>
+
+      <br>
+
+The first line in the Statusbar constructor creates an instance of
+Gtk::ProgressBar.<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>progress_bar
+= new
+Gtk::ProgressBar;</code></div>
+
+      <br>
+
+In the next eight lines of code the GNOME value
+'status_bar_meter_on_right' is
+retrieved from the
+GConf database. This is a user defined value that specifies whether the
+progress bar should appear on the left or right side of a GNOME appbar.
+Depending on this value, we either insert our progress bar at position
+zero (on the left) or pack it at the end (on the right) of the
+statusbar. <br>
+
+      <br>
+
+      
+      <div class="fbox"><code>GConfClient
+*client = gconf_client_get_default();<br>
+
+if
+(!gconf_client_get_bool(client,
+"/desktop/gnome/interface/status_bar_meter_on_right", 0))<br>
+
+&nbsp;&nbsp;&nbsp; insert_start(*progress_bar, 0, false, false);<br>
+
+else<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; pack_end(*progress_bar, false, false);<br>
+
+&nbsp;&nbsp;&nbsp; set_has_resize_grip(false);<br>
+
+}</code> </div>
+
+      <br>
+
+How is this code possible? If you look in the header file
+&lt;xfc/gtk/statusbar.hh&gt; you will see that Gtk::Statusbar derives
+from Gtk::HBox. If you also take a look at the GtkStatusbar source code
+you
+will see that GtkStatusbar is a GtkHBox that has one child, a
+GtkFrame, which also has one child, a GtkLabel. Because Gtk::Stausbar
+is also a Gtk::HBox you can pack another widget into it, either before
+or after the GtkFrame.<br>
+
+      <br>
+
+The set_has_size_grip() function is called to hide the size grip if the
+progress bar is on the right. If you want to, you can call this
+function each time you show and hide the progress bar (when the
+progress bar is on the right), so that the size grip is displayed when
+the
+progress bar is hidden and the size grip is hidden when the progress
+bar is displayed.<br>
+
+      <br>
+
+For convenience, Statusbar provides three progress bar functions:
+begin_progress(), set_progress() and end_progress(). The
+first function, begin_progress(), registers our private timeout
+callback,
+on_timeout(), to be called every 'interval' milliseconds: <br>
+
+      <br>
+
+      
+      <div class="fbox"><code>void <br>
+
+Statusbar::begin_progress(unsigned int interval, bool activity_mode)<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; timeout_connection =
+G::timeout_signal.connect(sigc::mem_fun(this,
+&amp;Statusbar::on_timeout), interval);<br>
+
+&nbsp;&nbsp;&nbsp; activity_mode_ = activity_mode;<br>
+
+}<br>
+
+      </code></div>
+
+      <br>
+
+If
+'activity_mode_' is set to false, on_timeout() emits the
+"update_progress"
+signal. Otherwise on_timeout() just pulses the progress bar. The
+callback returns true to ensure that it gets called again after the
+timeout interval has elapsed. If on_timeout() returned false it would
+be disconnected and not called again.<br>
+
+      <br>
+
+Here is the on_timeout() callback:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>bool<br>
+
+Statusbar::on_timeout()<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; if (activity_mode_)<br>
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; progress_bar_-&gt;pulse();<br>
+
+&nbsp;&nbsp;&nbsp; else<br>
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; update_progress_signal.emit();<br>
+
+&nbsp;&nbsp;&nbsp; <br>
+
+&nbsp;&nbsp;&nbsp; return true;<br>
+
+}</code><br>
+
+      </div>
+
+      <br>
+
+The second function, set_progress(), calls the
+Gtk::ProgressBar::set_fraction() method which updates the progress bar:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>void<br>
+
+Statusbar::set_progress(double fraction)<br>
+
+{<br>
+
+&nbsp;&nbsp; &nbsp;progress_bar_-&gt;set_fraction(fraction);<br>
+
+}</code><br>
+
+      </div>
+
+      <br>
+
+To actually update the progress bar,
+set_progress() should be called from the user's signal handler
+connected to the
+"update_progress" signal. The
+'fraction' argument is the fraction of the task currently completed.<br>
+
+      <br>
+
+The third function, end_progress(), must be called when the task is
+complete and the user has
+finished updating the progress bar:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>void <br>
+
+Statusbar::end_progress()<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; timeout_connection.disconnect();<br>
+
+}</code><br>
+
+      </div>
+
+      <br>
+
+As you can see, end_progress() disconnects the timeout callback so it
+no longer gets called. The way this API is designed, each call to
+begin_progress() should be paired with a call to end_progress(). <br>
+
+      <br>
+
+The "update_progress" signal is a libsigc++ signal that notifies the
+user when the progress bar needs updating. It gets emitted every
+time on_timeout() is called if the progress bar is not in activity
+mode. In response to this signal, the user should recalculate the
+fraction of their task completed and call set_progress() with the new
+value to update the progress bar.<br>
+
+      <br>
+
+You can connect a signal handler to the "update_progress" signal like
+this:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>statusbar-&gt;update_progress_signal.connect(sigc::mem_fun(this,
+&amp;MyClass::on_update_progress));&nbsp;&nbsp;</code>&nbsp; <br>
+
+      </div>
+
+      <br>
+
+where on_update_progress() has the following prototype:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>void on_update_progress();</code></div>
+
+      <br>
+
+Well that's it! The ease with which you can write composite widgets is
+one of the
+advantages of programming in C++. Compare the amount of source code
+required to implement our Statusbar with that for the GNOME appbar. Our
+statusbar requires a lot less code because it takes advantage of
+inheritance which reuses existing code. <br>
+
+      <br>
+
+In the <a href="chapter06.html">next
+chapter</a> we will add
+an instance of Statusbar to our XfcApp program and link it to the
+Gtk::UIManager so that the statusbar displays an action's tooltip on
+menu item selection. <br>
+
+      <br>
+
+      
+      <div align="justify">
+      
+      <div style="text-align: left;">
+      
+      <hr style="width: 100%; height: 1px;"> </div>
+
+      </div>
+
+      
+      <table style="width: 100%; text-align: left;" border="0" cellpadding="2" cellspacing="0">
+
+        <tbody>
+
+          <tr>
+
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+
+            <td style="text-align: center;"><a class="qindexF" href="chapter05.html">Top</a><br>
+
+            </td>
+
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+
+            </td>
+
+          </tr>
+
+        
+        </tbody>
+      
+      </table>
+
+      
+      <div style="text-align: center;"><a class="qindexF" href="index.html">Index</a><br>
+
+      </div>
+
+      </td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+</body>
+</html>

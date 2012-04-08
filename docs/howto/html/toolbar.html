@@ -1,0 +1,456 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Toolbars" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Toolbars</h1>
+      <br>
+Toolbars are containers that hold instances of Gtk::ToolItem.
+Typically tool items are buttons with icons, labels and
+tooltips, but any other widget can also be put inside a tool item.
+Available <a href="toolitems.html">ToolItems</a> include ToolButton,
+ToggleToolButton and RadioToolButton.<br>
+      <br>
+Toolbar items can be arranged horizontally or vertically and can be
+displayed with icons, labels, or both. Toolbar items can be visually
+grouped by adding instances of
+Gtk::SeparatorToolItem to the toolbar. If a separator tool item has its
+'expand' property set to true and its 'draw' property set to false the
+effect is to force all following items to the end of the toolbar. <br>
+      <br>
+You can create a Toolbar with the following constructors:<br>
+      <br>
+      <div class="fbox"><code>Toolbar();<br>
+&nbsp;<br>
+Toolbar(Gtk::Orientation orientation);<br>
+      <br>
+Toolbar(Gtk::Orientation orientation, Gtk::ToolbarStyle style);</code></div>
+      <br>
+The first constructor creates a default horizontal toolbar that will
+display both icons and text. The second constructor creates a toolbar
+with the specified orientation that will display both icons and text.
+The last constructor creates a toolbar with the specified orientation
+and style. <br>
+      <br>
+The 'orientation' argument specifies the
+whether to toolbar should be horizontal or vertical and can be one of
+the values from the Gtk::Orientation enum:<br>
+      <ul style="list-style-type: square;">
+        <li>ORIENTATION_HORIZONTAL</li>
+        <li>ORIENTATION_VERTICAL</li>
+      </ul>
+The 'style' argument specifies whether the toolbar should
+display icons, text or both and can be one of the values from the
+Gtk::ToolbarStyle enum:<br>
+      <ul style="list-style-type: square;">
+        <li>TOOLBAR_ICONS - buttons display only icons in the toolbar.</li>
+        <li>TOOLBAR_TEXT - buttons display only text labels in the
+toolbar.</li>
+        <li>TOOLBAR_BOTH - buttons display text and icons in the
+toolbar.</li>
+        <li>TOOLBAR_BOTH_HORIZ - buttons display icons and text
+alongside
+each other, rather than vertically stacked.</li>
+      </ul>
+After creating a toolbar you can append an items to the end, prepend an
+items at the start or insert items at a specified position with the
+following methods: <br>
+      <br>
+      <div class="fbox"><code>void append(ToolItem&amp; item, const
+String&amp; tooltip);<br>
+&nbsp;&nbsp; <br>
+void
+prepend(ToolItem&amp; item, const
+String&amp; tooltip);<br>
+&nbsp; <br>
+void
+insert(ToolItem&amp; item, int
+pos, const String&amp;
+tooltip); </code></div>
+      <br>
+The 'item' argument is the ToolItem to add and 'tooltip' is the text
+tooltip for that item. The 'pos' argument is the position in the
+toolbar to insert the tool item. <br>
+      <br>
+Separators can be placed between tool items with the following methods:<br>
+      <br>
+      <div class="fbox"><code>void append_separator();<br>
+&nbsp;&nbsp; <br>
+void
+insert_separator(int pos);</code></div>
+      <br>
+The 'pos' argument is the position in the toolbar to insert the
+separator. <br>
+      <br>
+If it's required, the orientation of a toolbar and its style can be
+changed "on the fly" using the following methods:<br>
+      <br>
+      <div class="fbox"><code>void
+set_orientation(Gtk::Orientation orientation);<br>
+      <br>
+void
+set_style(Gtk::ToolbarStyle
+style);</code></div>
+      <br>
+You can set the text displayed as the tooltip for a tool item and the
+private text to be used, if any:<br>
+      <br>
+      <div class="fbox"><code>void set_tooltip(ToolItem&amp;
+item, const String&amp;
+tip_text, const
+String&amp; tip_private = 0);</code></div>
+      <br>
+You can set and retrieve the show_arrow property with the following
+methods:<br>
+      <br>
+      <div class="fbox"><code>void set_show_arrow(bool show_arrow);<br>
+      <br>
+bool
+get_show_arrow() const;</code></div>
+      <div style="text-align: left;"><br>
+If 'show_arrow' is true an overflow menu will be shown when the toolbar
+doesn't have enough room for all its tool items.<br>
+      <br>
+A context menu for the toolbar can be created by connecting to
+the 'popup-context-menu' signal. This signal in emitted when the user
+right-clicks inside the toolbar to display a context menu. You can
+connect to the 'popup-context-menu' signal using its proxy signal
+function:<br>
+      <br>
+      <div class="fbox"><code>const
+PopupContextMenuSignalProxy signal_popup_context_menu();</code></div>
+      <br>
+Your connected slot function should have the following signature:<br>
+      <br>
+      <div class="fbox"><code>bool function(int x, int y, int button);</code></div>
+      <br>
+The 'x' and 'y' arguments are the coordinates of the point where the
+menu should appear. The 'button' argument is the mouse button the user
+pressed, or -1. The return value should be true if the signal was
+handled and false if not.<br>
+      <br>
+      <h2><a name="example"></a>Toolbar
+Example</h2>
+Let's take a
+look at a simple Toolbar example that shows you how to build a toolbar
+without using&nbsp; the Gtk::UIManager interface or stock items. It's
+an old example that <br>
+has been updated to use the new Gtk::TooItem API.<br>
+      <br>
+The header file for the Toolbar example is &lt;toolbar.hh&gt;:<br>
+&nbsp; <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br
+ style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/dialog.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/radiobutton.hh&gt;<br
+ style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/toolbar.hh&gt;<br>
+      <br>
+using namespace
+Xfc;<br>
+      <br>
+class
+ToolbarDialog : public
+Gtk::Dialog<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Gtk::Toolbar *toolbar;<br>
+&nbsp;&nbsp;&nbsp; Gtk::ToggleToolButton *toggle_button;<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; void
+on_toggle_button();<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; ToolbarDialog();<br>
+&nbsp;&nbsp;&nbsp; virtual
+~ToolbarDialog();<br>
+};</code></div>
+      <br>
+and the source file is &lt;toolbar.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "toolbar.hh"<br
+ style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/box.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/entry.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/image.hh&gt;<br style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/handlebox.hh&gt;<br
+ style="color: rgb(51, 51, 255);">
+#include &lt;xfc/gtk/tooltips.hh&gt;<br>
+      <br>
+ToolbarDialog::ToolbarDialog()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("Toolbar Example");<br>
+&nbsp;&nbsp;&nbsp; set_size_request(600, 300);<br>
+&nbsp;&nbsp;&nbsp; set_resizable(true);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+To make it nice we'll put the toolbar into the handle box so it can be
+detached from the main window.<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; Gtk::HandleBox *handlebox = new Gtk::HandleBox;<br>
+&nbsp;&nbsp;&nbsp; client_area()-&gt;pack_start(*handlebox, false,
+false, 5);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+The toolbar will be horizontal, with both icons and text, and we'll
+also pack it into our handlebox.<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; toolbar = new
+Gtk::Toolbar(Gtk::ORIENTATION_HORIZONTAL, Gtk::TOOLBAR_BOTH);<br>
+&nbsp;&nbsp;&nbsp; handlebox-&gt;add(*toolbar);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+We need an icon with a mask (one for each button) and an image widget
+to put the icon in,<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; //
+so we'll create a separate image widget for each button).<br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; Gtk::Image *image = new Gtk::Image("gtk.xpm");<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+Create our first button, a "close" button. To destroy any widget/window
+in response<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; //
+to a button click just create a slot by calling sigc::mem_fun() using
+the inherited<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; //
+dispose method and connect it to the button.<br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; Gtk::ToolButton *tool_button = new
+Gtk::ToolButton(*image,
+"Close");<br>
+&nbsp;&nbsp;&nbsp;
+tool_button-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;ToolbarDialog::dispose)); &nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; toolbar-&gt;append(*tool_button, "Closes this app");<br>
+&nbsp;&nbsp;&nbsp; tool_button-&gt;show();<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; //
+Append a separator after the close button. append_separator() is a
+convenience method<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; //
+that is equivalent to creating a new Gtk::SeparatorToolItem and adding
+to the toolbar<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; //
+with a call to Gtk::Toolbar::append().<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; toolbar-&gt;append_separator();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+Now, let's make our radio button group. Note, rather than set up a
+separate method to change<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; //
+the toolbar style we use "sigc::bind" to bind the toolbar style each
+radio button respresents directly<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; //
+to Gtk::Toolbar::set_style() method.<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; image = new
+Gtk::Image("gtk.xpm");<br>
+&nbsp;&nbsp;&nbsp; Gtk::RadioToolButton *radio_button =
+0;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; radio_button = new
+Gtk::RadioToolButton(radio_button);<br>
+&nbsp;&nbsp;&nbsp;
+radio_button-&gt;signal_clicked().connect(sigc::bind(sigc::mem_fun(toolbar,
+&amp;Gtk::Toolbar::set_style), Gtk::TOOLBAR_ICONS)); &nbsp;&nbsp;&nbsp;
+      <br>
+&nbsp;&nbsp;&nbsp; radio_button-&gt;set_contents(*image, "Icon");<br>
+&nbsp;&nbsp;&nbsp; toolbar-&gt;append(*radio_button, "Only icons in
+toolbar");<br>
+&nbsp;&nbsp;&nbsp; radio_button-&gt;show_all();<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; // The
+following radio buttons refer to previous radio button as the group<br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; image = new
+Gtk::Image("gtk.xpm");<br>
+&nbsp;&nbsp;&nbsp; radio_button = new
+Gtk::RadioToolButton(radio_button);<br>
+&nbsp;&nbsp;&nbsp;
+radio_button-&gt;signal_clicked().connect(sigc::bind(sigc::mem_fun(toolbar,
+&amp;Gtk::Toolbar::set_style), Gtk::TOOLBAR_TEXT)); &nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; radio_button-&gt;set_contents(*image, "Text");<br>
+&nbsp;&nbsp;&nbsp; toolbar-&gt;append(*radio_button, "Only texts in
+toolbar");<br>
+&nbsp;&nbsp;&nbsp; radio_button-&gt;show_all();<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; image = new
+Gtk::Image("gtk.xpm");<br>
+&nbsp;&nbsp;&nbsp; radio_button = new
+Gtk::RadioToolButton(radio_button);<br>
+&nbsp;&nbsp;&nbsp;
+radio_button-&gt;signal_clicked().connect(sigc::bind(sigc::mem_fun(toolbar,
+&amp;Gtk::Toolbar::set_style), Gtk::TOOLBAR_BOTH)); &nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; radio_button-&gt;set_contents(*image, "Both");<br>
+&nbsp;&nbsp;&nbsp; radio_button-&gt;set_active(true);<br>
+&nbsp;&nbsp;&nbsp; toolbar-&gt;append(*radio_button, "Icons and texts
+in toolbar");<br>
+&nbsp;&nbsp;&nbsp; radio_button-&gt;show_all();<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; //
+Append a separator&nbsp;&nbsp;&nbsp; <br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; toolbar-&gt;append_separator();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+Here we have just a simple toggle button. The on_toggle_button() method
+just checks <br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; //
+the toggle button's active state and enabless/disables the tooltips
+accordingly.<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; image = new
+Gtk::Image("gtk.xpm");<br>
+&nbsp;&nbsp;&nbsp; toggle_button = new
+Gtk::ToggleToolButton;<br>
+&nbsp;&nbsp;&nbsp;
+toggle_button-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;ToolbarDialog::on_toggle_button)); &nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; toggle_button-&gt;set_contents(*image, "Tooltips");<br>
+&nbsp;&nbsp;&nbsp; toggle_button-&gt;set_active(true);<br>
+&nbsp;&nbsp;&nbsp; toolbar-&gt;append(*toggle_button, "Toolbar with or
+without tips");<br>
+&nbsp;&nbsp;&nbsp; toggle_button-&gt;show();<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; toolbar-&gt;append_separator();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+Now we pack a widget into toolbar, we only have to create it and append
+it with an appropriate tooltip.<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; Gtk::Entry *entry = new Gtk::Entry;<br>
+&nbsp;&nbsp;&nbsp; Gtk::ToolItem *tool_item = new Gtk::ToolItem(*entry);<br>
+&nbsp;&nbsp;&nbsp; toolbar-&gt;append(*tool_item, "Only icons in
+toolbar");<br>
+&nbsp;&nbsp;&nbsp; tool_item-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // The Entry
+isn't created within the toolbar, so we must still show it.<br
+ style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; entry-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; //
+That's it ! let's show everything.<br style="color: rgb(0, 0, 102);">
+&nbsp;&nbsp;&nbsp; toolbar-&gt;show();<br>
+&nbsp;&nbsp;&nbsp; handlebox-&gt;show();<br>
+}<br>
+      <br>
+ToolbarDialog::~ToolbarDialog()<br>
+{<br>
+}<br>
+      <br>
+void <br>
+ToolbarDialog::on_toggle_button() <br>
+{ <br>
+&nbsp;&nbsp;&nbsp;
+toolbar-&gt;set_tooltips(toggle_button-&gt;get_active()); <br>
+}<br>
+      <br>
+int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace
+Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; ToolbarDialog dialog;<br>
+&nbsp;&nbsp;&nbsp;
+dialog.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp;&nbsp; dialog.show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return
+0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling Toolbar<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Toolbar in the
+&lt;examples/howto/toolbar&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/toolbar&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Toolbar, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+toolbar: toolbar.cc toolbar.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) toolbar.cc -o toolbar&nbsp; $(CFLAGS)
+`pkg-config xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o toolbar</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 624px; height: 343px;" alt=""
+ src="../../images/toolbar.png"><br>
+      </div>
+      <br>
+Clicking on a toolbar button will set the corresponding toolbar
+property
+and update the toolbar appearance accordingly.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="toolbar.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

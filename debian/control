@@ -1,0 +1,76 @@
+Source: xfc
+Priority: extra
+Maintainer: Bo Lorentsen <bl@lue.dk>
+Build-Depends: libglib2.0-0 (>= 2.12), libgtk2.0-0 (>= 2.8), libglade2-dev (>= 2.6), libsigc++-2.0-dev (>= 2.0.17), libatk1.0-0 (>= 1.12), libpango1.0-dev (>= 1.14), debhelper (>= 5), autotools-dev, libxfce4util-dev (>= 4.6.0), xfce4-panel-dev (>= 4.6.0), libxfconf-0-dev (>= 4.6.0), libxfce4util4 (>= 4.6.0), xfce4-panel (>= 4.6.0), libxfconf-0-2 (>= 4.6.0), doxygen, graphviz
+Standards-Version: 3.7.2
+Section: libs
+
+Package: libxfccore-dev
+Section: libdevel
+Architecture: any
+Depends: libglib2.0-dev (>= 2.12), libsigc++-2.0-dev (>= 2.0.17), libxfccore (= ${Source-Version})
+Description: XFC core library development files
+ XFC core GUI library development files binding glib
+
+Package: libxfccore
+Section: libs
+Architecture: any
+Depends: libglib2.0-0 (>= 2.12), libsigc++-2.0-0c2a (>= 2.0.2)
+Description: XFC core library
+ XFC core GUI library binding glib
+
+Package: libxfcui-dev
+Section: libdevel
+Architecture: any
+Depends: libxfccore-dev (= ${Source-Version}), libxfcui (= ${Source-Version}), libgtk2.0-dev (>= 2.8)
+Description: XFC ui library development files
+ XFC user interface GUI library development files binding gtk2
+
+Package: libxfcui
+Section: libs
+Architecture: any
+Depends: libgtk2.0-0 (>= 2.8), libxfcui, libxfccore (= ${Source-Version})
+Description: XFC ui library
+ XFC user interface GUI library binding gtk2
+
+Package: libxfcglade-dev
+Section: libdevel
+Architecture: any
+Depends: libxfcui-dev (= ${Source-Version}), libglade2-dev ( >= 2.6.0), libxfcglade (= ${Source-Version})
+Description: XFC glade library development files
+ XFC glade GUI library development files
+
+Package: libxfcglade
+Section: libs
+Architecture: any
+Depends: libxfcui (=${Source-Version}), libglade2-0 (>= 2.6.0), libatk1.0-0 (>= 1.12.4)
+Description: XFC glade library
+ XFC glade GUI library
+
+Package: libxfcde-dev
+Section: libdevel
+Architecture: any
+Depends: libxfconf-0-dev (>= 4.6.0), libxfccore (= ${Source-Version}), libxfce4util-dev (>= 4.6.0), xfce4-panel-dev (>= 4.6.0), libxfconf-0-dev (>= 4.6.0)
+Description: Xfce4 desktop environment development files
+ Xfce desktop environment development files
+
+Package: libxfcde
+Section: libs
+Architecture: any
+Depends: libxfccore (=${Source-Version}), libxfce4util4 (>= 4.6.0), xfce4-panel (>= 4.6.0), libxfconf-0-2 (>= 4.6.0)
+Description: Xfce4 desktop environment
+ Xfce4 desktop environment code
+
+Package: xfc-demo
+Section: app
+Architecture: any
+Depends: libxfcui (= ${Source-Version})
+Description: XFC demo application
+ XFC demo application that show a bit ofwhat this framework are able to do.
+
+Package: libxfc-doc
+Section: libs
+Architecture: any
+Depends: 
+Description: XFC documentation and sample code
+ XFC documentation, references ,howto and sample code.

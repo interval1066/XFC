@@ -1,0 +1,615 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+  <meta content="Widgets: The Button Widget" name="description">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>The Button Widget</h1>
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a class="mhl" href="buttonwidget.html#BW01">Buttons</a></li>
+        <li><a class="mhl" href="buttonwidget.html#example1">Image
+Button Example</a><br>
+        </li>
+        <li><a class="mhl" href="buttonwidget.html#BW02">Toggle
+Buttons</a></li>
+        <li><a class="mhl" href="buttonwidget.html#BW03">Check
+Buttons</a></li>
+        <li><a class="mhl" href="buttonwidget.html#BW04">Radio
+Buttons</a></li>
+        <li><a class="mhl" href="buttonwidget.html#example2">Radio
+Button Example</a></li>
+      </ol>
+      <br>
+      <h2><a name="BW01"></a>Buttons</h2>
+The button widget is a simple widget that emits several signals in
+response to user action. Generally it is used to attach a function to
+that is called when the button is pressed. The various signals and how
+to use them are outlined below. <br>
+      <br>
+A button can be created with one of the following constructors:<br>
+      <br>
+      <div class="fbox"><code>Button();<br>
+&nbsp; <br>
+Button(Gtk::Image&amp; image);<br>
+&nbsp;<br>
+Button(const char *label, bool use_underline = false);<br>
+      <br>
+Button(Gtk::Image&amp; image, const String&amp; label, bool
+use_underline = false, bool horizontal = false);<br>
+&nbsp;&nbsp; <br>
+Button(const Gtk::StockId&amp; stock_id);</code><br>
+      </div>
+      <br>
+The first constructor creates an empty button which can hold any valid
+child widget. The second constructors create a button that displays a
+Gtk::Image. The third constructor creates a button that displays a text
+label. If 'use_underline' is true the string is parsed for an
+underscore preceding the mnemonic character. The fourth constructor
+creates a button that displays a Gtk::Image and a text label. If
+'horizontal' is true the text is displayed beside the image; otherwise
+its displayed underneath. The fifth constructor creates a button that
+displays a stock image and its label.<br>
+      <br>
+If you create an empty button you can call the following set methods to
+set the button contents:<br>
+      <br>
+      <div class="fbox"><code> void set_label(const String&amp; label);<br>
+      <br>
+void set_stock_id(const Gtk::StockId&amp; stock_id);<br>
+&nbsp;&nbsp; <br>
+void set_image(Gtk::Image&amp; image, const String&amp; label, bool
+use_underline = false, bool horizontal = false);</code><br>
+      </div>
+      <br>
+You can set and retrieve the button relief style by calling the
+following methods, respectively:<br>
+      <br>
+      <div class="fbox"><code>void set_relief(Gtk::ReliefStyle
+newstyle);<br>
+      <br>
+Gtk::ReliefStyle get_relief() const;</code></div>
+      <br>
+The 'newstyle' argument can be one of the following values from the
+Gtk::ReliefStyle enum:<br>
+      <ul>
+        <li>RELIEF_NORMAL</li>
+        <li>RELIEF_HALF</li>
+        <li>RELIEF_NONE</li>
+      </ul>
+Making mouse clicks on a button not grab the focus is useful in places
+like toolbars where you don't want the keyboard focus removed from the
+main area of the application. You can set this by calling:<br>
+      <br>
+      <div class="fbox"><code>void set_focus_on_click(bool
+focus_on_click);</code></div>
+      <br>
+If 'focus_on_click' is set to true, the button grabs the focus when
+clicked with the mouse.<br>
+      <br>
+If the button's child widget is of type GTK_TYPE_MISC (an image or
+label) or GTK_TYPE_ALIGNMENT you can set its vertical and horizontal
+alignment, by calling:<br>
+      <br>
+      <div class="fbox"><code>void set_alignment(float xalign, float
+yalign);</code></div>
+      <br>
+You can connect callback slots to one or more button signals using the
+following Gtk::Button proxy signal functions: <br>
+      <ul>
+        <li>signal_pressed() - emitted when the button is initially
+pressed.</li>
+        <li>signal_released() - emitted when a button which is pressed
+is released.</li>
+        <li>signal_clicked() - emitted when a button clicked on by the
+mouse.</li>
+        <li>signal_enter() - emitted when the mouse cursor enters the
+region of the button.</li>
+        <li>signal_leave() - emitted when the mouse cursor leaves the
+region of the button.</li>
+        <li>signal_activate() - emitted when the button is activated.</li>
+      </ul>
+      <br>
+      <h2><a name="example1"></a>Image Button Example</h2>
+      <div align="justify">Here's an example of a button that displays
+and image with a text label beside it, using the fourth constructor
+above. The header file for this example is &lt;buttons.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class ButtonWindow : public Gtk::Window<br>
+{<br>
+protected:<br>
+&nbsp;&nbsp; &nbsp;virtual void on_clicked();<br>
+      <br>
+public:<br>
+&nbsp;&nbsp; &nbsp;ButtonWindow();<br>
+&nbsp;&nbsp; &nbsp;virtual ~ButtonWindow();<br>
+};</code><br>
+      </div>
+      <br>
+and the source file is &lt;buttons.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "buttons.hh"<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+#include &lt;xfc/gtk/button.hh&gt;<br>
+#include &lt;xfc/gtk/image.hh&gt;<br>
+#include &lt;xfc/gtk/label.hh&gt;<br>
+#include &lt;iostream&gt;<br>
+      <br>
+// ButtonWindow<br>
+      <br>
+ButtonWindow::ButtonWindow()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_title("Image Button!");<br>
+&nbsp;&nbsp; &nbsp;set_border_width(10);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Create an image from an XPM file&nbsp;&nbsp;
+&nbsp;<br>
+&nbsp;&nbsp; &nbsp;Gtk::Image *image = new Gtk::Image("info.xpm");<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;// Create a new button<br>
+&nbsp;&nbsp; &nbsp;Gtk::Button *button = new Gtk::Button(*image, "cool
+button", false, true);<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;add(*button);<br>
+&nbsp;&nbsp; &nbsp;button-&gt;show();<br>
+}<br>
+      <br>
+ButtonWindow::~ButtonWindow()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+ButtonWindow::on_clicked()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "Hello again - cool button was
+pressed" &lt;&lt; std::endl;<br>
+}<br>
+      <br>
+int main(int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace Main;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;ButtonWindow window;<br>
+&nbsp;&nbsp;
+&nbsp;window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp; &nbsp;window.show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;run();<br>
+&nbsp;&nbsp; &nbsp;return 0;<br>
+}</code><br>
+      </div>
+      <br>
+      <div style="text-align: left;">
+      <h2>Compiling Image Button<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Image Button in the
+&lt;examples/howto/buttons&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/buttons&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Image Button, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+buttons: buttons.cc buttons.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) buttons.cc -o buttons $(CFLAGS) `pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o buttons</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      </div>
+      <br>
+      </div>
+      <div style="text-align: center;"><img
+ style="width: 204px; height: 92px;" alt=""
+ src="../../images/buttons.png"><br>
+      <br>
+      <div style="text-align: left;">To make sure the button displays
+the pixmap, launch the program from a commnad shell.<br>
+      <br>
+      <h2><a name="BW02"></a>Toggle Buttons</h2>
+Toggle buttons are derived from normal buttons and
+are very similar, except they will always be in one of two states,
+alternated by a click. They may be depressed, and when you click again,
+they will pop back up. Click again, and they will pop back down.<br>
+      <div align="justify"><br>
+Toggle buttons are the basis for check buttons and radio buttons, as
+such, many of the calls used for toggle buttons are inherited by radio
+and check buttons. These will be pointed out when we come to them.<br>
+      </div>
+      <br>
+To create a toggle button you can use one of the following constructors:<br>
+      <br>
+      <div class="fbox"><code>ToggleButton();<br>
+&nbsp;&nbsp;&nbsp; <br>
+ToggleButton(const String&amp; label, bool use_underline = false);</code><br>
+      </div>
+      <br>
+The first constructor creates an empty toggle button, and the
+second creates a toggle button with a label widget already packed into
+it. If 'use_underline'
+is true, the label is parsed for an underscore preceding the mnemonic
+character. If you create an empty toggle button you can call one of the
+Gtk::Button set methods to set the button contents.<br>
+      <br>
+To retrieve the state of the toggle widget, including radio and check
+buttons, we use a construct as shown in the example below. This tests
+the state of the toggle button, by calling its get_active() function.
+The signal of interest to us emitted by
+toggle buttons (toggle button, check button, and radio button
+widgets) is the "toggled" signal. There are two ways to check for the
+state
+of these buttons.<br>
+      <ol>
+        <li>Derive your own class from the Gtk::ToggleButton and
+Gtk::ToggleButtonSignals and override
+it's protected on_toggled() virtual signal handler.</li>
+        <li>Create an instance of the Gtk::ToggleButton class and
+connect a
+slot through it's "toggled" proxy signal function. <br>
+        </li>
+      </ol>
+Using the second method to check the state of a toggle button, you
+create a
+new button instance and connect a signal handler to it's "toggled"
+signal, like this: <br>
+      <br>
+      <div class="fbox"><code>Gtk::ToggleButton
+*button = new Gtk::ToggleButton("Button");<br>
+button-&gt;signal_toggled().connect(sigc::bind(sigc::mem_fun(this,
+&amp;MyClass::on_button_toggled), button));</code> </div>
+      <br>
+The "toggled" signal expects a signal handler that takes no arguments.
+Since on_button_toggled() takes a toggle button pointer, you have to
+bind the pointer to the slot
+so that it gets passed to on_button_toggled() every time a
+"toggled" signal is emitted. <br>
+      <br>
+To
+check the state of the toggle button use the following construct:<br>
+      <br>
+      <div class="fbox"><code>void<br>
+MyClass::on_button_toggled(Gtk::ToggleButton *button)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; if
+(button-&gt;get_active()) <br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; // If
+control reaches here, the toggle button is down<br>
+&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp; else <br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; // If
+control reaches here, the toggle button is up<br>
+&nbsp;&nbsp;&nbsp; }<br>
+}</code> </div>
+      <code><br>
+      </code>To set the state of a toggle button, and its children, the
+radio and
+check buttons, call this method:<br>
+      <br>
+      <div class="fbox"><code>void
+set_active(bool is_active);</code></div>
+      <br>
+Pass in
+true or false for the 'is_active' argument to specify whether it
+should be down (depressed) or up (released). Default is up, or false.
+Note that when you use the set_active() method, and
+the state is actually changed, it causes the "clicked" and "toggled"
+signals to be emitted from the button.<br>
+      <br>
+      <div class="fbox"><code>bool
+get_active() const;</code></div>
+      <br>
+The get_active() function returns the current state of the toggle
+button as a bool (true or false) value.<br>
+      <br>
+      <h2><a name="BW03"></a>Check Buttons</h2>
+Check buttons inherit many properties and
+functions from the toggle buttons above, but look a little different.
+Rather than being buttons with text inside them, they are small squares
+with the text to the right of them. These are often used for toggling
+options on and off in applications.<br>
+      <br>
+The constructors are similar to those of the regular buttons:<br>
+      <br>
+      <div class="fbox"><code> CheckButton();<br>
+      <br>
+CheckButton(const String&amp; label, bool
+use_underline = false);</code> </div>
+      <br>
+The second constructor&nbsp; creates a check button
+with a label beside it. Checking the state of the check button is
+identical to that of the toggle button.<br>
+      <br>
+      </div>
+      </div>
+      <h2><a name="BW04"></a>Radio Buttons</h2>
+Radio buttons are similar to check buttons except
+they are grouped so that only one may be selected (depressed) at a
+time.
+This is good for places in your application where you need to select
+from a short list of options. <br>
+      <br>
+Radio button widgets are created by calling one of the following
+constructors:<br>
+      <br>
+      <div class="fbox"><code>RadioButton();<br>
+&nbsp;&nbsp; <br>
+RadioButton(const RadioButton *group);<br>
+&nbsp;&nbsp; <br>
+RadioButton(const RadioButton *group, const String&amp; label, bool
+use_underline = false);</code><br>
+      </div>
+      <br>
+The first constructor creates a new radio button in a new group. To be
+of any practical value, a widget should be packed into the radio
+button. The second constructor creates a new radio button and adds it
+to the same group that 'group' is a member of. The third constructor
+does the same as the second but it also lets you set the radio button
+label. You can pass null as the 'group' argument if the radio button is
+the first in a group. In subsequent calls, a radio button from the
+group you wish to add this button to should be passed as an argument.<br>
+      <br>
+Alternatively, you can set and retrieve the group a RadioButton is
+assigned to by calling the following methods respectively:<br>
+      <br>
+      <div class="fbox"><code>void set_group(Group *group);<br>
+      <br>
+Group* get_group() const;</code></div>
+      <br>
+Group is just a typedef for the real group, a GSList.&nbsp;<span
+ style="font-family: monospace;"></span>The group list does not need to
+be freed, as each RadioButton will remove itself and its list item when
+it is destroyed. <br>
+      <br>
+It is also a good idea to explicitly set which button in the group
+should be the
+default selected button with the Gtk::ToggleButton method:<br>
+      <br>
+      <div class="fbox"><code>void
+set_active(bool is_active);</code></div>
+      <br>
+      <div align="justify">
+      <div style="text-align: left;">
+      <h2><a name="example2"></a>Radio Button Example</h2>
+Here is a simple program that displays a window containing three radio
+buttons. The header file for this example is &lt;radiobutton.hh&gt;<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+#include &lt;xfc/gtk/radiobutton.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class RadioButtonWindow : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp; &nbsp;void on_toggled(const Gtk::RadioButton *button);<br>
+&nbsp;&nbsp; &nbsp; <br>
+public:<br>
+&nbsp;&nbsp; &nbsp;RadioButtonWindow();<br>
+&nbsp;&nbsp; &nbsp;~RadioButtonWindow();<br>
+};</code><br>
+      </div>
+      <br>
+and the source file is &lt;radiobutton.cc&gt;<br>
+      <br>
+      <div class="fbox"><code>#include "radiobuttons.hh"<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+#include &lt;xfc/gtk/separator.hh&gt;<br>
+#include &lt;iostream&gt;<br>
+      <br>
+RadioButtonWindow::RadioButtonWindow()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_title("Radio Buttons");<br>
+&nbsp;&nbsp; &nbsp;set_border_width(0);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Gtk::VBox *box1 = new Gtk::VBox;<br>
+&nbsp;&nbsp; &nbsp;add(*box1);<br>
+&nbsp;&nbsp; &nbsp;box1-&gt;show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Gtk::VBox *box2 = new Gtk::VBox(false, 10);<br>
+&nbsp;&nbsp; &nbsp;box2-&gt;set_border_width(10);<br>
+&nbsp;&nbsp; &nbsp;box1-&gt;pack_start(*box2);<br>
+&nbsp;&nbsp; &nbsp;box2-&gt;show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// When adding the first radio button to a group
+pass null for the group paramter.<br>
+&nbsp;&nbsp; &nbsp;Gtk::RadioButton *radio_button = 0;<br>
+&nbsp;&nbsp; &nbsp;radio_button = new Gtk::RadioButton(radio_button,
+"button1");<br>
+&nbsp;&nbsp;
+&nbsp;radio_button-&gt;signal_toggled().connect(sigc::bind(sigc::mem_fun(this,
+&amp;RadioButtonWindow::on_toggled), radio_button));<br>
+&nbsp;&nbsp; &nbsp;box2-&gt;pack_start(*radio_button);<br>
+&nbsp;&nbsp; &nbsp;radio_button-&gt;show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Then, pass a pointer to a radio button already in
+the group to the constructor of the other buttons.<br>
+&nbsp;&nbsp; &nbsp;radio_button = new Gtk::RadioButton(radio_button,
+"button2");<br>
+&nbsp;&nbsp;
+&nbsp;radio_button-&gt;signal_toggled().connect(sigc::bind(sigc::mem_fun(this,
+&amp;RadioButtonWindow::on_toggled), radio_button));<br>
+&nbsp;&nbsp; &nbsp;radio_button-&gt;set_active(true);<br>
+&nbsp;&nbsp; &nbsp;box2-&gt;pack_start(*radio_button);<br>
+&nbsp;&nbsp; &nbsp;radio_button-&gt;show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;radio_button = new Gtk::RadioButton(radio_button,
+"button3");<br>
+&nbsp;&nbsp;
+&nbsp;radio_button-&gt;signal_toggled().connect(sigc::bind(sigc::mem_fun(this,
+&amp;RadioButtonWindow::on_toggled), radio_button));<br>
+&nbsp;&nbsp; &nbsp;box2-&gt;pack_start(*radio_button);<br>
+&nbsp;&nbsp; &nbsp;radio_button-&gt;show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Gtk::HSeparator *separator = new Gtk::HSeparator;<br>
+&nbsp;&nbsp; &nbsp;box1-&gt;pack_start(*separator, false);<br>
+&nbsp;&nbsp; &nbsp;separator-&gt;show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;box2 = new Gtk::VBox(false, 10);<br>
+&nbsp;&nbsp; &nbsp;box2-&gt;set_border_width(10);<br>
+&nbsp;&nbsp; &nbsp;box1-&gt;pack_start(*box2, false);<br>
+&nbsp;&nbsp; &nbsp;box2-&gt;show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Gtk::Button *button = new Gtk::Button("close");<br>
+&nbsp;&nbsp;
+&nbsp;button-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;RadioButtonWindow::dispose));<br>
+&nbsp;&nbsp; &nbsp;box2-&gt;pack_start(*button);<br>
+&nbsp;&nbsp; &nbsp;button-&gt;set_flags(Gtk::CAN_DEFAULT);<br>
+&nbsp;&nbsp; &nbsp;button-&gt;grab_default();<br>
+&nbsp;&nbsp; &nbsp;button-&gt;show();<br>
+}<br>
+      <br>
+RadioButtonWindow::~RadioButtonWindow()<br>
+{<br>
+}<br>
+      <br>
+void <br>
+RadioButtonWindow::on_toggled(const Gtk::RadioButton *button)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;if (button-&gt;get_active())<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;std::cout &lt;&lt; "Selected:
+radio " &lt;&lt; button-&gt;get_label() &lt;&lt; std::endl;<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;<br>
+}<br>
+      <br>
+int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace Main;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;RadioButtonWindow window;<br>
+&nbsp;&nbsp;
+&nbsp;window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp; &nbsp;window.show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;run();<br>
+&nbsp;&nbsp; &nbsp;return 0;<br>
+}</code><br>
+      </div>
+      <br>
+      <h2>Compiling Radio Button<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Radio Button in the
+&lt;examples/howto/radionbuttons&gt; source directory along with a Makefile.
+If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/radionbuttons&gt; subdirectory.
+In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Radio Button, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+radiobuttons: radiobuttons.cc radiobuttons.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) radiobuttons.cc -o radiobuttons $(CFLAGS)
+`pkg-config xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o radiobuttons</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 207px; height: 199px;" alt=""
+ src="../../images/radiobuttons.png"><br>
+      </div>
+      <br>
+Launch the program from a shell. When you change the radio button
+selected the button's label text is sent to stdout.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="buttonwidget.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

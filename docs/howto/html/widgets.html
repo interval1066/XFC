@@ -1,0 +1,623 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+  <meta content="Widgets" name="description">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> <span class="qindexH"></span><span
+ class="qindexH"></span><span class="qindexH"></span> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Widgets</h1>
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a class="mhl" href="widgets.html#W01">Overview</a></li>
+        <li><a class="mhl" href="widgets.html#W02">Life Cycle of&nbsp;
+a
+Widget</a></li>
+        <li><a class="mhl" href="widgets.html#W03">Setting Widget
+Attributes</a></li>
+        <li><a class="mhl" href="widgets.html#W04">Other Widget Concepts</a><br>
+        </li>
+        <li><a class="mhl" href="widgets.html#W05">Writing Your Own
+Widgets</a></li>
+      </ol>
+      <br>
+      <h2><a name="W01"></a>Overview</h2>
+A widget is the on-screen representation of a graphical user
+interface element that
+can be manipulated by the user. Windows, menus, buttons and scrollbars
+are all examples of widgets. A widget type is implemented as a
+class that defines the functionality and attributes of a widget.
+Widgets are arranged into a hierarchy of classes. Each widget in the
+hierarchy inherits the attributes of its base widget class and adds
+some new
+functionality. For example, Gtk::Dialog is derived from Gtk::Window so
+it is a window, but it comes prepacked with a vertical box, a
+horizontal button box and a horizontal separator. <br>
+      <br>
+There are
+several ways to classify widgets:<br>
+      <ul>
+        <li><span style="font-weight: bold;">Containers</span>
+are widgets that store other widgets inside, such as <a
+ href="boxes.html">boxes</a>
+and <a href="tables.html">tables</a>.
+Containers can be subdivided into those that add functionality to a
+single child (such as Button, Frame, or EventBox), and those that
+manage layout for multiple widgets (such as Box or Table). <br>
+        </li>
+        <li><span style="font-weight: bold;">Composite</span><span
+ style="font-weight: bold;">
+widgets</span> are containers that
+come prepacked with useful child widgets.
+For example, the FileChooserDialog is a subclass of Gtk::Window
+that contains a combobox, several dialog
+buttons and a TreeView widget to display a list of files. Composite
+widgets are easy to write and are a
+convenient way to reuse code in an application.</li>
+        <li><span style="font-weight: bold;">Non-container
+widgets</span> can be actual
+controls (buttons or scroll bars), information displays
+(labels),
+or decorative elements (separators). Widgets that need to receive
+events or draw their own background have an associated Gdk::Window.
+Widgets that have no Gdk::Window draw on their parent container and are
+called 'no window' widgets.<br>
+        </li>
+      </ul>
+Gtk::Widget is
+the base class for all widgets in XFC. Widgets are very easy to use.
+You
+can create an instance of a standard widget and add it
+to a container, you can derive your own widget class from a standard
+widget and add some new functionality, you can write a <a
+ href="composite_widgets.html">composite widget</a>,
+or you can
+create your own <a href="custom_widgets.html">custom widget</a>
+class from scratch. Widgets provide public methods
+that can be called to set widget-specific attributes such as widget
+size or position. When
+a user interacts with a widget,
+such as pulling down a menu and making a selection, clicking a button,
+or moving a scrollbar the widget emits a signal. An application needs
+to respond to these signal emissions by calling a callback slot that
+you
+supply.
+A callback slot is a C++ function object (functor) that calls the class
+member or static function
+that you want attached to a user action.<br>
+      <br>
+      <h2><a name="W02"></a>Life
+Cycle of a<span style="font-weight: bold;"> </span>Widget </h2>
+      <h2><span class="qindexF"></span></h2>
+Widget resource and <a href="object_system.html#OS05">memory
+management</a> is mostly automatic
+in XFC. However, there are a couple
+of
+'gotchas' to keep in mind if
+you're doing more complicated things. Internally, a <a
+ href="object_system.html#OS04">reference
+count</a> is maintained for all
+widgets (actually, all G::Objects). Widgets begin
+their life with an initial reference count of 1. At this stage the
+widget is said to be 'floating' and
+is flagged as such. Removing a widget's initial
+reference is called 'sinking' the floating object and would
+destroy the widget if the floating reference was the only one. <br>
+      <br>
+Containers first reference and then sink any floating widgets that are
+added to them. By sinking a widget, a container 'takes ownership' of it
+for resource management purposes. Thus, the reference count of the
+widget remains 1, but the object is no longer flagged as floating. When
+a widget is removed from a container, or the container is
+destroyed, the reference count is decremented to 0. When an object's
+reference count reaches 0, it is destroyed. <br>
+      <br>
+In practice, this means that you only have to destroy top level
+widgets; any widgets that are inside a container will be destroyed
+along with the container. There's a danger here, however. Sometimes you
+want to remove a widget
+from a container; perhaps some element of your interface is optional or
+only appears under certain circumstances. When you remove the widget
+(using Gtk::Container::remove()), it will be unreferenced, its
+reference count will drop to 0, and it will be destroyed. To avoid this
+situation, you should add a reference to the widget before you remove
+it. <br>
+      <br>
+Use the following inherited G::Object methods to manipulate a widget's
+reference count:<br>
+      <br>
+      <div class="fbox"><code>virtual
+void ref();<br>
+      <br>
+virtual void unref();</code> </div>
+      <br>
+The ref() and unref() methods respectively increment and decrement the
+reference count of a widget. They are declared virtual for XFC's
+internal use only and are not meant to be overridden. The reason ref()
+and unref() are declared virtual is so XFC can handle
+floating references automatically, which leads to the next point.
+The first call to ref() will automatically reference and then sink a
+widget if it has been flagged as floating, so there is no sink function.<br>
+      <br>
+To safely remove a widget from a container, you might
+do this:<br>
+      <br>
+      <div class="fbox"><code>widget-&gt;ref();<br>
+container-&gt;remove(*widget);</code></div>
+      <br>
+The widget now has one
+reference, held by your code. At some point you will need to release
+the
+reference, destroying the widget. It would make sense to do so after
+re-adding the widget to some other container. Removing
+widgets from containers is uncommon; in general it's
+faster to simply hide the widget with Gtk::Widget::hide(), then show it
+again with Gtk::Widget::show() some
+later time. <br>
+      <br>
+A widget can be destroyed at any
+time by calling its inherited dispose method:<br>
+      <br>
+      <div class="fbox"><code>widget-&gt;dispose();</code></div>
+      <br>
+Destroying a widget frees any associated memory and resources. If
+the widget is inside a container, it is automatically removed from the
+container before it's destroyed. <br>
+      <br>
+It is important to remember these few simple rules: <br>
+      <ul>
+        <li> You must destroy any
+top level widgets when you are done with them, but child widgets are
+destroyed automatically. </li>
+        <li> If you want to
+remove a widget from a container without destroying it, you must first
+add a reference to the widget. </li>
+        <li> If you add a
+reference to a widget, you are responsible for unreferencing the widget
+again when you're done with it.</li>
+      </ul>
+      <span style="font-weight: bold;"><br>
+      </span>
+      <h2><span style="font-weight: bold;"><a name="W03"></a></span>Setting
+Widget Attributes</h2>
+      <h2><span style="font-weight: bold;"></span></h2>
+After creating a widget you will need to set one or more attributes so
+it behaves as expected. The universal attribute you need to
+set&nbsp; is the widget's visibility flag. This is done by calling
+one
+of the following Gtk::Widget show methods:<br>
+      <br>
+      <div class="fbox"><code>void
+show();<br>
+      <br>
+void show_all();</code> </div>
+      <br>
+Any widget that isn't shown will not appear on the screen. If you want
+to show all the widgets in a container, it's easier to call show_all()
+rather individually calling show()
+for each widget. Remember, you have to show the containers containing a
+widget,
+in addition to the widget itself, before it will appear on screen. <br
+ style="text-decoration: underline;">
+      <br>
+The hide methods reverse the effects of the show methods causing the
+widget to be hidden (invisible to the user):<br>
+      <br>
+      <div class="fbox"><code>void
+hide();<br>
+      <br>
+void hide_all();</code> </div>
+      <br>
+The show() and hide() methods are also signals and so have
+corresponding proxy signal functions and virtual signal handlers. You
+seldom, if ever, need to connect to or override these signals.<br>
+      <br>
+For widgets that can be 'activated' (such as buttons and menu items)
+the
+next method activates them:<br>
+      <br>
+      <div class="fbox"><code>bool
+activate();</code></div>
+      <br>
+Activation is what happens when you press
+'Enter' on a widget during key navigation; clicking a button, selecting
+a
+menu item, etc. If the widget can't be activated, the method returns
+false.<br>
+      <br>
+Rather than move a widget from one container to another yourself you
+can call the following method:<br>
+      <br>
+      <div class="fbox"><code>void
+reparent(Gtk::Widget&amp; new_parent);</code></div>
+      <br>
+which reparents the widget handling the reference counting
+issues to avoid destroying the widget. The 'new_parent' argument is the
+new container for the widget.<br>
+      <br>
+When you want a widget to have the keyboard
+focus call this next method. <br>
+      <br>
+      <div class="fbox"><code>void
+grab_focus();</code></div>
+      <br>
+The widget must be a focusable widget, such as a Gtk::Entry;
+something like Gtk::Frame won't work. (More precisely, it must have the
+Gtk::CAN_FOCUS flag set.)<br>
+      <br>
+Widgets can be named, which allows you to refer to them from a gtkrc
+file. You can apply a style to widgets with a particular name in the
+gtkrc file (see the GTK+ documentation for more information). Call the
+following methods to set
+and get a widget name:<br>
+      <br>
+      <div class="fbox"><code>void
+set_name(const String&amp; name);<br>
+      <br>
+String get_name() const;</code> </div>
+      <br>
+You can set the minimum size of a widget; that is, the widget's 'size
+request':<br>
+      <br>
+      <div class="fbox"><code>void
+set_size_request(int width, int height);</code></div>
+      <br>
+The 'width' and 'height' are the width and height the widget should
+request, in pixels, or -1 to unset, in which case the natural size
+request will be used instead. The size request of a widget is the
+smallest size a
+widget can accept while still functioning well and drawing itself
+correctly. In some strange cases a widget may be allocated less than
+its
+requested size, and in many cases a widget may be allocated more space
+than it requested. Passing (0,0) to this method means 'as small as
+possible'. <br>
+      <br>
+      <samp></samp>In
+most cases, Gtk::Window::set_default_size() is a
+better choice for
+top level windows than this method; setting the default size will still
+allow users to shrink the window. Setting the size request will force
+them to leave the window at least as large as the size request. <br>
+      <br>
+      <u>Note the inherent danger
+of setting any fixed size; themes,
+translations into other languages, different fonts, and user action can
+all change the appropriate size for a given widget. So, it's basically
+impossible to hard code a size that will always be correct.<br>
+      </u><br>
+You can also get the size request for a widget that was explicitly set
+using set_size_request(). <br>
+      <br>
+      <div class="fbox"><code>void
+get_size_request(int *width, int *height) const;</code></div>
+      <br>
+A return value of -1 for width or
+height indicates that that dimension has not been set explicitly and
+the
+natural requisition of the widget is being being used.<br>
+      <br>
+Commonly you will want to alter one or more widget style attributes.
+You should not call this method unless you know what you are doing:<br>
+      <br>
+      <div class="fbox"><code>void
+set_style(Gtk::Style&amp; style);</code></div>
+      <br>
+It interacts badly with themes, because
+themes work by replacing the Gtk::Style. Instead, you should use
+one of the Gtk::Widget 'modify style' methods:<br>
+      <br>
+      <div class="fbox"><code>void
+modify_style(Gtk::RcStyle&amp;
+style);<br>
+      <br>
+void modify_fg(StateType state, const Gdk::Color*
+color);<br>
+      <br>
+void modify_bg(StateType state, const Gdk::Color
+*color);<br>
+      <br>
+void modify_text(StateType state, const Gdk::Color
+*color);<br>
+      <br>
+void modify_base(StateType state, const Gdk::Color
+*color);<br>
+      <br>
+void modify_font(const Pango::FontDescription
+*font_desc);</code><br>
+      </div>
+      <br>
+The first method, modify_style(), allows you to set multiple attributes
+at one time by specifying a new RcStyle. Modifications made using this
+method take precedence over style values set via an RC file.
+RcStyle&nbsp; is designed so each field can either be set or unset,
+so
+it is possible, using this method, to modify some style values and
+leave the others unchanged. Modifications made take precedence over
+style values set via an RC file, however, they will be
+overridden if a style is explicitly set on the widget using
+set_style(). Modifications made are not cumulative with previous calls
+to modify_style() or with such
+functions as modify_fg(). If you wish to retain previous values, you
+must first call
+get_modifier_style(), make your modifications to the returned style,
+then
+call modify_style() with that style. On the other hand, if you first
+call
+modify_style(), subsequent calls to such methods as modify_fg() will
+have a
+cumulative effect with the initial modifications.<br>
+      <br>
+The other modify methods are convenience methods that let you change
+one style attribute. modify_fg() and modify_bg() set the foreground and
+background colors respectively for a widget in
+a particular state. modify_text() and modify_base() set the text and
+base colors respectively for a widget in
+a particular state. modify_font() sets the font to use for the widget.<br>
+      <br>
+To modify the font a label widget should use, do something like this:<br>
+      <br>
+      <div class="fbox"><code>Pango::FontDescription
+font_desc(font_name);<br>
+label-&gt;modify_font(&amp;font_desc);<br>
+      </code> </div>
+      <br>
+      <h2><a name="W04"></a>Other
+Widget Concepts</h2>
+There are a few other widget concepts that you need to be aware of,
+including
+sensitivity, focus and widget states. <br>
+      <h3><span style="font-weight: bold;">Sensitivity</span></h3>
+      <h3> </h3>
+Widgets can be sensitive or insensitive. Insensitive widgets are grayed
+out and do not respond to user input. Insensitive widgets are known as
+inactive, disabled, or ghosted in some other toolkits. You can call the
+following method to change a widget's sensitivity:<br>
+      <br>
+      <div class="fbox"><code>void
+set_sensitive(bool sensitive);</code></div>
+      <br>
+If the 'sensitive' argument is true, the user can interact with the
+widget, otherwise the widget is insensitive. By default GTK+ sets the
+sensitivity to true. A widget is only 'really' sensitive if all its
+parents are sensitive. The sensitivity of a widget can be tested with
+the following three
+functions:<br>
+      <br>
+      <div class="fbox"><code>bool
+is_sensitive() const;<br>
+      <br>
+bool sensitive() const;<br>
+      <br>
+bool parent_sensitive() const;<br>
+      </code></div>
+      <br>
+sensitive() returns true if the widget is sensitive and
+parent_sensitive() returns true if the widget's parent is sensitive.
+is_sensitive() returns true only if both the widget and
+all its parents are sensitive. The sensitivity of the widget itself
+only matters if the widget's parent is sensitive. For example, you can
+set the sensitivity of an entire container full of widgets just by
+setting the sensitivity of the container.<br>
+      <h3>Focus</h3>
+Within each top-level window, only one widget at a time can have the
+keyboard focus. Any key events received by the top-level window are
+forwarded to the focused widget. This is important because typing
+something on the keyboard should have only one effect - changing only
+one text entry field, for example. <br>
+      <br>
+Most widgets will give some visual indication that they have the
+current focus. Using the default GTK+ theme, the focused widget is
+typically surrounded by a thin black frame. The user can move the focus
+between widgets, using the arrow keys or the Tab key. Focus can also
+move to a widget if the user clicks it. <br>
+      <br>
+The following two functions test whether a widget can have, or has the
+focus:<br>
+      <br>
+      <div class="fbox"><code>bool
+can_focus() const;<br>
+      <br>
+bool has_focus() const;</code><br>
+      </div>
+      <br>
+can_focus() returns true if a widget is able to handle focus grabs and
+has_focus() returns true if a widget has grabbed the focus, and no
+other widget has done so more recently. The concept of focus is
+important for keyboard navigation. For example, pressing Enter or the
+space bar 'activates' many widgets if they have the focus; you can move
+between buttons with the Tab key, and press one with Space, for example.<br>
+      <br>
+      <div class="fbox"><code>bool
+is_focus() const;</code><br>
+      </div>
+      <br>
+The is_focus() function returns true if the widget is the focus widget
+within its top-level window. <br>
+      <br>
+      <div class="fbox"><code>void
+grab_focus();</code><br>
+      </div>
+      <br>
+Calling grab_focus() causes the widget to have the keyboard focus for
+the window it's inside. The widget must be a focusable widget, such as
+an Entry; something like Frame won't work. More precisely, can_focus()
+must return true.<br>
+      <h3>Grabs</h3>
+Widgets can grab the pointer and keyboard away from other widgets. This
+essentially means that the widget becomes 'modal': input goes only to
+that widget, and the focus can't be changed to another widget. A
+typical reason to grab input is to create a modal dialog; if a window
+has the grab, interaction with other windows is blocked. The widget
+grab methods are declared in the Main namespace. <br>
+      <br>
+      <div class="fbox"><code>void
+Main::grab_add(Gtk::Widget&amp;
+widget);</code><br>
+      </div>
+      <br>
+After calling grab_add() to make 'widget' the current grab widget, all
+mouse and keyboard interaction with other widgets in the same
+application is blocked. To remove the grab from the current grab widget
+call:<br>
+      <br>
+      <div class="fbox"><code>void
+Main::grab_remove(Gtk::Widget&amp;
+widget);</code></div>
+      <br>
+You have to pair calls to grab_add() and grab_remove(). To determine if
+a widget currently has the grab call this next function:<br>
+      <br>
+      <div class="fbox"><code>Gtk::Widget*
+Main::grab_get_current();</code></div>
+      <br>
+If no widget has the grab, grab_get_current() returns null. These grabs
+are a GTK+ concept and only grab events away from other widgets in the
+same
+application. There is another, GDK-level grab; a GDK keyboard or
+pointer grab
+occurs on an X-server-wide basis, with other applications unable to
+receive keyboard or mouse events. <br>
+      <br>
+To perform a GDK keyboard or pointer grab call the following
+Gtk::Widget methods:<br>
+      <br>
+      <div class="fbox"><code>Gdk::GrabStatus
+keyboard_grab(bool
+owner_events, unsigned int time);<br>
+      <br>
+Gdk::GrabStatus pointer_grab(Gdk::EventMaskField event_mask, Widget
+*confine_to, Gdk::Cursor *cursor, bool owner_events, unsigned int time</code><code></code><code>);</code><br>
+      </div>
+      <br>
+A call to either of these functions overrides any previous keyboard or
+pointer grab by this client. Most of the arguments in these two methods
+have default values, so they're easy to use. The widget's GDK window
+will own the grab until there is a corresponding call to
+keyboard_ungrab() or pointer_ungrab(), or the grab widget becomes
+unviewable. Like the GTK+ grab functions, keyboard_grab() must be
+paired with a call to keyboard_ungrab(), and pointer_grab must be
+paired with a call to pointer_ungrab().<br>
+      <br>
+      <div class="fbox"><code>void
+Gdk::keyboard_ungrab(unsigned int
+time = GDK_CURRENT_TIME);<br>
+      <br>
+      </code><code></code><code>void
+Gdk::pointer_ungrab(unsigned int
+time = GDK_CURRENT_TIME);</code><code><br>
+      </code></div>
+      <br>
+These two functions ungrab for the default display only. To ungrab for
+a specific display, there are two equivalent ungrab methods declared in
+Gdk::Display.<br>
+      <br>
+      <h3>Widget States</h3>
+Widgets have states which determine their appearance. The exact meaning
+and visual representation of a given state depends on the particular
+widget and the current theme. A widget's state can be one of the
+following values
+from the Gtk::StateType enum:
+      <ul>
+        <li>STATE_NORMAL - just
+like it sounds, the state during normal
+operation.<br>
+        </li>
+        <li>STATE_ACTIVE - a
+button is currently pressed in, or a check
+box is currently checked, for example. </li>
+        <li>STATE_PRELIGHT - the
+mouse is over the widget (and
+typically clicking would have some effect). Buttons "highlight" when
+you move over them, for example. </li>
+        <li>STATE_SELECTED - the
+widget is in a list or other set of
+alternatives, and is the currently selected option. </li>
+        <li>STATE_INSENSITIVE -
+the widget is inactive, or unresponsive
+and will not respond to user input. </li>
+      </ul>
+You can retrieve the current state of a widget by calling the following
+function:<br>
+      <br>
+      <div class="fbox">Gtk::StateType
+get_state() const;<br>
+      </div>
+      <br>
+      <h2><a name="W05"></a>Writing Your Own Widgets</h2>
+Although XFC comes with many types of widgets that should cover your
+most basic needs, there will come a time when you need to create your
+own new widget type. Writing a new widget in XFC is a lot easier that
+in GTK+. That's because C can only try to be an object orientated
+language; C++ is inherently object orientated. How many times have you
+had to rewrite C functions for a new widget. In C++ you write it once
+and use it over and over again. But it's not all that simple. A new
+widget written in XFC can only be used in an XFC application. If you
+want a new widget that can be used by other language bindings then you
+need to write the GTK+ widget in C.<br>
+&nbsp;<br>
+Since XFC uses widget inheritance extensively, if there is already a
+widget that is close to what you want, it is often possible to write a
+useful new widget type in just a few lines of code. This is often the
+case when writing a new compostie widget. Writing a new widget from
+scratch is somewhat harder because it requires more code to implement.
+If you are unfamiliar with writing your own widgets there are two
+examples you can work through. The <a href="composite_widgets.html">Tictactoe</a>
+example shows you how to write a new composite widget and the <a
+ href="custom_widgets.html">Dial</a>
+example shows you how to write a
+new widget from scratch. Both examples are well documented and are
+discussed in detail.<br>
+      <br>
+      <span style="font-weight: bold;"></span>
+      <hr style="width: 100%; height: 1px;" noshade="noshade"><span
+ style="font-weight: bold;"></span><span style="font-weight: bold;"></span>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="widgets.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

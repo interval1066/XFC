@@ -1,0 +1,1059 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+  <meta content="Widgets: The Drawing Area Widget" name="description">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td class="greybluestripe" colspan="1" rowspan="1">&nbsp;&laquo; <a
+ class="qindexH" href="../../index.html">Main Page</a><span
+ class="qindexH"> | </span><a class="qindexH" href="index.html">Index</a></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>The Drawing Area Widget<br>
+      </h1>
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a class="mhl" href="drawingarea.html#DA01">Overview</a><br>
+        </li>
+        <li><a class="mhl" href="drawingarea.html#DA02">Event Handling</a></li>
+        <li><a class="mhl" href="drawingarea.html#example1">A Simple
+Drawing Area<br>
+          </a></li>
+        <li><a class="mhl" href="drawingarea.html#example2">The
+Scribble Example</a></li>
+      </ol>
+      <br>
+      <h2><a name="DA01"></a>Overview<br>
+      </h2>
+The Gtk::DrawingArea widget is used for
+creating custom user interface elements. It's essentially a blank
+widget with a GDK window you can draw on. A drawing area is created
+using one of the following constructors:<br>
+      <br>
+      <div class="fbox"><code>DrawingArea();<br>
+      <br>
+DrawingArea(int width,
+int height);</code> </div>
+      <br>
+      <div align="justify">
+      <div style="text-align: left;">The
+'width' and 'height' are the
+default size for the drawing area. If you use the first constructor you
+can
+set the default size later by calling the Gtk::Widget method:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>void set_size_request(int width, int
+height);</code></div>
+      <br>
+      <div style="text-align: left;">Since GTK+ 2.0, widgets are double
+buffered by
+default. 'Double buffered' simply means that all drawing to a widget's
+GDK window is diverted to an off-screen buffer, and after the last
+"expose_event" the buffer is drawn to the screen. The result is that
+users see the window update in one smooth step, and don't see
+individual
+graphics primitives being rendered. In very simple terms, double
+buffered widgets don't flicker, so you
+would only turn off double buffering if you had special needs and
+really
+knew what you were doing. <br>
+      <br>
+To turn off double buffering call the following Gtk::Widget method,
+with 'double_buffered' set to false:</div>
+      <br>
+      <div class="fbox"><code>void
+set_double_buffered(bool
+double_buffered);</code></div>
+      <br>
+      <div style="text-align: left;">It
+should be noted that when you
+create a drawing area widget, you are
+completely responsible for drawing its contents. If your window is
+obscured then uncovered, the widget is sent an "expose_event" signal
+and must redraw what
+was previously hidden. Having to remember everything that was drawn on
+the screen so you can
+properly redraw it can, to say the least, be a nuisance. In addition,
+it
+can be visually distracting if portions of the window are cleared, then
+redrawn step by step. The solution to this problem is to use an
+off-screen backing pixmap. Instead of drawing directly to the screen,
+draw to an image stored in server memory but not displayed, then when
+the image changes or new portions of the image are displayed, copy
+the relevant portions onto the screen.<br>
+      <br>
+After creating a drawing area widget, your application will need to
+connect to
+one or more of the following signals:<br>
+      <ul>
+        <li>Mouse and button press
+signals, to respond to input from
+the user. </li>
+        <li>The "realize" signal
+to take any necessary actions when the
+widget is instantiated on a particular display (such as creating GDK
+resources). </li>
+        <li>The "configure_event"
+signal to take any necessary actions
+when the widget changes size. </li>
+        <li>The "expose_event"
+signal to handle redrawing the contents
+of the widget.</li>
+      </ul>
+To receive keyboard events, you will need
+to set the Gtk::CAN_FOCUS flag on the drawing area: <br>
+      <br>
+      <div class="fbox"><code>widget-&gt;set_flags(Gtk::CAN_FOCUS);</code></div>
+      <br>
+You should probably
+draw some user-visible indication that the drawing area is focused. Use
+the Gtk::Widget::has_focus() function in your expose event handler to
+decide
+whether to draw the focus indicator. See Gtk::Style::draw_focus() for
+one way
+to draw focus.<br>
+      <br>
+Expose events are normally delivered when a drawing area first comes
+on screen, or when it's covered by another window and then uncovered
+(exposed). You can also force an expose event by adding to the "damage
+region" of the drawing area's window; Gtk::Widget::queue_draw_area()
+and Gdk::Window::invalidate_rect() are equally good ways to do this.
+You'll
+then get an expose event for the invalid region. <br>
+      <br>
+      </div>
+      </div>
+      <h2><a name="DA02"></a>Event
+Handling</h2>
+      <div align="justify">
+      <div style="text-align: left;">GTK+
+provides widget signals for lower-level
+GDK events, such as
+the mouse being moved, or a key being pressed. The handlers for these
+signals have a parameter which is a reference to a class containing
+information about the event. For instance, motion event handlers are
+passed a reference to a Gdk::EventMotion class, which looks like this:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>class
+EventMotion : public EventAny<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; GdkEventMotion* gdk_event_motion() const;<br>
+&nbsp; <br>
+&nbsp;&nbsp; &nbsp;unsigned int time() const;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;double x() const;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;double y() const;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;int x_int() const;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;int y_int() const;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;double* axes() const;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;ModifierTypeField state() const;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;bool is_hint() const;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Device* device() const;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;double x_root() const;<br>
+&nbsp; <br>
+&nbsp;&nbsp; &nbsp;double y_root() const;<br>
+};</code><br>
+      </div>
+      <br>
+      </div>
+All events inherit the following methods from Gdk::EventAny:<br>
+      <br>
+      <div class="fbox"><code>Gdk::EventType
+type() const;<br>
+      <br>
+Gdk::Window* window() const;</code> </div>
+      <br>
+      <div style="text-align: left;">The
+type() function returns the type of event, in this
+case
+Gdk::MOTION_NOTIFY, and window() returns the Gdk::Window in which the
+event
+occurred. The x() and y() functions return the coordinates of the event
+as a double and x_int() and y_int() return the coordinates of the event
+as an integer. The x_root() and y_root() functions return the
+coordinates of the event relative to the root (0, 0) of the screen. The
+state() function returns the modifier state when the event occurred
+(that is, it
+specifies which modifier keys and mouse buttons were pressed), and is
+the
+bitwise OR of one or more of the following values in the
+Gdk::ModifierType enum:<br>
+      </div>
+      <ul>
+        <li>SHIFT_MASK</li>
+        <li>LOCK_MASK</li>
+        <li>CONTROL_MASK</li>
+        <li>MOD1_MASK</li>
+        <li>MOD2_MASK</li>
+        <li>MOD3_MASK</li>
+        <li>MOD4_MASK</li>
+        <li>MOD5_MASK</li>
+        <li>BUTTON1_MASK</li>
+        <li>BUTTON2_MASK</li>
+        <li>BUTTON3_MASK</li>
+        <li>BUTTON4_MASK</li>
+        <li>BUTTON5_MASK</li>
+        <li>RELEASE_MASK</li>
+        <li>MODIFIER_MASK</li>
+      </ul>
+      <div align="justify">As
+with other signals, to determine what
+happens
+when a GDK event occurs, you can either explicitly connect a signal
+handler through a proxy signal function, or you can derive a new widget
+class and override one or more of its Gtk::WidgetSignals virtual signal
+handlers for the events you are interested in. <br>
+      <br>
+You would connect to the "motion_notify_event" using its proxy signal
+function like this:<br>
+      <br>
+      <div class="fbox"><code>widget-&gt;signal_motion_notify_event().connect(sig::mem_fun(this,
+&amp;MyWindow::motion_notify_event_handler))</code></div>
+      <br>
+where 'motion_notify_event_handler' has the following prototype:<br>
+      <br>
+      <div class="fbox"><code>bool
+function(const Gdk::EventMotion&amp; event);</code></div>
+      <br>
+You also need to let
+GTK+ know which events you want to be notified about. To do this, call
+one of the following Gtk::Widget methods:<br>
+      <br>
+      </div>
+      <div class="fbox"><code>void
+add_events(Gdk::EventMaskField
+events);</code><br>
+      <code><br>
+void
+set_events(Gdk::EventMaskField events);</code></div>
+      <br>
+      <div align="justify">
+      <div style="text-align: left;">The
+'events' argument is the event mask which determines which events a
+widget will receive. It can be one or more OR'd bit values from the
+Gdk::EventMask enum:<br>
+      <ul>
+        <li>EXPOSURE_MASK</li>
+        <li>POINTER_MOTION_MASK</li>
+        <li>POINTER_MOTION_HINT_MASK</li>
+        <li>BUTTON_MOTION_MASK</li>
+        <li>BUTTON1_MOTION_MASK</li>
+        <li>BUTTON2_MOTION_MASK</li>
+        <li>BUTTON3_MOTION_MASK</li>
+        <li>BUTTON_PRESS_MASK</li>
+        <li>BUTTON_RELEASE_MASK</li>
+        <li>KEY_PRESS_MASK</li>
+        <li>KEY_RELEASE_MASK</li>
+        <li>ENTER_NOTIFY_MASK</li>
+        <li>LEAVE_NOTIFY_MASK</li>
+        <li>FOCUS_CHANGE_MASK</li>
+        <li>STRUCTURE_MASK</li>
+        <li>PROPERTY_CHANGE_MASK</li>
+        <li>VISIBILITY_NOTIFY_MASK</li>
+        <li>ROXIMITY_IN_MASK</li>
+        <li>PROXIMITY_OUT_MASK</li>
+        <li>SUBSTRUCTURE_MASK</li>
+        <li>SCROLL_MASK</li>
+        <li>ALL_EVENTS_MASK</li>
+      </ul>
+Both methods enable the events specified in the event mask, however,
+add_events() adds 'events' to the widget's existing event mask, whereas
+set_events() replaces the widget event mask with 'events'. Keep in mind
+that different widgets have different default event masks, and by
+changing the event mask you may disrupt a widget's functionality, so be
+careful. <br>
+      </div>
+      <br>
+There are a few subtle points that have to
+be
+observed when calling set_events(). First, it must be
+called before the GDK window for a widget is created (that is, before
+the widget is realized). In practical terms,
+this means you should call it immediately after creating a widget.
+Consider using add_events() for widgets that are already realized, or
+if you want to preserve the existing event mask. Second, the widget
+must have an associated GDK window. For efficiency,
+many widget types do not have their own window, but draw in their
+parent's window. The following widgets do this:<br>
+      <br>
+      <table
+ style="background-color: rgb(133, 147, 179); width: 591px; height: 124px; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellpadding="4" cellspacing="1">
+        <tbody>
+          <tr>
+            <td
+ style="background-color: rgb(248, 249, 253); width: 25%;">Gtk::Alignment<br>
+Gtk::Arrow<br>
+Gtk::AspectFrame<br>
+Gtk::Bin<br>
+Gtk::Box<br>
+Gtk::Button<br>
+            </td>
+            <td
+ style="background-color: rgb(248, 249, 253); width: 25%;">Gtk::CheckButton<br>
+Gtk::Fixed<br>
+Gtk::Frame<br>
+Gtk::Image<br>
+Gtk::Label<br>
+Gtk::MenuItem<br>
+            </td>
+            <td
+ style="background-color: rgb(248, 249, 253); width: 25%;">Gtk::Notebook<br>
+Gtk::Paned<br>
+Gtk::RadioButton<br>
+Gtk::Range<br>
+Gtk::ScrolledWindow<br>
+Gtk::Separator<br>
+            </td>
+            <td
+ style="background-color: rgb(248, 249, 253); width: 25%;"><samp></samp>
+            <samp></samp><samp></samp>Gtk::Table<br>
+Gtk::Toolbar<br>
+Gtk::VBox<br>
+Gtk::HBox<br>
+Gtk::VSeparator<br>
+Gtk::HSeparator </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><small
+ style="color: rgb(17, 55, 95);">Widgets with no GDK
+window</small><br>
+      </div>
+      </div>
+      <ul>
+      </ul>
+      <div align="justify">To
+capture events for these widgets, place them inside an <a
+ href="eventbox.html">EventBox</a>
+widget.<br>
+      </div>
+      <br>
+      <h2><a name="example1"></a>A
+Simple Drawing Area</h2>
+The following code demonstrates using a drawing area to display
+a circle in a widget with the foreground color set to blue. Note that
+GDK
+automatically clears the exposed area to the background color before
+sending the expose event, and that drawing is implicitly clipped to the
+exposed area. <br>
+      <br>
+The source file the this example is &lt;simple.cc&gt;<br>
+      <br>
+      <div class="fbox">#include
+&lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/drawingarea.hh&gt;<br>
+#include &lt;xfc/gtk/style.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+#include &lt;xfc/gdk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class Window : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp; &nbsp;Gtk::DrawingArea *area;<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp; &nbsp;bool on_area_expose_event(const
+Gdk::EventExpose&amp; event);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp; &nbsp;Window();<br>
+};<br>
+      <br>
+Window::Window()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;area = new Gtk::DrawingArea(100, 100);<br>
+&nbsp;&nbsp;
+&nbsp;area-&gt;signal_expose_event().connect(sigc::mem_fun(this,
+&amp;Window::on_area_expose_event));<br>
+&nbsp;&nbsp; &nbsp;add(*area);<br>
+&nbsp;&nbsp; &nbsp;area-&gt;show();<br>
+&nbsp;}<br>
+      <br>
+bool<br>
+Window::on_area_expose_event(const Gdk::EventExpose&amp; event)<br>
+{<br>
+&nbsp;&nbsp;
+&nbsp;area-&gt;get_window()-&gt;draw_arc(*area-&gt;get_style()-&gt;fg_gc(area-&gt;get_state()),
+// context<br>
+&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0, 0, // x, y,<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+area-&gt;get_allocation().width(), //
+width<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+area-&gt;get_allocation().height(), //
+height<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0, 64 * 360); //
+angle1, angle2<br>
+&nbsp;&nbsp; &nbsp;return true;<br>
+}<br>
+      <br>
+int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace Main;<br>
+&nbsp;&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Window window;<br>
+&nbsp;&nbsp;
+&nbsp;window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp;&nbsp; &nbsp;window.show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;run();<br>
+&nbsp;&nbsp;&nbsp; &nbsp;return 0;<br>
+};<br>
+      </div>
+      <br>
+      <h2>Compiling Simple<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Simple in the
+&lt;examples/howto/drawingarea&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/drawingarea&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for S, add the following lines to a
+new text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+simple: simple.cc<br>
+&nbsp;&nbsp;&nbsp; $(CC) simple.cc -o simple $(CFLAGS) `pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o simple</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 161px; height: 179px;" alt=""
+ src="../../images/simple.png"><br>
+      </div>
+      <div style="text-align: left;"><br>
+      </div>
+      <h2><a name="example2"></a>The
+Scribble Example</h2>
+In this section, we will build a simple drawing
+program called Scribble. In the process, we will examine how to
+handle mouse events, how to draw in a window, and how to do the drawing
+using a backing pixmap. This is a port of an older GTK+ example still
+in
+the current release. If you ever need to turn double buffering
+off, and draw to an off-screen buffer yourself, this example shows you
+how.<br>
+      <br>
+Since GTK+ 2.0, widgets are double buffered by
+default. "Double buffered" simply means that all drawing to a widget's
+Gdk::Window is diverted to an off-screen buffer, and after the last
+"expose_event" the buffer is drawn to the screen. The result is that
+users see the window update in one smooth step, and don't see
+individual
+graphics primitives being rendered. In very simple terms, double
+buffered widgets don't flicker, so you
+would only turn off double buffering if you had special needs and
+really
+knew what you were doing.<br>
+      <br>
+      <h3>Events</h3>
+      <div style="text-align: left;">For
+our drawing program, we want to know when the
+mouse button is pressed and when the mouse is moved, so we specify
+Gdk::POINTER_MOTION_MASK and Gdk::BUTTON_PRESS_MASK. We also want to
+know when we need to redraw our window, so we specify
+Gdk::EXPOSURE_MASK. Although we want to be notified via a configure
+event when our window size changes, we don't have to specify the
+corresponding Gdk::STRUCTURE_MASK flag, because it is automatically
+specified for all windows.<br>
+      </div>
+      <br>
+It turns out that there is a problem with just specifying
+Gdk::POINTER_MOTION_MASK. This will cause the server to add a new
+motion
+event to the event queue every time the user moves the mouse. Imagine
+that it takes us 0.1 seconds to handle a motion event, but the X server
+queues a new motion event every 0.05 seconds. We will soon get way
+behind with the users drawing. If the user draws for 5 seconds, it will
+take us another 5 seconds to catch up after they release the mouse
+button! What we would like is to only get one motion event for each
+event we process. The way to do this is to specify
+Gdk::POINTER_MOTION_HINT_MASK. <br>
+      <br>
+When we specify Gdk::POINTER_MOTION_HINT_MASK, the server sends us a
+motion event the first time the pointer moves after entering our
+window,
+or after a button press or release event. Subsequent motion events will
+be suppressed until we explicitly ask for the position of the pointer
+using the Gdk::Window method:<br>
+      <br>
+      <div class="fbox"><code>Gdk::Window*
+get_pointer(int *x, int *y,
+Gdk::ModifierTypeField *mask) const;</code></div>
+      <br>
+There is another function,
+Gtk::Widget::get_pointer() which has a simpler interface, but turns out
+not to be very useful, since it only retrieves the position of the
+mouse, not whether the buttons are pressed.<br>
+      <br>
+In Scribble, we derive a new DrawingArea from Gtk::DrawingArea and
+Gtk::WidgetSignals and
+override the following virtual signal handlers: <br>
+      <br>
+      <div class="fbox"><code>virtual
+bool on_expose_event(const Gdk::EventExpose&amp; event);<br>
+      <br>
+virtual bool on_configure_event(const Gdk::EventConfigure&amp;
+event);<br>
+      <br>
+virtual bool on_button_press_event(const Gdk::EventButton&amp;
+event);<br>
+      <br>
+virtual bool on_motion_notify_event(const Gdk::EventMotion&amp;
+event);</code><br>
+      </div>
+      <br>
+We still have to let GTK+ know which events to notify us about. The
+code
+that does this is:<br>
+      <br>
+      <div class="fbox"><code>Gdk::EventMaskField
+flags = get_events();<br>
+flags |= (Gdk::LEAVE_NOTIFY_MASK | Gdk::BUTTON_PRESS_MASK |
+Gdk::POINTER_MOTION_MASK | Gdk::POINTER_MOTION_HINT_MASK);<br>
+set_events(flags);</code></div>
+      <br>
+      <div style="text-align: left;">We'll
+save the "expose_event" and "configure_event"
+handlers for later. The "motion_notify_event" and "button_press_event"
+handlers are pretty simple:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>bool <br>
+DrawingArea::on_button_press_event(const Gdk::EventButton&amp;
+event)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;if (event.button() == 1
+&amp;&amp; pixmap)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;draw_brush(event.x(), event.y());<br>
+      <br>
+&nbsp;&nbsp; &nbsp;return true;<br>
+}<br>
+      <br>
+bool<br>
+DrawingArea::on_motion_notify_event(const Gdk::EventMotion&amp;
+event)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;int x, y;<br>
+&nbsp;&nbsp; &nbsp;Gdk::ModifierTypeField state;<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;if (event.is_hint())<br>
+&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;
+&nbsp;event.window()-&gt;get_pointer(&amp;x, &amp;y,
+&amp;state);<br>
+&nbsp;&nbsp; &nbsp;else<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;x =
+(int)event.x();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;y =
+(int)event.y();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;state =
+event.state();<br>
+&nbsp;&nbsp; &nbsp;}<br>
+      <br>
+&nbsp;&nbsp; &nbsp;if (state &amp; Gdk::BUTTON1_MASK
+&amp;&amp; pixmap)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;draw_brush(x, y);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;return true;<br>
+}<br>
+      </code></div>
+      <br>
+      <h3>Creating an off-screen
+pixmap</h3>
+To create an offscreen pixmap, we call the following constructor:<br>
+      <br>
+      <div class="fbox"><code>Gdk::Pixmap(const
+Gdk::Window&amp;
+window, int width, int height);</code></div>
+      <br>
+The 'window' argument specifies the
+Gdk::Window that the new pixmap takes some of its properties from. The
+'width'
+and 'height' arguments specify the size of the pixmap. <br>
+      <br>
+      <h3>The "configure_event"
+handler</h3>
+We create the off-screen pixmap in the "configure_event" handler. This
+event is generated whenever the window changes size, including when it
+is initially created.<br>
+      <br>
+      <div align="justify">
+      <div style="text-align: left;">
+      <div class="fbox"><code>bool <br>
+DrawingArea::on_configure_event(const Gdk::EventConfigure&amp;
+event)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; if (pixmap)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;pixmap-&gt;unref();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;pixmap = new Gdk::Pixmap(*get_window(),
+get_allocation().width(), get_allocation().height());<br>
+&nbsp;&nbsp;&nbsp;
+pixmap-&gt;draw_rectangle(*(get_style()-&gt;white_gc()),
+0, 0, get_allocation().width(), get_allocation().height());<br>
+&nbsp;&nbsp; &nbsp;return true;<br>
+}<br>
+      </code></div>
+      <code><br>
+      </code>The call to
+Gdk::Drawable::draw_rectangle() clears
+the pixmap initially to white. We'll say more about that in a moment.<br>
+      <br>
+      <h3>The "expose_event"
+handler</h3>
+The expose event handler simply copies the relevant portion of
+the pixmap onto the screen (we determine the area we need to redraw by
+using the event.area() field of the exposure event):<br>
+      <br>
+      <div class="fbox"><code>bool<br>
+DrawingArea::on_expose_event(const Gdk::EventExpose&amp; event)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;
+get_window()-&gt;draw_drawable(*(get_style()-&gt;fg_gc(get_state())),
+*pixmap, event.area(), event.area().x(), event.area().y());<br>
+&nbsp;&nbsp; &nbsp;return false;<br>
+}</code><br>
+      </div>
+      <br>
+      <h3>Drawing Primitives</h3>
+We've now seen how to keep the screen up to date
+with our pixmap, but how do we actually draw interesting stuff on our
+pixmap? There are a large number of calls in Xfc::Gdk library for
+drawing on drawables. A drawable is simply something that can be drawn
+upon. It can be a window, a pixmap, or a bitmap (a black and white
+image). We've already seen two such calls above,
+Gdk::Drawable::draw_rectangle()
+and&nbsp;Gdk::Drawable:draw_drawable().
+The complete list of Gdk::Drawable methods is:<br>
+      <div align="justify">
+      <ul>
+        <li>draw_point()</li>
+        <li>draw_points()</li>
+        <li>draw_line()</li>
+        <li>draw_lines()</li>
+        <li>draw_segments()</li>
+        <li>draw_rectangle()</li>
+        <li>draw_arc()</li>
+        <li>draw_polygon()</li>
+        <li>draw_drawable()</li>
+        <li>draw_image()</li>
+        <li>draw_glyphs()</li>
+        <li>draw_layout_line()</li>
+        <li>draw_layout()</li>
+        <li>draw_pixbuf()</li>
+        <li>draw_rgb_image()</li>
+        <li>draw_rgb_image_dithalign()</li>
+        <li>draw_rgb_32_image()</li>
+        <li>draw_rgb_32_image_dithalign()</li>
+        <li>draw_gray_image()</li>
+        <li>draw_indexed_image()</li>
+      </ul>
+See the the header file
+&lt;xfc/gdk/drawable.hh&gt; for further details on these
+methods. These
+methods all share the same first argument - a reference to a graphics
+context (Gdk::GC).<br>
+      <br>
+A graphics context encapsulates information about things such as
+foreground and background color and line width. Gdk::GC has a full set
+of methods for creating and modifying graphics contexts, but to keep
+things simple we'll just use predefined graphics contexts. Each widget
+has an associated style (which can be modified in a gtkrc file). This,
+among other things, stores a number of graphics contexts. Some examples
+of accessing these graphics contexts are:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>widget-&gt;get_style()-&gt;white_gc();<br>
+      <br>
+widget-&gt;get_style()-&gt;black_gc();<br>
+      <br>
+widget-&gt;get_style()-&gt;fg_gc(Gtk::STATE_NORMAL);<br>
+      <br>
+widget-&gt;get_style()-&gt;bg_gc(widget-&gt;get_state());</code></div>
+      <br>
+      <div align="justify">The
+fg_gc() and bg_gc() methods take a single parameter, the
+Gtk::StateType, which can be
+one
+of the values from the Gtk::StateType enumeration:<br>
+      </div>
+      <ul>
+        <li>STATE_NORMAL,</li>
+        <li>STATE_ACTIVE,</li>
+        <li>STATE_PRELIGHT,</li>
+        <li>STATE_SELECTED,</li>
+        <li>STATE_INSENSITIVE</li>
+      </ul>
+      <div align="justify">For
+instance, for Gtk::STATE_SELECTED the default
+foreground color is white and the default background color is dark blue.<br>
+      </div>
+      <br>
+Our draw_brush() method, which does the actual drawing on the screen,
+is then:<br>
+      <br>
+      <div class="fbox"><code>void<br>
+DrawingArea::draw_brush(double x, double y)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Gdk::Rectangle update_rect((int)x - 5,
+(int)y - 5, 10, 10);<br>
+&nbsp;&nbsp;
+&nbsp;pixmap-&gt;draw_rectangle(*(get_style()-&gt;black_gc()),
+update_rect);<br>
+&nbsp;&nbsp; &nbsp;queue_draw_area(update_rect);<br>
+}</code><br>
+      </div>
+      <br>
+After we draw the rectangle representing the brush onto the pixmap, we
+call one of the following Gtk::Widget methods:<br>
+      <br>
+      <div class="fbox"><code>void
+queue_draw_area(int x, int y, int width, int height);<br>
+      <br>
+void queue_draw_area(const Gdk::Rectangle&amp; rectangle);</code> </div>
+      <br>
+which notifies X that the area given needs to be
+updated. X will eventually generate an expose event which will cause
+our
+expose event handler to copy the relevant portions to the screen.<br>
+      <br>
+We have now covered the entire drawing program except for a few mundane
+details like creating the main window.<br>
+      <br>
+      <h3>The Complete
+Scribble Source Code</h3>
+The header file for the Scribble example is &lt;scribble.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include
+&lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/drawingarea.hh&gt;<br>
+#include &lt;xfc/gtk/widgetsignals.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class DrawingArea : public Gtk::DrawingArea, protected
+Gtk::WidgetSignals<br>
+{<br>
+&nbsp;&nbsp; &nbsp;Gdk::Pixmap *pixmap;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;void draw_brush(double x, double y);<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp; &nbsp;virtual bool on_expose_event(const
+Gdk::EventExpose&amp; event);<br>
+&nbsp;&nbsp; &nbsp;virtual bool on_configure_event(const
+Gdk::EventConfigure&amp; event);<br>
+&nbsp;&nbsp; &nbsp;virtual bool on_button_press_event(const
+Gdk::EventButton&amp; event);<br>
+&nbsp;&nbsp; &nbsp;virtual bool
+on_motion_notify_event(const Gdk::EventMotion&amp; event);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp; &nbsp;DrawingArea();<br>
+&nbsp;&nbsp; &nbsp;virtual ~DrawingArea();<br>
+};<br>
+      <br>
+class ScribbleWindow : public Gtk::Window<br>
+{<br>
+public:<br>
+&nbsp;&nbsp; &nbsp;ScribbleWindow();<br>
+&nbsp;&nbsp; &nbsp;virtual ~ScribbleWindow();<br>
+};</code><br>
+      </div>
+      <br>
+and the source file is &lt;scribble.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include
+"scribble.hh"<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+#include &lt;xfc/gtk/button.hh&gt;<br>
+#include &lt;xfc/gtk/style.hh&gt;<br>
+#include &lt;xfc/gdk/color.hh&gt;<br>
+#include &lt;xfc/gdk/gc.hh&gt;<br>
+#include &lt;xfc/gdk/pixmap.hh&gt;<br>
+#include &lt;xfc/gdk/window.hh&gt;<br>
+      <br>
+// DrawingArea<br>
+      <br>
+DrawingArea::DrawingArea()<br>
+: Gtk::WidgetSignals(this),<br>
+&nbsp; pixmap(0)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_size_request(200, 200);<br>
+&nbsp;&nbsp; &nbsp;set_double_buffered(false);<br>
+&nbsp;&nbsp; &nbsp;Gdk::EventMaskField flags = get_events();<br>
+&nbsp;&nbsp; &nbsp;flags |= (Gdk::LEAVE_NOTIFY_MASK |
+Gdk::BUTTON_PRESS_MASK | Gdk::POINTER_MOTION_MASK |
+Gdk::POINTER_MOTION_HINT_MASK);<br>
+&nbsp;&nbsp; &nbsp;set_events(flags);<br>
+}<br>
+      <br>
+DrawingArea::~DrawingArea()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;if (pixmap)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;pixmap-&gt;unref();<br>
+}<br>
+      <br>
+bool<br>
+DrawingArea::on_expose_event(const Gdk::EventExpose&amp; event)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;// Redraw the screen from the backing
+pixmap<br>
+&nbsp;&nbsp;
+&nbsp;get_window()-&gt;draw_drawable(*(get_style()-&gt;fg_gc(get_state())),
+*pixmap, event.area(), event.area().x(), event.area().y());<br>
+&nbsp;&nbsp; &nbsp;return false;<br>
+}<br>
+      <br>
+bool <br>
+DrawingArea::on_configure_event(const Gdk::EventConfigure&amp;
+event)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;// Create a new backing pixmap of the
+appropriate size<br>
+&nbsp;&nbsp; &nbsp;if (pixmap)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;pixmap-&gt;unref();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;pixmap = new Gdk::Pixmap(*get_window(),
+get_allocation().width(), get_allocation().height());<br>
+      <br>
+&nbsp;&nbsp;
+&nbsp;pixmap-&gt;draw_rectangle(*(get_style()-&gt;white_gc()),
+0, 0, get_allocation().width(), get_allocation().height());<br>
+&nbsp;&nbsp; &nbsp;return true;<br>
+}<br>
+      <br>
+bool <br>
+DrawingArea::on_button_press_event(const Gdk::EventButton&amp;
+event)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;if (event.button() == 1
+&amp;&amp; pixmap)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;draw_brush(event.x(), event.y());<br>
+      <br>
+&nbsp;&nbsp; &nbsp;return true;<br>
+}<br>
+      <br>
+bool<br>
+DrawingArea::on_motion_notify_event(const Gdk::EventMotion&amp;
+event)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;int x, y;<br>
+&nbsp;&nbsp; &nbsp;Gdk::ModifierTypeField state;<br>
+&nbsp;&nbsp; &nbsp;<br>
+&nbsp;&nbsp; &nbsp;if (event.is_hint())<br>
+&nbsp;&nbsp; &nbsp; &nbsp;&nbsp;
+&nbsp;event.window()-&gt;get_pointer(&amp;x, &amp;y,
+&amp;state);<br>
+&nbsp;&nbsp; &nbsp;else<br>
+&nbsp;&nbsp; &nbsp;{<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;x =
+(int)event.x();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;y =
+(int)event.y();<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;state =
+event.state();<br>
+&nbsp;&nbsp; &nbsp;}<br>
+      <br>
+&nbsp;&nbsp; &nbsp;if (state &amp; Gdk::BUTTON1_MASK
+&amp;&amp; pixmap)<br>
+&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;draw_brush(x, y);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;return true;<br>
+}<br>
+      <br>
+void<br>
+DrawingArea::draw_brush(double x, double y)<br>
+{<br>
+&nbsp;&nbsp; &nbsp;// Draw a rectangle on the screen<br>
+&nbsp;&nbsp; &nbsp;Gdk::Rectangle update_rect((int)x - 5,
+(int)y - 5, 10, 10);<br>
+&nbsp;&nbsp;
+&nbsp;pixmap-&gt;draw_rectangle(*(get_style()-&gt;black_gc()),
+update_rect);<br>
+&nbsp;&nbsp; &nbsp;queue_draw_area(update_rect);<br>
+}<br>
+      <br>
+// ScribbleWindow<br>
+      <br>
+ScribbleWindow::ScribbleWindow()<br>
+{<br>
+&nbsp;&nbsp; &nbsp;set_name("Test Input");<br>
+      <br>
+&nbsp;&nbsp; &nbsp;Gtk::VBox *vbox = new Gtk::VBox;<br>
+&nbsp;&nbsp; &nbsp;add(*vbox);<br>
+&nbsp;&nbsp; &nbsp;vbox-&gt;show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// Create the drawing area<br>
+&nbsp;&nbsp; &nbsp;DrawingArea *drawing_area = new
+DrawingArea;<br>
+&nbsp;&nbsp; &nbsp;vbox-&gt;pack_start(*drawing_area);<br>
+&nbsp;&nbsp; &nbsp;drawing_area-&gt;show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;// And a quit button<br>
+&nbsp;&nbsp; &nbsp;Gtk::Button *button = new
+Gtk::Button("Quit");<br>
+&nbsp;&nbsp; &nbsp;vbox-&gt;pack_start(*button, false,
+false);<br>
+&nbsp;&nbsp;
+&nbsp;button-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;ScribbleWindow::dispose));<br>
+&nbsp;&nbsp; &nbsp;button-&gt;show();<br>
+}<br>
+      <br>
+ScribbleWindow::~ScribbleWindow()<br>
+{<br>
+}<br>
+      <br>
+int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp; &nbsp;using namespace Main;<br>
+      <br>
+&nbsp;&nbsp; &nbsp;init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp; &nbsp;ScribbleWindow window;<br>
+&nbsp;&nbsp;
+&nbsp;window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp; &nbsp;window.show();<br>
+      <br>
+&nbsp;&nbsp; &nbsp;run();<br>
+&nbsp;&nbsp; &nbsp;return 0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling Scribble<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Scribble in the
+&lt;examples/howto/drawingarea&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/drawingarea&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Scribble, add the following lines to a
+new text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+scribble: scribble.cc scribble.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) scribble.cc -o scribble $(CFLAGS) `pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o scribble</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When you
+compile and run this program you will see the following window appear,
+which you can draw on:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 224px; height: 270px;" alt=""
+ src="../../images/scribble.png"><br>
+      </div>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="drawingarea.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

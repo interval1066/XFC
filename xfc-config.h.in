@@ -1,0 +1,90 @@
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#cmakedefine HAVE_DLFCN_H
+
+/* Define to 1 if you have the `flockfile' function. */
+#cmakedefine HAVE_FLOCKFILE
+
+/* Define to 1 if you have the `funlockfile' function. */
+#cmakedefine HAVE_FUNLOCKFILE
+
+/* Define to 1 if you have the `getc_unlocked' function. */
+#cmakedefine HAVE_GETC_UNLOCKED
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#cmakedefine HAVE_INTTYPES_H
+
+/* Define to 1 if you have the `lstat' function. */
+#cmakedefine HAVE_LSTAT
+
+/* Define to 1 if you have the <memory.h> header file. */
+#cmakedefine HAVE_MEMORY_H
+
+/* Define to 1 if you have the `mkstemp' function. */
+#cmakedefine HAVE_MKSTEMP
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#cmakedefine HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#cmakedefine HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#cmakedefine HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#cmakedefine HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#cmakedefine HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#cmakedefine HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#cmakedefine HAVE_UNISTD_H
+
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#cmakedefine LT_OBJDIR
+
+/* Define to the address where bug reports for this package should be sent. */
+#cmakedefine PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#cmakedefine PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#cmakedefine PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#cmakedefine PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#cmakedefine PACKAGE_URL
+
+/* Define to the version of this package. */
+#define PACKAGE_VERSION "${XFC_VERSION}"
+
+/* Define to 1 if you have the ANSI C header files. */
+#cmakedefine STDC_HEADERS
+
+/* "Define if cairo vector drawing system is enabled" */
+#cmakedefine XFC_CAIRO
+
+/* "Defined if XFC support added" */
+#cmakedefine XFC_DE_FOUND
+
+/* Define major version */
+#define XFC_MAJOR_VERSION ${XFC_MAJOR_VERSION}
+
+/* Define micro version */
+#define XFC_MICRO_VERSION ${XFC_MICRO_VERSION}
+
+/* Define minor version */
+#define XFC_MINOR_VERSION ${XFC_MINOR_VERSION}
+
+/* Defined if pango text render is supported" */
+#cmakedefine XFC_PANGO
+
+/* "Defined if sourceview widget is defined" */
+#cmakedefine XFC_SOURCEVIEW

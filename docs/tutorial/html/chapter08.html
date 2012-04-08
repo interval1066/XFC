@@ -1,0 +1,758 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+  
+  
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+
+  
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+
+  
+  <meta content="Tutorial: Building a GNU autotools project" name="description">
+</head>
+
+
+<body>
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="height: 25px;" class="darkbluestripe"><br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="height: 25px;" class="greybluestripe" colspan="1" rowspan="1">
+      
+      <table style="width: 100%; text-align: left;" border="0" cellpadding="0" cellspacing="0">
+
+        <tbody>
+
+          <tr>
+
+            <td style="white-space: nowrap; width: 50%;">&nbsp;&laquo; <a class="qindexH" href="index.html">Index</a><span class="qindexH"> | </span><a class="qindexH" href="chapter07.html">Adding a client area and context
+menu</a><span style="text-decoration: underline;"></span><a class="qindexF qindexH" href="chapter07.html"> </a><span class="qindexH"></span> </td>
+
+            <td style="white-space: nowrap; text-align: right; width: 50px;"><a href="pretend"><span class="qindexF"></span><span class="qindexF"></span></a><a class="qindexH" href="chapter09.html">Internationalization and
+Localization</a> &raquo; <br>
+
+            </td>
+
+          </tr>
+
+        
+        </tbody>
+      
+      </table>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td colspan="1" rowspan="1">
+      
+      <div style="text-align: center;"><br>
+
+      </div>
+
+      
+      <h1>Chapter
+8: Building
+a GNU autotools project</h1>
+
+      
+      <h3>Table of Contents</h3>
+
+      
+      <ol>
+
+        <li><a class="mhl" href="chapter08.html#C801">The Essential
+Files</a></li>
+
+        <li><a class="mhl" href="chapter08.html#C802">The Directory
+Structure</a></li>
+
+        <li><a class="mhl" href="chapter08.html#C803">Makefile.am</a></li>
+
+        <li><a class="mhl" href="chapter08.html#C804">configure.ac</a></li>
+
+        <li><a class="mhl" href="chapter08.html#C805">Generating the
+Output Files</a></li>
+
+        <li><a class="mhl" href="chapter08.html#C806">Building and
+Installing the
+Project</a></li>
+
+        <li><a class="mhl" href="chapter08.html#C807">Maintaining the
+Input Files</a></li>
+
+        <li><a class="mhl" href="chapter08.html#C808">Some Helpful Links</a></li>
+
+      
+      </ol>
+
+      <br>
+
+If you're unfamiliar with the GNU autotools and want to know how to
+build and maintain an autotools project you should read this chapter.
+It will take you step-by-step through the process of creating and
+building a small project, and at the end provide you with some helpful
+links to more documentation and examples. You should also work through
+the next chapter on Internationalization and Localization. It will show
+you how to add international support to an autotools project.<br>
+
+      <br>
+
+Autoconf and Automake provide an effective build system to
+maintain your software, usually on someone else's system.
+Automake
+examines source files, determines how they depend on each other, and
+generates a Makefile so the files can be compiled in the correct order.
+Autoconf permits automatic configuration of software installation,
+handling a large number of system quirks to increase portability.
+Libtool (not discussed here) is a command-line interface to the
+compiler
+and linker that makes it easy to generate static and shared libraries.<br>
+
+      <br>
+
+      
+      <h2 style="color: rgb(21, 67, 116);"><a name="C801"></a>The
+Essential Files</h2>
+
+      <span style="font-family: sans-serif;">The smallest
+project requires you provide only two files:</span><br style="font-family: sans-serif;">
+
+      
+      <ul style="list-style-type: square; font-family: sans-serif;">
+
+        <li>Makefile.am - an input file to Automake that specifies a
+project's
+build requirements: what needs to be built, and where it goes when
+installed.</li>
+
+        <li>configure.ac - an input file to Autoconf that provides the
+macro
+invocations and shell code fragments Autoconf uses to build a configure
+script.<br>
+
+        </li>
+
+      
+      </ul>
+
+      <span style="font-family: sans-serif;">The GNU autotools will
+generate the rest of the files needed to build
+the project. <br>
+
+      <br>
+
+      </span> <span style="color: rgb(0, 55, 85);"></span>
+      
+      <h2 style="color: rgb(21, 67, 116);"><a name="C802"></a>The
+Directory Structure</h2>
+
+      <span style="font-family: sans-serif;">Before writing any code
+for a new project you need to decide on the
+directory structure the project will use.&nbsp; </span><br style="font-family: sans-serif;">
+
+      
+      <ul style="list-style-type: square; font-family: sans-serif;">
+
+        <li>The top-level directory is used for configuration
+files,
+such as configure.ac, and other sundry files like ChangeLog, COPY (a
+copy of the project license) and README. </li>
+
+        <li>Any unique library should have its own subdirectory<em> </em>containing
+all headers and sources, a Makefile.am, and any other library specific
+files.</li>
+
+        <li>The headers and sources for the main application should be
+in
+another subdirectory, typically called &lt;src&gt;<em>.</em></li>
+
+        <li>Other directories can include: &lt;config&gt; for
+intermediate
+files, <em>&lt;</em>docs&gt; for the project documentation and <em>&lt;</em>test&gt;
+for
+the project self-test suite.<br>
+
+        </li>
+
+      
+      </ul>
+
+      
+      <div style="text-align: justify;"><span style="font-family: sans-serif;">The following steps will take you
+through creating and building the XfcApp project. The top-level
+directory for </span><span style="font-family: sans-serif;">XfcApp</span><span style="font-family: sans-serif;"> is &lt;examples/tutorial/chapter08&gt;. You
+will find the
+project's header files and source files in the </span><span style="font-family: sans-serif;">&lt;src&gt;</span> subdirectory.
+There
+are six files: main.cc xfcapp.cc, xfcapp.hh, xfcapp.ui,
+statusbar.cc and statusbar.hh. The only change from the previous
+chapter is that the main
+function has been moved out of &lt;xfcapp.cc&gt; and into the file
+&lt;main.cc&gt;. <br>
+
+      <br>
+
+      </div>
+
+      
+      <h2 style="color: rgb(21, 67, 116);"><a name="C803"></a>Makefile.am</h2>
+
+You must provide a Makefile.am file
+for each directory in your source tree. Makefile.am for the
+top-level directory is simple. Create a new text file called
+'Makefile.am'
+in the &lt;examples/tutorial/chapter08&gt; subdirectory and add the following
+line
+to
+the
+file and save it:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>SUBDIRS
+= src</code></div>
+
+      <br>
+
+The SUBDIRS variable is used to list the subdirectories that must be
+built. <br>
+
+      <br>
+
+Next, in the &lt;examples/tutorial/chapter08/src&gt; subdirectory create another
+text
+file called 'Makefile.am' and add the following lines to the file and
+save
+it:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>bin_PROGRAMS
+= xfcapp<br>
+
+      <br>
+
+AM_CXXFLAGS = $(XFCUI_CFLAGS) $(GCONF_CFLAGS)<br>
+
+      <br>
+
+      </code><code>xfcapp</code><code>_SOURCES = main.cc </code><code>xfcapp</code><code>.cc
+      </code><code></code><code></code><code>xfcapp.ui statusbar.cc<br>
+
+      </code><code>xfcapp</code><code>_LDADD = $(XFCUI_LIBS)</code><samp>
+$(GCONF_LIBS) </samp></div>
+
+      <br>
+
+      <span style="font-family: sans-serif;">The bin_PROGRAMS variable
+specifies
+that we want a program called xfcapp to be built and installed in
+the bin directory when </span><span style="font-family: sans-serif;">'make
+install</span><em style="font-family: sans-serif;">'&nbsp; </em><span style="font-family: sans-serif;">is run. </span><br style="font-family: sans-serif;">
+
+      <br style="font-family: sans-serif;">
+
+      <span style="font-family: sans-serif;">The AM_CXXFLAGS macro sets
+the compiler flags. You should not use
+CXXFLAGS in Makefile.am because it's unsafe. CXXFLAGS is a user
+variable
+that users expect to be able to override.</span><br style="font-family: sans-serif;">
+
+      <br style="font-family: sans-serif;">
+
+      <span style="font-family: sans-serif;">The xfcapp_SOURCES
+variable specifies the source files used to
+build the xfcapp target. Note that the SOURCES variable for a
+target
+is prefixed by the name of the target, in this case xfcapp.</span><br style="font-family: sans-serif;">
+
+      <br style="font-family: sans-serif;">
+
+      <span style="font-family: sans-serif;">The last variable,
+xfcapp_LDADD, specifies the libraries that must
+be passed to the linker to build the target. This variable is only used
+by programs and libraries. Note that LDADD uses the same naming rule as
+the SOURCES variable.<br>
+
+      </span><br>
+
+      
+      <h2 style="color: rgb(21, 67, 116);"><span style="text-decoration: underline;"><a name="C804"></a>configure.ac</span></h2>
+
+A configure.ac file must be in the
+project's top-level directory.&nbsp; Change to&nbsp; the
+&lt;examples/tutorial/chapter08&gt; directory and create a text file called
+'configure.ac'. Add the following lines to the file and save it:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>AC_INIT(src/main.cc)<br>
+
+      <br>
+
+PACKAGE=xfcapp<br>
+
+VERSION=0.1.0<br>
+
+      <br>
+
+AM_INIT_AUTOMAKE($PACKAGE, $VERSION)<br>
+
+      <br>
+
+XFCUI_REQUIRED_VERSION=4.3<br>
+
+PKG_CHECK_MODULES(XFCUI, xfcui-4.3 &gt;= $XFCUI_REQUIRED_VERSION)<br>
+
+AC_SUBST(XFCUI_CFLAGS)<br>
+
+AC_SUBST(XFCUI_LIBS)<br>
+
+      <br>
+
+GCONF_REQUIRED_VERSION=2.0.0<br>
+
+PKG_CHECK_MODULES(GCONF, gconf-2.0 &gt;= $GCONF_REQUIRED_VERSION)<br>
+
+AC_SUBST(GCONF_CFLAGS)<br>
+
+AC_SUBST(GCONF_LIBS)<br>
+
+      <br>
+
+AC_PROG_CXX<br>
+
+AC_PROG_LIBTOOL<br>
+
+      <br>
+
+AC_OUTPUT(Makefile src/Makefile)</code></div>
+
+      <br>
+
+      
+      <div style="text-align: left;"> The AC_INIT macro performs
+essential
+initialization for the generated configure script. It takes as an
+argument a filename from the &lt;src&gt; subdirectory, to ensure that
+the &lt;src&gt;
+subdirectory has been specified correctly.<br>
+
+      </div>
+
+      <br>
+
+The PACKAGE and VERSION variables declare the name and version of the
+package respectively.<br>
+
+      <br>
+
+The AM_INIT_AUTOMAKE macro does all the standard initialization
+required by Automake and takes two arguments, the package name and
+version number. <br>
+
+      <br>
+
+The XFCUI_REQUIRED_VERSION variable specifies the minimum required
+libXFCui
+version, in this case 4.3.<br>
+
+      <br>
+
+The PKG_CHECK_MODULES macro checks for the specified version of the
+libXFCui library and if found places the necessary include flags
+in&nbsp;
+$(XFCUI_CFLAGS) and the libraries to link with in $(XFCUI_LIBS). If the
+correct version is not found configure will report an error.<br>
+
+      <br>
+
+The GCONF_REQUIRED_VERSION variable specifies the minimum required
+GConf
+version, in this case 2.0.0.<br>
+
+      <br>
+
+The PKG_CHECK_MODULES macro checks for the specified version of the
+GConf library and if found places the necessary include flags in&nbsp;
+$(GCONF_CFLAGS) and the libraries to link with $(GCONF_LIBS). If the
+correct version is not found configure will report an error. <br>
+
+      <br>
+
+The AC_PROG_CXX macro checks for the C++ compiler and sets the
+variables CXX,
+GXX and CXXFLAGS.<br>
+
+      <br>
+
+The AC_PROG_LIBTOOL macro integrates libtool support into the configure
+script.<code><br>
+
+      </code><br>
+
+The last macro AC_OUTPUT must be called at the end of configure.ac to
+create the Makefiles in each directory.<br>
+
+      <br>
+
+      
+      <h2><span style="color: rgb(0, 55, 85);"><a name="C805"></a>Generating
+the Output Files</span></h2>
+
+      <span style="font-family: sans-serif;">Now we need to generate
+the required
+output files from the two input files </span><span style="font-family: sans-serif;">configure.ac</span><span style="font-family: sans-serif;"> and </span><span style="font-family: sans-serif;">Makefile.am</span><span style="font-family: sans-serif;">.
+First we need to collect all the macro invocations in configure.ac that
+Autoconf will need to build the configure script. This is done with the
+following command:<br>
+
+      <br>
+
+      </span>
+      
+      <div class="fbox"><code>$
+aclocal</code></div>
+
+      <br>
+
+This generates the file aclocal.m4 and adds it to the current
+directory. <br>
+
+      <br>
+
+Now run libtoolize to add the necessary libtool files to the project:<br>
+
+      <span style="font-family: sans-serif;"><br>
+
+      </span>
+      
+      <div class="fbox"><code>$ libtoolize
+--force --copy</code></div>
+
+      <br>
+
+The '--force' argument forces libtoolize to overwrite existing files
+and
+the '--copy' argument copies files to the project instead of linking to
+them.<br>
+
+      <br>
+
+Next run autoconf:<br>
+
+      <span style="font-family: sans-serif;"><br>
+
+      </span>
+      
+      <div class="fbox"><code>$
+autoconf</code></div>
+
+      <br>
+
+After running autoconf you
+will find the 'configure' script in the current directory. It's
+important
+to run aclocal<em> </em>first because Automake relies on the contents
+on configure.ac and aclocal.m4.<br>
+
+      
+      <div style="text-align: left;"> <br>
+
+      </div>
+
+There are a few files that the GNU
+standard says must be present in the top-level directory, and if not
+found Automake will report an error. Enter the following command
+to create these files:<br>
+
+      <span style="font-family: sans-serif;"><br>
+
+      </span>
+      
+      <div class="fbox"><code>$
+touch AUTHORS NEWS README ChangeLog</code></div>
+
+      <br>
+
+Now you can run Automake to create Makefile.in:<br>
+
+      <span style="font-family: sans-serif;"><br>
+
+      </span>
+      
+      <div class="fbox"><code>$
+automake --add-missing --copy</code></div>
+
+      <br>
+
+The '--add-missing'
+argument copies some boilerplate files from your Automake installation
+into the current directory and the '--copy' argument copies files
+instead
+of linking to them.<br>
+
+      <br>
+
+By now, the contents of the &lt;examples/tutorial/chapter08&gt; directory should
+be
+looking a lot like the top level directory of any GNU package you may
+have installed before:<br>
+
+      <br>
+
+      <span style="font-family: sans-serif;"></span>
+      
+      <div class="fbox"><code>autom4te.cache&nbsp;
+src</code><code></code><code>&nbsp;
+AUTHORS&nbsp; </code><code>aclocal.m4&nbsp; </code><code>ChangeLog&nbsp;
+      </code><code>config.guess&nbsp; config.sub&nbsp; </code><code>configure&nbsp;
+      </code><code>configure.ac&nbsp; </code><code>COPYING&nbsp; </code><code>depcomp&nbsp;
+      </code><code>INSTALL&nbsp; </code><code>install-sh&nbsp;
+Makefile.in&nbsp; </code><code>Makefile.am&nbsp; </code><code>mkinstalldirs&nbsp;
+      </code><code>missing</code><code>&nbsp; </code><code>NEWS&nbsp; </code><code>README</code></div>
+
+      <br>
+
+You should delete the &lt;autom4te.cache&gt; directory from any
+a source tarball you release. This directory is a cache that is created
+and used by Automake only.<br>
+
+      <br>
+
+      
+      <h2 style="color: rgb(21, 67, 116);"><a name="C806"></a>Building
+and Installing the Project</h2>
+
+At this point you should be able to
+package up your source tree in a tarball and give it to other users to
+install on their own systems. A user just has to unpack the tarball and
+run the following commands:<br>
+
+      <br>
+
+      <span style="font-family: sans-serif;"></span>
+      
+      <div class="fbox"><code>$
+./configure --prefix=some_directory<br>
+
+$ make<br>
+
+$ make install</code></div>
+
+      <br>
+
+      
+      <div style="text-align: left;"> If you run the above commands and
+look in your bin directory you will find xfcapp. Have a look at the
+size of the executable. Wow! Its 510 kbytes. That's because it contains
+all the debugging and compiler symbols needed to debug the program. <br>
+
+      </div>
+
+      <br>
+
+Now run the following command:<br>
+
+      <span style="font-family: sans-serif;"><br>
+
+      </span>
+      
+      <div class="fbox"><code>$
+make install-strip</code></div>
+
+      <br>
+
+If you look at the size of xfcapp
+now it's a lot smaller, only 63 kbytes. The command 'make
+install-strip' strips out all the debugging symbols. The resulting
+executable is much smaller and faster but you won't be able to debug
+the
+program. As a rule, you should only strip a program when installing a
+stable version.<br>
+
+      <br>
+
+      
+      <h2><span style="color: rgb(0, 55, 85);"><a name="C807"></a><span style="color: rgb(21, 67, 116);">Maintaining
+the Input Files</span></span></h2>
+
+Everytime you edit any of the GNU autotools input files in your
+package, you must regenerate the output
+files. If you add a new source file to the xfcapp_SOURCES variable
+in Makefile.am you must regenerate Makefile.in. If you are building
+your
+package you will need to rerun configure to regenerate the Makefile's.
+Many project maintainers put the necessary commands to do this into a
+script called 'autogen.sh' and run this script whenever the
+output files need to be regenerated. <br>
+
+      
+      <div style="text-align: justify;"><br>
+
+      </div>
+
+Create a text file called 'autogen.sh'
+in the top-level directory and make sure you change its file mode to
+make it executable. Add the following commands to the file and save it:
+      <br>
+
+      <br>
+
+      <span style="font-family: sans-serif;"></span>
+      
+      <div class="fbox"><code>#!
+/bin/sh<br>
+
+      <br>
+
+aclocal \<br>
+
+&amp;&amp; automake --add-missing --copy\<br>
+
+&amp;&amp; autoconf</code></div>
+
+      <br>
+
+Now you can easily run the following commands to update your
+project's output files, and rebuild the project:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>$./autogen.sh<br>
+
+$ ./configure --prefix=/some_directory<br>
+
+$ make<br>
+
+$ make install</code></div>
+
+      <br>
+
+      
+      <h2><a name="C808"></a>Some
+helpful links </h2>
+
+This tutorial should get you started
+using the GNU autotools and that should be enough, for a while.
+Eventually you will need to know more, like how to build a shared
+library or what other macros should be added to configure.ac. I found
+the
+following links very useful:<br>
+
+      
+      <ul style="list-style-type: square;">
+
+        <li><a class="mhl" href="http://www.openismus.com/documents/linux/automake/automake.shtml">Using
+Automake and Autoconf with C++</a></li>
+
+        <li><a class="mhl" href="http://www.openismus.com/documents/linux/using_libraries/using_libraries.shtml">Using
+C/C++ libraries with Automake and Autoconf</a></li>
+
+        <li><a class="mhl" href="http://www.openismus.com/documents/linux/building_libraries/building_libraries.shtml">Building
+C/C++ libraries with automake and autoconf</a></li>
+
+        <li><a class="mhl" href="http://sources.redhat.com/autobook/">GNU
+Autoconf,
+Automake, and Libtool</a></li>
+
+        <li><a class="mhl" href="http://www.gnu.org/software/autoconf/manual/autoconf-2.57/autoconf.html">GNU
+Autoconf manual</a></li>
+
+        <li><a class="mhl" href="http://www.gnu.org/software/automake/manual/automake.html">GNU
+Automake manual</a><br>
+
+        </li>
+
+      
+      </ul>
+
+In the <a href="chapter09.html">next chapter</a> you will learn add
+international language support to the XfcApp project.<br>
+
+      <br>
+
+      
+      <div align="justify">
+      
+      <div style="text-align: left;">
+      
+      <hr style="width: 100%; height: 1px;"> </div>
+
+      </div>
+
+      
+      <table style="width: 100%; text-align: left;" border="0" cellpadding="2" cellspacing="0">
+
+        <tbody>
+
+          <tr>
+
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+
+            <td style="text-align: center;"><a class="qindexF" href="chapter08.html">Top</a><br>
+
+            </td>
+
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+
+            </td>
+
+          </tr>
+
+        
+        </tbody>
+      
+      </table>
+
+      
+      <div style="text-align: center;"><a class="qindexF" href="index.html">Index</a><br>
+
+      </div>
+
+      </td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+</body>
+</html>

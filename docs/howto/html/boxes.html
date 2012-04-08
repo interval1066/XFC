@@ -1,0 +1,672 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Packing Boxes" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"> <br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a></td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1" style="text-align: center;">
+      <ol>
+      </ol>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <h1>Packing Boxes</h1>
+      <br>
+Containers
+use a notion of
+packing. Packing refers to adding widgets
+with
+reference to a particular position in a container. The container most
+commonly used to pack widgets is the box.&nbsp; A box organizes
+widgets
+into a rectangular area that has two reference positions: the start and
+the end of the box.
+There are two types of
+boxes: horizontal boxes and vertical boxes. <br>
+      <br>
+For a horizontal box the start is defined as the
+left side and the end is defined as the right side. For a vertical box,
+the start is defined as the top of the box and the end
+is defined as the bottom. Horizontal boxes can pack
+widgets left to right (from the start) or right to left (from the
+end). Vertical boxes can pack widgets top to bottom (from the start)
+or bottom to top (from the end). All Child widgets packed in a box are
+organized into a single row so they have
+one dimension in common. For horizontal boxes, child widgets all have
+the same height. For vertical boxes, child widgets all have the same
+width. The other dimension depends on a widget's requested size, the
+flags specified when a
+widget is added to a box and the number widgets packed into the box. <br>
+      <br>
+Gtk::Box is an abstract widget which encapsulates the functionality of
+the box. A box is a
+'no window' widget so it is always invisible. Horizontal boxes are
+represented by the class Gtk::HBox and vertical
+boxes are represented by the class Gtk::VBox. <br>
+      <br>
+You can create an
+instance of a box with these two constructors:<br>
+      <br>
+      <div class="fbox"><code>HBox(bool
+homogeneous = false, int
+spacing = 0); <br>
+VBox(bool homogeneous = false, int
+spacing = 0);</code></div>
+      <br>
+The 'homogeneous' argument
+controls whether each widget in an horizontal box has the same width,
+or whether each widget in an vertical box has the same height. The
+'spacing' argument sets the default
+space, in pixels, to place between widgets in the box. If homogenous is
+set to true, the Gtk::Box pack methods function essentially as if the
+expand argument was always turned on (see later).<br>
+&nbsp; <br>
+Child widgets can be packed into a box with either of the following
+Gtk::Box pack methods:<br>
+      <br>
+      </div>
+      <div class="fbox"><code>void
+pack_start(Gtk::Widget&amp; child,
+bool
+expand = true, bool fill = true, unsigned int
+padding = 0);<br>
+void
+pack_end(Gtk::Widget&amp; child, bool
+expand = true, bool fill = true, unsigned int
+padding = 0);</code></div>
+      <div style="text-align: left;"><br>
+Use repeated calls to pack_start() to pack child widgets into a
+horizontal box from
+left to right or into a vertical box from top to bottom. Use
+pack_end() to pack child widgets into a horizontal box from right
+to left and into a vertical box from bottom to top. <br>
+      <br>
+The 'child' argument is the
+child widget to add to a box. The 'expand'
+argument specifies whether extra space given to a box should be
+allocated to the widget. The default value is true. Any extra space
+given to a box, such as when a box is resized, is allocated equally
+among widgets that set expand to true. Setting expand
+to false will allow you to justify child widgets to the left or right.
+Otherwise they will expand to fit the box.The 'fill' argument specifies
+whether the
+extra space is allocated to the widget itself or is allocated as
+padding on either side of the widget. The default value is true. fill
+only
+has
+an effect if the expand argument is also true. The 'padding' argument
+sets the extra
+space in pixels to put between this child and its neighbours. The
+default value is zero.<br>
+      <br>
+Child widgets can also be inserted into a box at a given position:<br>
+      <br>
+      </div>
+      <div class="fbox"><code>void
+insert_start(Gtk::Widget&amp; child,
+int position, bool
+expand = true, bool fill = true, unsigned int
+padding = 0);<br>
+void
+insert_end(Gtk::Widget&amp; child, int
+position, bool
+expand = true, bool fill = true, unsigned int
+padding = 0);</code></div>
+      <div style="text-align: left;"><br>
+As you can see the insert methods are almost indentical to the pack
+methods. The only difference is the 'position'
+argument which lets you specify the zero-based position at which to
+insert the new widget. <br>
+      <br>
+Because Gtk::Box is also a container, you can use Gtk::Container::add()
+to pack widgets into a box. If you do, the widgets will be packed the
+same as with pack_start() using the default arguments. You should also
+use Gtk::Container::remove() to remove widgets from the box.<br>
+      <br>
+      <h2><a name="example"></a>The
+Packbox Example</h2>
+Setting appropriate packing flags when you pack a widget into a box
+lets GTK+ know where you want to place your widgets. It also tells GTK+
+how it should do automatic resizing when the parent box is resized.
+There are a number of options as to how your widgets can be packed
+inside a box. As you can imagine, these options give you quite a bit of
+flexibility when and creating and placing widgets. Because of this
+flexibility, packing boxes can be confusing at
+first. There are a lot of options, and it's not immediately obvious how
+they all fit together. In the end, however, there are basically five
+different styles. <br>
+      <br>
+The header file for the Packbox example is &lt;packbox.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include
+&lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class PackBox : public
+Gtk::HBox<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; PackBox(bool
+homogeneous, int spacing, bool expand, bool
+fill, unsigned int padding);<br>
+&nbsp;&nbsp;&nbsp; ~PackBox();<br>
+};<br>
+      <br>
+class PackBoxWindow : public Gtk::Window<br>
+{<br>
+public:<br>
+&nbsp;&nbsp;&nbsp; PackBoxWindow(int
+which);<br>
+&nbsp;&nbsp;&nbsp; ~PackBoxWindow();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; void
+example_1(Gtk::VBox *vbox);<br>
+&nbsp;&nbsp;&nbsp; void
+example_2(Gtk::VBox *vbox);<br>
+&nbsp;&nbsp;&nbsp; void
+example_3(Gtk::VBox *vbox);<br>
+};</code> </div>
+      <br>
+      <br>
+and the source file is &lt;packbox.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include
+"packbox.hh"<br>
+#include &lt;xfc/gtk/button.hh&gt;<br>
+#include &lt;xfc/gtk/label.hh&gt;<br>
+#include &lt;xfc/gtk/separator.hh&gt;<br>
+#include &lt;cstdio&gt;<br>
+      <br>
+// PackBox<br>
+      <br>
+PackBox::PackBox(bool homogeneous, int spacing, bool
+expand, bool fill, unsigned
+int padding)<br>
+: Gtk::HBox(homogeneous, spacing)<br>
+{<br>
+// Make a new hbox
+filled with button-labels. Arguments for the variables we're interested<br>
+// are passed in to this constructor. We do not show
+the box, but do show everything inside.<br>
+      <br>
+// Create a series of buttons with the appropriate
+settings<br>
+Gtk::Button *button = new
+Gtk::Button("hbox-&gt;pack_start");<br>
+pack_start(*button, expand, fill, padding);<br>
+button-&gt;show();<br>
+      <br>
+button = new
+Gtk::Button("(*button,");<br>
+pack_start(*button, expand, fill, padding);<br>
+button-&gt;show();<br>
+      <br>
+// Create a button
+with
+the label depending on the value of expand<br>
+if (expand)<br>
+button = new
+Gtk::Button("true,");<br>
+else<br>
+button = new
+Gtk::Button("false,");<br>
+      <br>
+pack_start(*button, expand, fill, padding);<br>
+button-&gt;show();<br>
+      <br>
+// This is the
+same as
+the button creation for "expand" above, but uses the shorthand form.<br>
+button = new
+Gtk::Button(fill ? "true," : "false,");<br>
+pack_start(*button, expand, fill, padding);<br>
+button-&gt;show();<br>
+      <br>
+String s = String::format("%d);", padding);<br>
+      <br>
+button = new
+Gtk::Button(s);<br>
+pack_start(*button, expand, fill, padding);<br>
+button-&gt;show();<br>
+}<br>
+      <br>
+PackBox::~PackBox()<br>
+{<br>
+}<br>
+      <br>
+// PackBoxWindow<br>
+      <br>
+PackBoxWindow::PackBoxWindow(int which)<br>
+{<br>
+set_border_width(10);<br>
+      <br>
+// We create a
+vertical
+box (vbox) to pack the horizontal boxes into. This allows us to stack<br>
+// the horizontal boxes filled with buttons one on
+top of the other in this vbox.<br>
+Gtk::VBox *vbox = new Gtk::VBox;<br>
+      <br>
+// Which example
+to show.<br>
+switch (which)<br>
+{<br>
+case 1:<br>
+example_1(vbox);<br>
+break;<br>
+      <br>
+case 2:<br>
+example_2(vbox);<br>
+break;<br>
+      <br>
+case 3:<br>
+example_3(vbox);<br>
+}<br>
+      <br>
+// Create another
+new
+hbox; remember we can use as many as we need!<br>
+Gtk::HBox *quitbox = new Gtk::HBox;<br>
+      <br>
+// Our quit button.<br>
+Gtk::Button *button = new Gtk::Button("Quit");<br>
+      <br>
+// Connect the
+signal to
+terminate the program when the button is clicked.<br>
+button-&gt;signal_clicked().connect(slot(this,
+&amp;PackBoxWindow::dispose));<br>
+      <br>
+// Pack the button
+into
+the quitbox. The last 3 arguments to Gtk::Box::pack_start are: expand,
+fill, padding.<br>
+quitbox-&gt;pack_start(*button,
+true,
+false);<br>
+      <br>
+// pack the
+quitbox into
+the vbox (box1)<br>
+vbox-&gt;pack_start(*quitbox,
+false,
+false);<br>
+      <br>
+// Pack the vbox
+(box1)
+which now contains all our widgets, into the main window.<br>
+add(*vbox);<br>
+      <br>
+// And show
+everything
+left<br>
+button-&gt;show();<br>
+quitbox-&gt;show();<br>
+vbox-&gt;show();<br>
+      <br>
+// Showing the
+window
+last so everything pops up at once.<br>
+show();<br>
+      <br>
+}<br>
+      <br>
+PackBoxWindow::~PackBoxWindow()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+PackBoxWindow::example_1(Gtk::VBox *vbox)<br>
+{<br>
+// Create a new
+label.<br>
+Gtk::Label *label = new Gtk::Label("Gtk::HBox *hbox = new
+Gtk::HBox(false, 0);");<br>
+      <br>
+// Align the label
+to
+the left side.<br>
+label-&gt;set_alignment(0, 0);<br>
+      <br>
+// Pack the label
+into
+the vertical box (vbox). Remember that widgets added to a vbox<br>
+// will be packed one on top of the other in order.<br>
+vbox-&gt;pack_start(*label,
+false,
+false);<br>
+      <br>
+// Show the label<br>
+label-&gt;show();<br>
+      <br>
+// Create a box -
+homogeneous = false, spacing = 0, expand = false, fill = false, padding
+= 0<br>
+PackBox *box = new
+PackBox(false, 0, false, false, 0);<br>
+vbox-&gt;pack_start(*box, false, false);<br>
+box-&gt;show();<br>
+      <br>
+// Call our
+PackBox
+constructor - homogeneous = false, spacing = 0, expand = true, fill =
+false, padding = 0<br>
+box = new
+PackBox(false, 0, true, false, 0);<br>
+vbox-&gt;pack_start(*box, false, false);<br>
+box-&gt;show();<br>
+      <br>
+// Args are:
+homogeneous, spacing, expand, fill, padding<br>
+box = new
+PackBox(false, 0, true, true, 0);<br>
+vbox-&gt;pack_start(*box, false, false);<br>
+box-&gt;show();<br>
+      <br>
+// Creates a
+separator,
+we'll learn more about these later, but they are quite simple.<br>
+Gtk::HSeparator *separator = new Gtk::HSeparator;<br>
+      <br>
+// Pack the
+separator
+into the vbox. Remember each of these widgets is being packed into a
+vbox,<br>
+// so they'll be stacked vertically.<br>
+vbox-&gt;pack_start(*separator,
+false,
+true, 5);<br>
+separator-&gt;show();<br>
+      <br>
+// Create another
+new
+label, and show it.<br>
+label = new
+Gtk::Label("Gtk::HBox *hbox = new Gtk::HBox(true, 0);");<br>
+label-&gt;set_alignment(0, 0);<br>
+vbox-&gt;pack_start(*label, false, false);<br>
+label-&gt;show();<br>
+      <br>
+// Args are:
+homogeneous, spacing, expand, fill, padding<br>
+box = new
+PackBox(true, 0, true, false, 0);<br>
+vbox-&gt;pack_start(*box, false, false);<br>
+box-&gt;show();<br>
+      <br>
+// Args are:
+homogeneous, spacing, expand, fill, padding<br>
+box = new
+PackBox(true, 0, true, true, 0);<br>
+vbox-&gt;pack_start(*box, false, false);<br>
+box-&gt;show();<br>
+      <br>
+// Another new
+separator.<br>
+separator = new
+Gtk::HSeparator;<br>
+      <br>
+// The last 3
+arguments
+to Gtk::Box::pack_start are: expand, fill, padding.<br>
+vbox-&gt;pack_start(*separator,
+false,
+true, 5);<br>
+separator-&gt;show();<br>
+}<br>
+      <br>
+void<br>
+PackBoxWindow::example_2(Gtk::VBox *vbox)<br>
+{<br>
+// Create a new
+label.<br>
+Gtk::Label *label = new Gtk::Label("Gtk::HBox *hbox = new
+Gtk::HBox(false, 10);");<br>
+label-&gt;set_alignment(0, 0);<br>
+vbox-&gt;pack_start(*label, false, false);<br>
+label-&gt;show();<br>
+      <br>
+// Args are:
+homogeneous, spacing, expand, fill, padding<br>
+PackBox *box = new
+PackBox(false, 10, true, false, 0);<br>
+vbox-&gt;pack_start(*box, false, false);<br>
+box-&gt;show();<br>
+      <br>
+// Args are:
+homogeneous, spacing, expand, fill, padding<br>
+box = new
+PackBox(false, 10, true, true, 0);<br>
+vbox-&gt;pack_start(* box, false, false);<br>
+box-&gt;show();<br>
+      <br>
+Gtk::HSeparator *separator = new
+Gtk::HSeparator;<br>
+// The last 3
+arguments
+to Gtk::Box::pack_start are: expand, fill, padding.<br>
+vbox-&gt;pack_start(*separator,
+false,
+true, 5);<br>
+separator-&gt;show();<br>
+      <br>
+label = new
+Gtk::Label("Gtk::HBox *hbox = new Gtk::HBox(false, 0);");<br>
+label-&gt;set_alignment(0, 0);<br>
+vbox-&gt;pack_start(*label, false, false);<br>
+label-&gt;show();<br>
+      <br>
+// Args are:
+homogeneous, spacing, expand, fill, padding<br>
+box = new
+PackBox(false, 0, true, false, 10);<br>
+vbox-&gt;pack_start(*box, false, false);<br>
+box-&gt;show();<br>
+      <br>
+// Args are:
+homogeneous, spacing, expand, fill, padding<br>
+box = new
+PackBox(false, 0, true, true, 10);<br>
+vbox-&gt;pack_start(*box, false, false);<br>
+box-&gt;show();<br>
+      <br>
+separator = new Gtk::HSeparator;<br>
+// The last 3
+arguments
+to Gtk::Box::pack_start are: expand, fill, padding.<br>
+vbox-&gt;pack_start(*separator,false,
+true, 5);<br>
+separator-&gt;show();<br>
+}<br>
+      <br>
+void<br>
+PackBoxWindow::example_3(Gtk::VBox *vbox)<br>
+{<br>
+// This
+demonstrates the
+ability to use Gtk::Box::pack_end() to right justify widgets.<br>
+// First, we create a label as before.<br>
+Gtk::Label *label = new Gtk::Label("Gtk::HBox *hbox = new
+Gtk::HBox(false, 0);");<br>
+label-&gt;set_alignment(0, 0);<br>
+vbox-&gt;pack_start(*label, false, false);<br>
+label-&gt;show();<br>
+      <br>
+// Then we create
+a new
+box.<br>
+PackBox *box = new
+PackBox(false, 0, false, false, 0);<br>
+      <br>
+// Create the
+label that
+will be put at the end.<br>
+label = new
+Gtk::Label("end");<br>
+      <br>
+// Pack it using
+Gtk::Box::pack_end(), so it is put on the right<br>
+// side of the hbox created in the make_box() call.<br>
+box-&gt;pack_end(*label, false,
+false);<br>
+      <br>
+// Show the label.<br>
+label-&gt;show();<br>
+      <br>
+// Pack box into
+vbox<br>
+vbox-&gt;pack_start(*box, false,
+false);<br>
+box-&gt;show();<br>
+      <br>
+// A separator for
+the
+bottom.<br>
+Gtk::HSeparator *separator = new Gtk::HSeparator;<br>
+      <br>
+// This explicitly
+sets
+the separator to 400 pixels wide by 5 pixels high. This is so the hbox
+we created<br>
+// will also be 400 pixels wide, and the "end" label
+will be separated from the other labels in the hbox.<br>
+// Otherwise, all the widgets in the hbox would be
+packed as close together as possible.<br>
+separator-&gt;set_size_request(400, 5);<br>
+      <br>
+// pack the
+separator
+into the vbox (box1) created near the start of the constructor<br>
+vbox-&gt;pack_start(*separator,
+false,
+true, 5);<br>
+separator-&gt;show();<br>
+}<br>
+      <br>
+int main (int
+argc, char *argv[])<br>
+{<br>
+using namespace Main;<br>
+      <br>
+init(&amp;argc, &amp;argv);<br>
+      <br>
+if (argc != 2)<br>
+{<br>
+fprintf (stderr, "usage: packbox
+num, where num is 1, 2, or 3.\n");<br>
+//
+This just does cleanup in GTK and exits with an exit status of 1.<br>
+exit (1);<br>
+}<br>
+      <br>
+int which =
+atoi(argv[1]);<br>
+      <br>
+PackBoxWindow window(which);<br>
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+      <br>
+run();<br>
+return 0;<br>
+}</code> </div>
+      <br>
+      <h2>Compiling Packbox<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Packbox in the
+&lt;examples/howto/packbox&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/packbox&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Packbox, add the following lines to a new text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+packbox: packbox.cc packbox.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) packbox.cc -o packbox $(CFLAGS) `pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o packbox</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. Packbox
+can display three
+different main windows, depending on the command line option passed: 1,
+2 or 3. Using different flags, each window displays several rows of
+buttons, each row packed into a
+separate box. The button text on each button in a row corresponds to
+the value the button sets in the call to the pack_start(). When
+you
+compile and run this program with the value 1, you will see the
+following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 589px; height: 271px;" alt=""
+ src="../../images/packbox.png"> </div>
+      <br>
+The source code is commented it fairly well so you shouldn't have
+any problems following it. Try running the program with the value 2 and
+then 3, and resize each window to see how the button widgets in a row
+get resized.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="boxes.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

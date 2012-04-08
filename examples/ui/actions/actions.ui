@@ -1,0 +1,51 @@
+<!--*- xml -*-->
+<ui>
+  <menubar>
+    <menu name="Menu _1" action="Menu1Action">
+      <menuitem name="cut" action="cut"/>
+      <menuitem name="copy" action="copy"/>
+      <menuitem name="paste" action="paste"/>
+      <separator name="sep1"/>
+      <menuitem name="bold1" action="bold"/>
+      <menuitem name="bold2" action="bold"/>
+      <separator name="sep2"/>
+      <menuitem name="toggle-cnp" action="toggle-cnp"/>
+      <separator name="sep3"/>
+      <menuitem name="quit" action="quit"/>
+    </menu>
+    <menu name="Menu _2" action="Menu2Action">
+      <menuitem name="cut" action="cut"/>
+      <menuitem name="copy" action="copy"/>
+      <menuitem name="paste" action="paste"/>
+      <separator name="sep4"/>
+      <menuitem name="bold" action="bold"/>
+      <separator name="sep5"/>
+      <menuitem name="justify-left" action="justify-left"/>
+      <menuitem name="justify-center" action="justify-center"/>
+      <menuitem name="justify-right" action="justify-right"/>
+      <menuitem name="justify-fill" action="justify-fill"/>
+      <separator name="sep6"/>
+      <menuitem  name="customise-accels" action="customise-accels"/>
+      <separator name="sep7"/>
+      <menuitem action="toolbar-icons"/>
+      <menuitem action="toolbar-text"/>
+      <menuitem action="toolbar-both"/>
+      <menuitem action="toolbar-both-horiz"/>
+    </menu>
+      <menu name="DynamicMenu" action="Menu3Action"/>
+  </menubar>
+  <toolbar name="toolbar">
+    <toolitem name="cut" action="cut"/>
+    <toolitem name="copy" action="copy"/>
+    <toolitem name="paste" action="paste"/>
+    <separator name="sep9"/>
+    <toolitem name="bold" action="bold"/>
+    <separator name="sep10"/>
+    <toolitem name="justify-left" action="justify-left"/>
+    <toolitem name="justify-center" action="justify-center"/>
+    <toolitem name="justify-right" action="justify-right"/>
+    <toolitem name="justify-fill" action="justify-fill"/>
+    <separator name="sep11"/>
+    <toolitem name="quit" action="quit"/>
+  </toolbar>
+</ui>

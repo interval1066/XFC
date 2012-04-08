@@ -1,0 +1,30 @@
+ADD_SUBDIRECTORY( glib )
+
+INCLUDE_DIRECTORIES( ${GLIB_INCLUDE_DIRS} ${GOJB_INCLUDE_DIRS} ${GMOD_INCLUDE_DIRS} ${GTHR_INCLUDE_DIRS} 
+	${SIGC_INCLUDE_DIRS} ${XFC_CORE_SOURCE_DIR})
+
+INCLUDE_DIRECTORIES( ${SIGC_INCLUDE_DIRS} ${GLIB_INCLUDE_DIRS} ${XFC_SOURCE_DIR} ${XFC_CORE_SOURCE_DIR} )
+
+ADD_LIBRARY( xfc_core SHARED convert.cc i18n.cc object.cc stackobject.cc trackable.cc 
+ utfstring.cc version.cc ${glib_src})
+
+TARGET_LINK_LIBRARIES( xfc_core ${GLIB_LIBRARIES} ${GOBJ_LIBRARIES} ${GMOD_LIBRARIES} ${GTHR_LIBRARIES} ${SIGC_LIBRARIES})
+SET_TARGET_PROPERTIES( xfc_core PROPERTIES VERSION ${XFC_VERSION} SOVERSION ${XFC_MAJOR_VERSION} )
+#SET_TARGET_PROPERTIES( xfc_core PROPERTIES LINK_INTERFACE_LIBRARIES "")
+
+INSTALL(TARGETS xfc_core
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib )
+
+INSTALL( FILES
+ convert.hh
+ i18n.hh
+ integerobject.hh
+ object.hh
+ pointer.hh 
+ stackobject.hh
+ trackable.hh 
+ utfstring.hh 
+ version.hh 
+ xfccore.hh
+ DESTINATION include/xfce4/xfc)

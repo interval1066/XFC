@@ -1,0 +1,1870 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+  
+  
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+
+  
+  <meta content="Widgets: The TreeView Widget" name="description">
+
+  
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+
+
+<body>
+
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0" cellspacing="0">
+
+  <tbody>
+
+    <tr>
+
+      <td style="height: 25px;" class="darkbluestripe"><br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td style="height: 25px;" class="greybluestripe" colspan="1" rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH" href="index.html">Index</a> </td>
+
+    </tr>
+
+    <tr>
+
+      <td colspan="1" rowspan="1">
+      
+      <div style="text-align: center;"><br>
+
+      </div>
+
+      
+      <h1>The
+TreeView Widget</h1>
+
+      
+      <h3>Table of Contents</h3>
+
+      
+      <ol>
+
+        <li><a class="mhl" href="treeview.html#TV01">Cell Renderers</a><br>
+
+        </li>
+
+        <li><a class="mhl" href="treeview.html#TV02">Tree Models</a></li>
+
+        <li><a class="mhl" href="treeview.html#TV03">Tree
+Selections</a><br>
+
+        </li>
+
+        <li><a class="mhl" href="treeview.html#TV04">Creating
+a Model</a></li>
+
+        <li><a class="mhl" href="treeview.html#TV05">Creating the
+TreeView</a></li>
+
+        <li><a class="mhl" href="treeview.html#TV06">Creating a
+TreeViewColumn</a></li>
+
+        <li><a class="mhl" href="treeview.html#TV07">Managing a
+Selection</a><br>
+
+        </li>
+
+        <li><a class="mhl" href="treeview.html#TV08">TreeView Example</a><br>
+
+        </li>
+
+      
+      </ol>
+
+      <br>
+
+      
+      <div align="justify">
+      
+      <div style="text-align: left;">To create a tree or list widget in
+XFC you need
+to use the TreeModel interface in conjunction with a TreeView widget.
+Designed around the Model/View/Controller (MVC) architecture this
+widget consists of four major parts: <br>
+
+      </div>
+
+      
+      <ul style="list-style-type: square;">
+
+        <li>Gtk::TreeView - the tree view widget.<br>
+
+        </li>
+
+        <li>Gtk::TreeViewColumn - the view column.</li>
+
+        <li>Gtk::CellRenderer - the cell renderers.</li>
+
+        <li>Gtk::TreeModel - the tree model interface.</li>
+
+      
+      </ul>
+
+      
+      <div style="text-align: left;">The View is composed of the first
+three, while the last is the
+Model. One of the prime benefits of the MVC design is that multiple
+views can be created of a single model. For example, a model mapping
+the
+file system could be created for a file manager. Many views could be
+created to display various parts of the file system, but only one copy
+need be kept in memory. <br>
+
+      <br>
+
+      
+      <h2><a name="TV01"></a>Cell
+Renderers</h2>
+
+CellRenderer is the base class of a set of objects used for
+rendering data to a cell in a TreeViewColumn.
+Typically, one cell renderer is used to draw many cells on the screen.
+To this extent, it isn't expected that a cell renderer keep any
+permanent state around. Instead, any state is set just prior to use,
+using its properties. The purpose of the cell renderers is to provide
+extensibility to the
+widget and to allow multiple ways of rendering the same type of data.
+For example, consider how to render a bool variable. Should you
+render it as a string of "true" or "false", "On" or "Off", or should
+you
+render it as a check button?<br>
+
+      <br>
+
+      </div>
+
+      </div>
+
+      
+      <div align="justify"> There are three standard cell renderers
+that
+come with GTK+: <br>
+
+      
+      <ul style="list-style-type: square;">
+
+        <li>Gtk::CellRendererPixbuf - renders images, either
+user-defined or one of
+the stock icons that come with GTK+. </li>
+
+        <li>Gtk::CellRendererText - renders strings, numbers or bool
+values as text. </li>
+
+        <li>Gtk::CellRendererToggle - renders a bool value in form of a
+check
+button or as a radio button.</li>
+
+      
+      </ul>
+
+      
+      <ul style="list-style-type: square;">
+
+      
+      </ul>
+
+and their respective constructors are:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>CellRendererPixbuf();<br>
+
+      <br>
+
+CellRendererText();<br>
+
+      <br>
+
+CellRendererToggle();</code></div>
+
+      <br>
+
+If you want to have editable text cells, use CellRendererText and make
+sure the 'editable' property is set:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>Gtk::CellRendererText
+*cell = new
+Gtk::CellRendererText;<br>
+
+cell-&gt;property_editable() = true;</code></div>
+
+      <br>
+
+      
+      <h2><a name="TV02"></a>Tree
+Models</h2>
+
+      
+      <div style="text-align: left;">A<span style="font-weight: bold;">
+TreeModel</span> defines a generic interface for use by the TreeView
+widget. It is an abstract interface,
+and is designed to be usable with any appropriate class. The programmer
+just has to derive a new class that inherits from this
+interface for it to be viewable in a TreeView widget.<br>
+
+      </div>
+
+      
+      <div align="justify">
+      
+      <div style="text-align: left;"><br>
+
+A <strong style="font-weight: normal;">TreeModel</strong> is
+represented as a hierarchical tree of
+strongly-typed, columned data. In other words, the model can be seen as
+a tree where every node has different values depending on which column
+is being queried. The type of data found in a column is determined by
+using the GType system (i.e. G_TYPE_INT, GTK_TYPE_BUTTON,
+G_TYPE_POINTER, etc.). The types are homogeneous per column across all
+nodes. It is important to note that this interface only provides a way
+of examining a model and observing changes. The implementation of each
+individual model decides how and if changes are made.<br>
+
+      <br>
+
+In order to make life simpler for programmers who do not need to write
+their own specialized model, two generic models are provided: <strong>ListStore</strong>
+and <strong>TreeStore</strong>. To use these, the developer simply
+pushes data into these models as necessary. These models provide the
+data structure as well as all appropriate tree interfaces. As a result,
+implementing drag and drop, sorting, and storing data is trivial. For
+the vast majority of trees and lists, these two models are sufficient.<br>
+
+      <br>
+
+Models are accessed on a node/column level of granularity. One can
+query for the value of a model at a certain node and a certain column
+on
+that node. There are two structures used to reference a particular node
+in a model. They are the TreePath and the TreeIter (iter is short for
+iterator). Most of the interface consists of operations on a TreeIter.<br>
+
+      <br>
+
+A <strong>TreePath</strong> is essentially a potential node. It
+is a
+location on a model that may or may not actually correspond to a node
+on
+a specific model. The TreePath class has two methods that can return a
+path either as a String or as a vector of integers. <br>
+
+      </div>
+
+      <br>
+
+      
+      <div class="fbox"><code>String to_string() const;<br>
+      <br>
+std::vector&lt;int&gt; get_indices() const;</code></div>
+
+      <br>
+
+      
+      <div style="text-align: left;">The first method,
+to_string(),&nbsp; returns the string form which is
+a
+list of numbers separated by a colon. Each number (a zero-based index)
+refers to the offset at that level. Thus, the path "0" refers to the
+root node, and the path "2:4" refers to the fifth child of the third
+node. The second method, get_indices(), returns the current indices of
+the path as a vector of integers, each integer representing a node in
+the tree.<br>
+
+      <br>
+
+A <strong>TreeIter</strong><strong> </strong>is a reference to a
+specific
+node on a specific model. It is a generic class that represents an
+integer and three generic pointers. These are filled in by the model in
+a model-specific way. One can convert a path to an iterator by calling
+either of the following TreeModel methods:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>bool
+get_iter(Gtk::TreeIter&amp; iter, const
+Gtk::TreePath&amp; path) const;<br>
+
+      <br>
+
+bool
+get_iter(Gtk::TreeIter&amp; iter, const
+String&amp; path) const;</code></div>
+
+      <br>
+
+The 'iter' argument is an uninitialized TreeIter.
+In
+the first method 'path' is a TreePath and in the second it is the
+string representation of a TreePath. Both methods set iter to a
+valid iterator pointing to the specified path, if it exists and returns
+true.
+Otherwise, iter is left invalid and false is returned.<br>
+
+      <br>
+
+These iterators are the primary way of
+accessing a model and are similar to the iterators used by <a href="textview.html">text buffers</a>. They are generally statically
+allocated on the heap and only used for a short time. The model
+interface defines a set of operations using them for navigating the
+model.<br>
+
+      <br>
+
+It is expected that models fill in the iterator with private data. For
+example, the ListStore model, which is internally a simple linked list,
+stores a list node in one of the pointers. The TreeModelSort stores an
+array and an offset in two of the pointers. Additionally, there is an
+integer field. This field is generally filled with a unique stamp per
+model. This stamp is for catching errors resulting from using invalid
+iterators with a model.<br>
+
+      <br>
+
+The <strong style="font-weight: normal;">life cycle of an iterator</strong>
+can be a little
+confusing at first. Iterators are expected to always be valid for as
+long as the model is unchanged (and doesn't emit a signal). The model
+is considered to own all outstanding iterators and nothing needs to be
+done to free them from the user's point of view. Additionally, some
+models guarantee that an iterator is valid for as long as the node it
+refers to is valid (most notably the ListStore and TreeStore). Although
+generally uninteresting, as one always has to allow for the case where
+iterators do not persist beyond a signal, some very important
+performance enhancements were made in the sort model. As a result, the
+TREE_MODEL_ITERS_PERSIST flag was added to indicate this behavior.<br>
+
+      <br>
+
+To help show some common operations on a model, here are two examples.
+The first example shows three ways of getting the iter at the
+location "3:2:5". While the first method shown is easier, the second is
+much more common, as you often get paths from signal handlers.<br>
+
+      </div>
+
+      </div>
+
+      
+      <div style="text-align: left;"><br>
+
+      </div>
+
+      <strong>Example 1</strong>. <strong>Acquiring a Gtk::TreeIter.<br>
+
+      </strong><br>
+
+      
+      <div style="text-align: left;">There are three ways of getting
+the iter pointing to a location. The
+first two use the above get_iter() methods:<br>
+
+      </div>
+
+      <br>
+
+      
+      <div class="fbox"><code>GtkTreeIter
+iter;<br>
+
+      <br>
+
+// First method: get the iterator
+from a
+path. A smart pointer is used because our tree path must be
+unreferenced.<br>
+
+Pointer&lt;Gtk::TreePath&gt; path = new
+Gtk::TreePath("3:2:5");<br>
+
+bool success =
+model-&gt;get_iter(iter, *path);<br>
+
+      <br>
+
+// Second method: get the iterator
+from a
+string<br>
+
+bool success =
+model-&gt;get_iter(iter, "3:2:5");</code></div>
+
+      <br>
+
+      
+      <div style="text-align: left;">The third method involves walking
+the tree to
+find the iterator. To do this you need to use the TreeModel
+iterate_nth_child() method:<br>
+
+      </div>
+
+      <br>
+
+      
+      <div class="fbox"><code>bool
+iterate_nth_child(Gtk::TreeIter&amp; iter, const
+Gtk::TreeIter *parent, int n);</code></div>
+
+      <br>
+
+      
+      <div style="text-align: left;">The 'iter' argument is an
+uninitialized TreeIter, 'parent'
+is the TreeIter to get the child from, and 'n' is the index of
+the
+desired child. This method sets iter to be the child of parent, using
+the given index. The first index is 0. If index is too big, or parent
+has no children, iter is set to an invalid iterator and false is
+returned. The parent will remain a valid node after this
+method
+has been called. As a special case, if parent is null, then
+the nth root node is set.<br>
+
+      <br>
+
+To find an iterator by walking the tree you would do this:<br>
+
+      </div>
+
+      <br>
+
+      
+      <div class="fbox"><code>Gtk::TreeIter
+iter;<br>
+
+Gtk::TreeIter parent_iter;<br>
+
+      <br>
+
+bool success =
+model-&gt;iterate_nth_child(iter, 0, 3);<br>
+
+if (success)<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; parent_iter = iter;<br>
+
+&nbsp;&nbsp;&nbsp; model-&gt;iterate_nth_child(iter, &amp;parent_iter,
+2);<br>
+
+&nbsp;&nbsp;&nbsp; parent_iter = iter;<br>
+
+&nbsp;&nbsp;&nbsp; model-&gt;iterate_nth_child(iter, 0, 5);<br>
+
+}</code></div>
+
+      <br>
+
+      <strong>Example 2. Reading data from a TreeModel<br>
+
+      <br>
+
+      </strong>
+      
+      <div style="text-align: left;">This second example shows a quick
+way of iterating
+through a list and getting a string and an integer from each row. The
+model used is a ListStore with two columns: a string column and an
+integer column.<br>
+
+      </div>
+
+      <strong><br>
+
+      </strong>
+      
+      <div class="fbox"><code>#include &lt;iostream&gt;<br>
+
+      <br>
+
+enum<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; STRING_COLUMN,<br>
+
+&nbsp;&nbsp;&nbsp; INT_COLUMN,<br>
+
+&nbsp;&nbsp;&nbsp; N_COLUMNS<br>
+
+};<br>
+
+      <br>
+
+Gtk::TreeIter iter;<br>
+
+int row_count = 0;<br>
+
+      <br>
+
+// Get the first iter in the list<br>
+
+bool success =
+model-&gt;get_iter_first(iter);<br>
+
+      <br>
+
+while (success)<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; // Walk through
+the
+list, reading each row<br>
+
+&nbsp;&nbsp;&nbsp; String str_data;<br>
+
+&nbsp;&nbsp;&nbsp; model-&gt;get_value(iter, STRING_COLUMN, str_data);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; int int_data;<br>
+
+&nbsp;&nbsp;&nbsp; model-&gt;get_value(iter, INT_COLUMN, int_data);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Do something
+with the
+data<br>
+
+&nbsp;&nbsp;&nbsp; std::cout &lt;&lt; "Row "
+&lt;&lt;
+&nbsp;row_count &lt;&lt; ": (" &lt;&lt; str_data &lt;&lt; "," &lt;&lt;
+int_data &lt;&lt; ")" &lt;&lt; std::endl;<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; row_count++;<br>
+
+&nbsp;&nbsp;&nbsp; success = model-&gt;iterate_next(iter);<br>
+
+}</code></div>
+
+      <br>
+
+      
+      <h2><a name="TV03"></a>Tree
+Selections</h2>
+
+      
+      <div style="text-align: left;">TreeSelection is a helper object
+to
+manage the selection for a TreeView widget. The TreeSelection object is
+automatically created when a new TreeView widget is created, and cannot
+exist independently of this widget. The primary reason the
+TreeSelection
+object exists is for cleanliness of code and API. That is, there is no
+conceptual reason the TreeSelection functions could not be methods of
+the
+TreeView widget instead.<br>
+
+      <br>
+
+The TreeSelection object can be retrieved from a TreeView widget by
+calling:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>Gtk::TreeSelection*
+get_selection() const;</code></div>
+
+      <br>
+
+      </div>
+
+TreeSelection can be manipulated
+to check the selection
+status of the tree, as well as select and de-select individual rows.
+Selection is done completely view side. As a result, multiple views of
+the same model can have completely different selections. Additionally,
+you cannot change the selection of a row on the model that is not
+currently displayed by the view without expanding its parents first.<br>
+
+      
+      <div style="text-align: left;"> <br>
+
+One of the important things to remember when monitoring the selection
+of a view is that the 'changed' signal is mostly a hint. That
+is,
+it may only emit one signal when a range of rows is selected.
+Additionally, it may on occasion emit a changed signal when
+nothing has happened (mostly as a result of programmers calling
+select_row on an already selected row).<br>
+
+      </div>
+
+      <br>
+
+      
+      <h2><a name="TV04"></a>Creating
+a TreeModel</h2>
+
+      
+      <div style="text-align: left;">XFC provides two types of models
+that can be
+used: ListStore and TreeStore. ListStore is used to model columned list
+widgets, while TreeStore models columned tree widgets. It is possible
+to
+develop a new type of model, but the existing models should be
+satisfactory for all but the most specialized of situations. <br>
+
+      <br>
+
+To create a new ListStore model call one of the following constructors:<br>
+
+      </div>
+
+      <br>
+
+      
+      <div class="fbox"><code>ListStore(int n_columns, ...);<br>
+
+      <br>
+
+ListStore(int n_columns, const std::vector&lt;GType&gt;&amp;
+types);</code></div>
+
+      <br>
+
+      
+      <div style="text-align: left;">The first constructor creates a
+list store 'n_columns' in length, where each column is of the type
+passed in the variable argument list. For
+example:<br>
+
+      </div>
+
+      <br>
+
+      
+      <div class="fbox"><code>Gtk::ListStore
+*model = new Gtk::ListStore(3,
+G_TYPE_INT,
+G_TYPE_STRING,
+G_TYPE_BOOLEAN);</code></div>
+
+      <br>
+
+      
+      <div style="text-align: left;">The second constructor does the
+same thing except
+you pass a vector of types. For example:<br>
+
+      </div>
+
+      <br>
+
+      
+      <div class="fbox"><code>std::vector&lt;GType&gt;
+types;<br>
+
+types.push_back(G_TYPE_INT);<br>
+
+types.push_back(G_TYPE_STRING);<br>
+
+types.push_back(G_TYPE_BOOLEAN);<br>
+
+Gtk::ListStore *model = new
+Gtk::ListStore(3, types);</code></div>
+
+      <br>
+
+      
+      <div style="text-align: left;">
+      
+      <div style="text-align: left;">Both examples create a list store
+with three
+columns: an integer column, a string column and a boolean column. The
+columns appear in the view in the order of declaration. Typically the 3
+is never passed directly like that; usually an enum is created wherein
+the different columns are enumerated, followed by a token that
+represents the total number of columns. The next example will
+illustrate
+this, only using a tree store instead of a list store. Creating a tree
+store operates almost exactly the same.<br>
+
+      </div>
+
+      <br>
+
+      
+      <div class="fbox"><code>enum<br>
+
+{<br>
+
+&nbsp;&nbsp; TITLE_COLUMN, &nbsp; &nbsp;// Book
+title<br>
+
+&nbsp;&nbsp; AUTHOR_COLUMN, &nbsp; // Author<br>
+
+&nbsp;&nbsp; CHECKED_COLUMN, &nbsp;// Is checked
+out?<br>
+
+&nbsp;&nbsp; N_COLUMNS &nbsp; &nbsp; &nbsp; &nbsp;//
+Total number of columns<br>
+
+};<br>
+
+      <br>
+
+Gtk::TreeStore *model = new
+Gtk::TreeStore(N_COLUMNS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN);</code></div>
+
+      <br>
+
+      </div>
+
+      
+      <div style="text-align: left;">Adding data to the model is done
+using one of the ListStore or
+TreeStore set methods. To do this, a TreeIter must be acquired. The
+iterator points to the location where data will be added. Once an
+iterator has been acquired, the set method is used to apply
+data
+to the part of the model that the iterator points to.<br>
+
+      
+      <div style="text-align: left;"> <br>
+
+For a ListStore you can acquire an iterator with one of the following
+methods:<br>
+
+      </div>
+
+      <br>
+
+      
+      <div class="fbox"><code>Gtk::TreeIter
+insert(int position);<br>
+
+      <br>
+
+Gtk::TreeIter insert_before(Gtk::TreeIter&amp; sibling);<br>
+
+      <br>
+
+Gtk::TreeIter insert_after(Gtk::TreeIter&amp; sibling);<br>
+
+      <br>
+
+Gtk::TreeIter prepend();<br>
+
+      <br>
+
+Gtk::TreeIter append();</code></div>
+
+      <br>
+
+All these methods add a new row to the model and
+return an iterator set to this row. The first method inserts the row
+at the specified position. The next two methods insert the row before
+and after the row identified by<em> '</em>sibling'. The fourth method
+prepends the row to the beginning of the list and the the last method
+appends the row to the end of the list.<br>
+
+      
+      <div style="text-align: left;"> <br>
+
+For a TreeStore you can acquire an iterator with one of the following
+methods:<br>
+
+      </div>
+
+      <br>
+
+      
+      <div class="fbox"><code>Gtk::TreeIter
+insert(int position, Gtk::TreeIter *parent
+= 0);<br>
+
+      <br>
+
+Gtk::TreeIter insert_before(Gtk::TreeIter&amp; sibling, Gtk::TreeIter
+*parent = 0);<br>
+
+      <br>
+
+Gtk::TreeIter insert_after(Gtk::TreeIter&amp; sibling, Gtk::TreeIter
+*parent = 0);<br>
+
+      <br>
+
+Gtk::TreeIter prepend(Gtk::TreeIter *parent = 0);<br>
+
+      <br>
+
+Gtk::TreeIter append(Gtk::TreeIter *parent = 0);</code></div>
+
+      <br>
+
+As with ListStore, these methods add a new row to
+the model and return an iterator set to this row, except there is
+an
+extra argument: a pointer to a parent iterator. Remember, a TreeStore
+implements a tree-like hierarchical structure so you can can have
+top level rows, parent rows and child rows. A Child row itself can be a
+parent to a list of child rows which get displayed when the user clicks
+on the row's arrow indicator.<br>
+
+      <br>
+
+In the TreeStore methods above, if 'parent' is null the row is
+added to the top level, otherwise the row is added to the list of child
+rows for the parent. By default, rows are added to the
+top level.<br>
+
+      
+      <div style="text-align: left;"> <br>
+
+There are six methods that can be used to set values in a ListStore or
+TreeStore:<br>
+
+      </div>
+
+      <br>
+
+      
+      <div class="fbox"><code>void
+set_value(Gtk::TreeIter&amp; iter, int
+column, const G::Value&amp; value);<br>
+
+      <br>
+
+void
+set_value(Gtk::TreeIter&amp;
+iter, int column, const
+char *str);<br>
+
+      <br>
+
+template&lt;typename DataType&gt;<br>
+
+void set_value(const
+TreeIter&amp; iter, int column, const DataType&amp; data);<br>
+
+      <br>
+
+template&lt;typename
+DataType&gt;<br>
+
+void set_enum(const
+TreeIter&amp; iter, int column, const DataType&amp; data);<br>
+
+      <br>
+
+template&lt;typename DataType&gt;<br>
+
+void set_object(const TreeIter&amp; iter, int column, const
+DataType&amp; data);<br>
+
+      <br>
+
+template&lt;typename DataType&gt;<br>
+
+void
+set_pointer(const
+TreeIter&amp; iter, int
+column, const
+DataType&amp; data)</code></div>
+
+      <br>
+
+The first two methods are ordinary functions. The
+'iter'
+argument is a valid iterator pointing to the row being modified and
+'column'<em> </em>is
+the column number to modify. In the first method 'value' is a
+G::Value that holds the new value for a cell. The second method lets
+you
+easily set string literals without using a template. The other four
+methods are template functions. They let you set cell values directly
+without using a G::Value.<br>
+
+      <br>
+
+Before going any further, just a word about G::Values and why there are
+four template functions. The G::Value class is declared in
+&lt;xfc/glib/value.hh&gt;. G:Value has 16 overloaded get() and set()
+methods. Most of these methods handle unique data types, like bool,
+gchar, gint, glong and gfloat without any trouble. However, enums and
+flags fall victim to compiler conversions and require special handling
+to prevent compiler errors. Rather than duplicate code, G::Value
+handles
+theses two types internally. All you are required to do is call the
+right method. For enums, you must cast the enum to an integer before
+calling the G::Value get() or set() methods. For flags, you must cast
+the flag to an unsigned integer before calling get() or set().<br>
+
+      <br>
+
+That brings us back to the four template functions.&nbsp; All the
+template functions require a typename 'DataType<em>'. </em>DataType is
+the actual data type you are passing. For the set_value() template it
+must be one of the standard data types, such as bool, int, float,
+double, or an Xfc::String. For set_enum() it can be any
+enumeration type. For set_object() DataType<em> </em>must be a pointer
+to an object derived
+from G::Object. For set_pointer() DataType can be a pointer
+to
+any object. Such pointers are handled internally as a generic (void*)
+pointer, without any interpretation.
+      
+      <div style="text-align: left;"><br>
+
+For example, to set a G_TYPE_BOOLEAN column, you would write:<br>
+
+      </div>
+
+      <br>
+
+      
+      <div class="fbox"><code>model-&gt;set_value(iter,
+column_number, false);</code></div>
+
+      <br>
+
+and to set a G_TYPE_ENUM column, with say a Gtk::StateType, you would
+write:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>model-&gt;set_enum(iter,
+column_number, Gtk::STATE_ACTIVE);</code></div>
+
+      <br>
+
+There are six corresponding methods declared in TreeModel that can be
+used to get values
+from a ListStore or TreeStore:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>void
+get_value(const TreeIter&amp; iter, int column, G::Value&amp; value)
+const;<br>
+
+      <br>
+
+bool get_value(const TreeIter&amp; iter, int column, String&amp; str)
+const;<br>
+
+      <br>
+
+template&lt;typename
+DataType&gt;<br>
+
+void get_value(const TreeIter&amp; iter, int
+column, DataType&amp; data) const;<br>
+
+      <br>
+
+template&lt;typename
+DataType, typename ValueType&gt;<br>
+
+void get_enum(const TreeIter&amp; iter, int column, DataType&amp; data)
+const;<br>
+
+&nbsp;<br style="color: rgb(153, 0, 0);">
+
+template&lt;typename DataType&gt;<br>
+
+void get_object(const TreeIter&amp; iter, int column, DataType&amp;
+data) const;<br>
+
+&nbsp;<br>
+
+template&lt;typename DataType&gt;<br>
+
+void
+get_pointer(const
+TreeIter&amp; iter, int
+column, DataType&amp; data) const;</code></div>
+
+      <br>
+
+To get the value set for the G_TYPE_BOOLEAN column above you would do
+this:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>bool
+value;<br>
+
+model-&gt;get_value(iter, column_number, value);</code></div>
+
+      <br>
+
+and to get the value set for the G_TYPE_ENUM column above you would do
+this:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>Gtk::StateType
+value;<br>
+
+model-&gt;get_enum(iter, column_number, value);</code></div>
+
+      <br>
+
+So, putting it all together, consider the initial example: <br>
+
+      <br>
+
+      
+      <div class="fbox"><code>//
+Acquire an iterator<br>
+
+Gtk::TreeIter iter = model-&gt;append();<br>
+
+      <br>
+
+// Set the cell values<br>
+
+model-&gt;set_value(iter, TITLE_COLUMN, "The
+Principle of
+Reason");<br>
+
+model-&gt;set_value(iter,&nbsp;AUTHOR_COLUMN,&nbsp;"Martin Heidegger");<br>
+
+model-&gt;set_value(iter,&nbsp;CHECKED_COLUMN, false);</code></div>
+
+      <br>
+
+The argument passed to the TreeStore append method is a
+parent iterator. It is used to add a row to a TreeStore as a child of
+an
+existing row. This means that the new row will only be visible when its
+parent is visible and in its expanded state. <br>
+
+      <br>
+
+Here is a TreeStore example that uses child iterators: <br>
+
+      <br>
+
+      
+      <div class="fbox"><code>//
+Acquire a top-level iterator<br>
+
+Gtk::TreeIter parent_iter = model-&gt;append();<br>
+
+      <br>
+
+// Set the cell values<br>
+
+model-&gt;set_value(parent_iter, TITLE_COLUMN, "The
+Art of
+Computer Programming");<br>
+
+model-&gt;set_value(parent_iter,&nbsp;AUTHOR_COLUMN,&nbsp;"Donald E.
+Knuth");<br>
+
+model-&gt;set_value(parent_iter,&nbsp;CHECKED_COLUMN, false);<br>
+
+      <br>
+
+// Acquire a child iterator and set
+the
+values for the child cell<br>
+
+Gtk::TreeIter child_iter =
+model-&gt;append(&amp;parent_iter);<br>
+
+model-&gt;set_value(child_iter, TITLE_COLUMN,&nbsp;"Volume 1:
+Fundamental Algorithms");<br>
+
+      <br>
+
+child_iter = model-&gt;append(&amp;parent_iter);<br>
+
+model-&gt;set_value(child_iter, TITLE_COLUMN,&nbsp;"Volume 2:
+Seminumerical Algorithms");<br>
+
+      <br>
+
+child_iter = model-&gt;append(&amp;parent_iter);<br>
+
+model-&gt;set_value(child_iter, TITLE_COLUMN,&nbsp;"Volume 3: Sorting
+and Searching");</code></div>
+
+      <br>
+
+      
+      <h2><a name="TV05"></a>Creating
+a TreeView</h2>
+
+While there are several different models to choose
+from, there is only one view widget to deal with. It works with either
+a ListStore or TreeStore model. Setting up a TreeView is not difficult
+but it does need a TreeModel to know where to retrieve its data from. <br>
+
+      <br>
+
+You can create a TreeView with one of the following constructors:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>TreeView();<br>
+
+      <br>
+
+TreeView(Gtk::TreeModel&amp;
+model);</code></div>
+
+      <br>
+
+If you call the first constructor you will need to explicitly set the
+model. <br>
+
+      <br>
+
+You can set and get the model for the TreeView by calling these two
+methods:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>void
+set_model(Gtk::TreeModel *model);<br>
+
+      <br>
+
+Gtk::TreeModel* get_model() const;</code> </div>
+
+      <br>
+
+Once the TreeView widget has a model, it will need
+to know how to display the model. It does this with columns and <a href="treeview.html#TV01">cell
+renderers</a>. <br>
+
+      <br>
+
+      
+      <h2><a name="TV06"></a>Creating
+a TreeViewColumn</h2>
+
+      <strong style="font-weight: normal;">A TreeViewColumn</strong> is
+the object
+that TreeView uses to organize the vertical columns in the tree view.
+It
+needs to know the name of the column to label for the user, what type
+of
+cell renderer to use, and which piece of data to retrieve from the
+model
+for a given row. <br>
+
+      <br>
+
+You can create a TreeViewColumn by calling one of the following
+constructors:<br>
+
+      <span style="color: rgb(21, 67, 116);"></span><br>
+
+      
+      <div class="fbox"><code>TreeViewColumn();<br>
+
+      <br>
+
+TreeViewColumn(const
+String&amp; title);<br>
+
+      <br>
+
+TreeViewColumn(const String&amp; title,
+Gtk::CellRenderer&amp; cell, const
+String&amp; attribute, int
+column);<br>
+
+      <br>
+
+TreeViewColumn(const
+String&amp; title, CellRenderer&amp; cell, const
+CellColumnAttributes&amp;
+attributes); </code></div>
+
+      <span style="color: rgb(21, 67, 116);"></span><br>
+
+The 'title' argument is the title of the tree
+column,&nbsp;
+'cell' is the cell renderer to pack into the beginning of the
+tree column, 'attribute' is an attribute of the cell renderer, and
+'column'&nbsp; is the column position on the model to get the attribute
+from.&nbsp; In the last constructor the 'attributes' argument is a
+CellColumnAttributes object containing the tree column attributes to
+set.<br>
+
+      <br>
+
+Here is a simple example that uses the third constructor to set one
+attribute column:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>Gtk::CellRendererText
+*cell = new Gtk::CellRendererText;<br>
+
+Gtk::TreeViewColumn *column = new
+Gtk::TreeViewColumn ("Author", cell, "text",
+AUTHOR_COLUMN);<br>
+
+tree_view-&gt;append_column(*column);</code></div>
+
+      <br>
+
+Here is an example that uses a CellColumnAttributes object to set
+several attributes:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>enum { <br>
+
+&nbsp;&nbsp;&nbsp; TEXT_COLUMN, <br>
+
+&nbsp;&nbsp;&nbsp; COLOR_COLUMN, <br>
+
+&nbsp;&nbsp;&nbsp; N_COLUMNS <br>
+
+};<br>
+
+      <br>
+
+Gtk::CellRendererText&nbsp; *cell = new Gtk::CellRendererText();<br>
+
+Gtk::CellColumnAttributes attributes;<br>
+
+attributes.add("text", TEXT_COLUMN);<br>
+
+attributes.add("foreground", COLOR_COLUMN);<br>
+
+Gtk::TreeViewColumn *column = new
+Gtk::TreeViewColumn("Title", cell, attributes);<br>
+
+tree_view-&gt;append_column(*column);</code></div>
+
+      <br>
+
+      
+      <h2><a name="TV07"></a>Managing
+a Selection</h2>
+
+At this point, all the steps in creating a displayable tree have been
+covered. The model is created, data is stored in it, a tree view is
+created and columns are added to it. Most applications will need to not
+only deal with displaying data, but
+also receiving input events from users. To do this, simply get a
+reference to a selection object and connect a slot to its 'changed'
+signal.<br>
+
+      <br>
+
+You would connect a slot the changed signal like this: <br>
+
+      <br>
+
+      
+      <div class="fbox"><code>Gtk::TreeSelection *selection =
+tree_view-&gt;get_selection();<br>
+
+selection-&gt;set_mode(Gtk::SELECTION_SINGLE);<br>
+
+selection-&gt;signal_changed().connect(sigc::mem_fun(this,
+&amp;MyWindow::changed_handler));</code></div>
+
+      <br>
+
+where the 'changed_handler' has the prototype:<br>
+
+      <samp><br>
+
+      </samp>
+      
+      <div class="fbox"><code>void
+MyWindow::changed_handler();</code></div>
+
+      <br>
+
+Then, you retrieve the row data in the 'changed_handler' like this: <br>
+
+      <br>
+
+      
+      <div class="fbox"><code>void<br>
+
+MyWindow::changed_handler()<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; Gtk::TreeModel *model = 0;<br>
+
+&nbsp;&nbsp;&nbsp; Gtk::TreeIter iter;<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; if
+(selection-&gt;get_selected(&amp;iter, &amp;model))<br>
+
+&nbsp;&nbsp;&nbsp; {<br>
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; String author;<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; model-&gt;get_value(iter,
+AUTHOR_COLUMN, author);<br>
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; g_print ("You selected a book by
+%s\n", author);<br>
+
+&nbsp;&nbsp;&nbsp; }<br>
+
+}</code></div>
+
+      <br>
+
+      
+      <h2><a name="TV08"></a>TreeView
+Example</h2>
+
+Here is an simple example of using a TreeView
+widget that creates a simple
+model
+and view, and puts them together. The model is populated with the data
+from &nbsp;the section: <a href="treeview.html#TV04">Creating a Model</a>.
+More information can be found on this in the <a href="treeview.html#TV02">Tree Models</a> section.<br>
+
+      <br>
+
+The header file for the TreeView example is
+&lt;treeview.hh&gt;:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+
+#include &lt;xfc/gtk/treestore.hh&gt;<br>
+
+#include &lt;xfc/gtk/treeview.hh&gt;<br>
+
+#include &lt;xfc/gtk/window.hh&gt;<br>
+
+      <br>
+
+using namespace Xfc;<br>
+
+      <br>
+
+class TreeViewWindow : public Gtk::Window<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; Pointer&lt;Gtk::TreeStore&gt; model;<br>
+
+&nbsp;&nbsp;&nbsp; Gtk::TreeView *tree_view;<br>
+
+      <br>
+
+protected:<br>
+
+&nbsp;&nbsp;&nbsp; void on_selection();<br>
+
+&nbsp;&nbsp;&nbsp; void on_toggled(const char *path_str);<br>
+
+      <br>
+
+public:<br>
+
+&nbsp;&nbsp;&nbsp; TreeViewWindow();<br>
+
+&nbsp;&nbsp;&nbsp; virtual
+~TreeViewWindow();<br>
+
+};</code></div>
+
+      <br>
+
+and the source file is &lt;treeview.cc&gt;:<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>#include "treeview.hh"<br>
+
+#include &lt;xfc/gtk/cellrenderertext.hh&gt;<br>
+
+#include &lt;xfc/gtk/cellrenderertoggle.hh&gt;<br>
+
+#include &lt;iostream&gt;<br>
+
+      <br>
+
+enum<br>
+
+{<br>
+
+&nbsp;&nbsp; TITLE_COLUMN,<br>
+
+&nbsp;&nbsp; AUTHOR_COLUMN,<br>
+
+&nbsp;&nbsp; CHECKED_COLUMN,<br>
+
+&nbsp;&nbsp; N_COLUMNS<br>
+
+};<br>
+
+      <br>
+
+TreeViewWindow::TreeViewWindow()<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; set_title("TreeView Example");<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // We'll create a
+TreeStore model but this could be any model. The model pointer<br>
+
+&nbsp;&nbsp;&nbsp; // is a smart pointer because we own the initial
+reference and it must be freed.<br>
+
+&nbsp;&nbsp;&nbsp; model = new Gtk::TreeStore(N_COLUMNS,
+G_TYPE_STRING, G_TYPE_STRING, G_TYPE_BOOLEAN);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Populate the
+model
+with data. First acquire a top-level iterator.<br>
+
+&nbsp;&nbsp;&nbsp; Gtk::TreeIter parent_iter =
+model-&gt;append();<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Then, set the
+cell
+values<br>
+
+&nbsp;&nbsp;&nbsp; model-&gt;set_value(parent_iter,
+TITLE_COLUMN, "The Art of Computer Programming");<br>
+
+&nbsp;&nbsp;&nbsp; model-&gt;set_value(parent_iter, AUTHOR_COLUMN,
+"Donald E. Knuth");<br>
+
+&nbsp;&nbsp;&nbsp; model-&gt;set_value(parent_iter, CHECKED_COLUMN,
+false);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Then, acquire a
+child
+iterator and set the values for the child cells<br>
+
+&nbsp;&nbsp;&nbsp; Gtk::TreeIter child_iter =
+model-&gt;append(&amp;parent_iter);<br>
+
+&nbsp;&nbsp;&nbsp; model-&gt;set_value(child_iter, TITLE_COLUMN,
+"Volume 1: Fundamental Algorithms");<br>
+
+&nbsp;&nbsp;&nbsp; model-&gt;set_value(child_iter, CHECKED_COLUMN,
+false);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; child_iter = model-&gt;append(&amp;parent_iter);<br>
+
+&nbsp;&nbsp;&nbsp; model-&gt;set_value(child_iter, TITLE_COLUMN,
+"Volume 2: Seminumerical Algorithms");<br>
+
+&nbsp;&nbsp;&nbsp; model-&gt;set_value(child_iter, CHECKED_COLUMN,
+false);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; child_iter = model-&gt;append(&amp;parent_iter);<br>
+
+&nbsp;&nbsp;&nbsp; model-&gt;set_value(child_iter, TITLE_COLUMN,
+"Volume 3: Sorting and Searching");<br>
+
+&nbsp;&nbsp;&nbsp; model-&gt;set_value(child_iter, CHECKED_COLUMN,
+false);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Create a
+TreeView<br>
+
+&nbsp;&nbsp;&nbsp; tree_view = new
+Gtk::TreeView(*model);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // You can't
+create a
+TreeSelection, you have to retrieve it from the TreeView.<br>
+
+&nbsp;&nbsp;&nbsp; Gtk::TreeSelection *selection =
+tree_view-&gt;get_selection();<br>
+
+&nbsp;&nbsp;&nbsp; selection-&gt;set_mode (Gtk::SELECTION_SINGLE);<br>
+
+&nbsp;&nbsp;&nbsp;
+selection-&gt;signal_changed().connect(sigc::mem_fun(this,
+&amp;TreeViewWindow::on_selection));<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Create a text
+cell
+render and arbitrarily make it red for demonstration purposes.<br>
+
+&nbsp;&nbsp;&nbsp; Gtk::CellRendererText *renderer = new
+Gtk::CellRendererText;<br>
+
+&nbsp;&nbsp;&nbsp; renderer-&gt;property_foreground().set("red");<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Create first
+column,
+associating the "text" attribute of the cell_renderer with the first
+column of the model<br>
+
+&nbsp;&nbsp;&nbsp; Gtk::TreeViewColumn *column = new
+Gtk::TreeViewColumn("Author", renderer,
+"text", AUTHOR_COLUMN);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Add the column
+to the
+view.<br>
+
+&nbsp;&nbsp;&nbsp;
+tree_view-&gt;append_column(*column);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Create second
+column.
+The title of the book.<br>
+
+&nbsp;&nbsp;&nbsp; renderer = new
+Gtk::CellRendererText;<br>
+
+&nbsp;&nbsp;&nbsp; column = new
+Gtk::TreeViewColumn("Title", renderer, "text", TITLE_COLUMN);<br>
+
+&nbsp;&nbsp;&nbsp; tree_view-&gt;append_column(*column);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Create last
+column.
+Whether a book is checked out.<br>
+
+&nbsp;&nbsp;&nbsp; Gtk::CellRendererToggle
+*toggle_renderer = new
+Gtk::CellRendererToggle;<br>
+
+&nbsp;&nbsp;&nbsp;
+toggle_renderer-&gt;signal_toggled().connect(sigc::mem_fun(this,
+&amp;TreeViewWindow::on_toggled));<br>
+
+&nbsp;&nbsp;&nbsp; column = new
+Gtk::TreeViewColumn("Check out", toggle_renderer, "active",
+CHECKED_COLUMN);<br>
+
+&nbsp;&nbsp;&nbsp; tree_view-&gt;append_column(*column);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Now we can
+manipulate
+the view just like any other widget<br>
+
+&nbsp;&nbsp;&nbsp; add(*tree_view);<br>
+
+&nbsp;&nbsp;&nbsp; tree_view-&gt;show_all();<br>
+
+}<br>
+
+      <br>
+
+      <br>
+
+TreeViewWindow::~TreeViewWindow()<br>
+
+{<br>
+
+}<br>
+
+      <br>
+
+void<br>
+
+TreeViewWindow::on_selection()<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; Gtk::TreeIter iter;<br>
+
+&nbsp;&nbsp;&nbsp; Gtk::TreeSelection *selection =
+tree_view-&gt;get_selection();<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; if
+(selection-&gt;get_selected(&amp;iter))<br>
+
+&nbsp;&nbsp;&nbsp; {<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; String title;<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; model-&gt;get_value(iter,
+TITLE_COLUMN, title);<br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; std::cout &lt;&lt; "You
+selected a book with the title \"" &lt;&lt; title &lt;&lt; "\""
+&lt;&lt;
+std::endl;<br>
+
+&nbsp;&nbsp;&nbsp; }<br>
+
+}<br>
+
+      <br>
+
+void<br>
+
+TreeViewWindow::on_toggled(const
+char *path_str)<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; Gtk::TreeIter iter;<br>
+
+&nbsp;&nbsp;&nbsp; Pointer&lt;Gtk::TreePath&gt; path = new
+Gtk::TreePath(path_str);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Get toggled iter<br>
+
+&nbsp;&nbsp;&nbsp; model-&gt;get_iter(iter, *path);<br>
+
+&nbsp;&nbsp;&nbsp; bool checked;<br>
+
+&nbsp;&nbsp;&nbsp; model-&gt;get_value(iter, CHECKED_COLUMN, checked);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Do something
+with the
+value<br>
+
+&nbsp;&nbsp;&nbsp; checked ^= 1;<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; // Set new value
+for the
+CHECKED_COLUMN<br>
+
+&nbsp;&nbsp;&nbsp; model-&gt;set_value(iter,
+CHECKED_COLUMN, checked);<br>
+
+}<br>
+
+      <br>
+
+int main (int
+argc, char *argv[])<br>
+
+{<br>
+
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; TreeViewWindow window;<br>
+
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+
+&nbsp;&nbsp;&nbsp; window.show();<br>
+
+      <br>
+
+&nbsp;&nbsp;&nbsp; run();<br>
+
+&nbsp;&nbsp;&nbsp; return 0;<br>
+
+}</code></div>
+
+      <br>
+
+      
+      <h2>Compiling TreeView<br>
+
+      </h2>
+
+If you compiled and installed XFC yourself, you will find the source
+code for TreeView in the
+&lt;examples/howto/treeview&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/treeview&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+
+      <br>
+
+To create a Makefile for TreeView, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+
+      <br>
+
+      
+      <div class="fbox"><code>CC = g++<br>
+
+      <br>
+
+CFLAGS = -Wall -O2<br>
+
+      <br>
+
+treeview: treeview.cc treeview.hh<br>
+
+&nbsp;&nbsp;&nbsp; $(CC) treeview.cc -o treeview $(CFLAGS) `pkg-config
+xfcui-X.X --cflags --libs`<br>
+
+      <br>
+
+clean: <br>
+
+&nbsp;&nbsp;&nbsp; rm -f *.o treeview</code><br>
+
+      </div>
+
+      <br>
+
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+
+      <br>
+
+      
+      <div style="text-align: center;"><img style="width: 451px; height: 160px;" alt="" src="../../images/treeview.png"><br>
+
+      </div>
+
+      <br>
+
+The window displays a simple tree view with one parent row and three
+child rows. Click on the row arrow to display and hide the child rows.
+You can also check the checkbuttons at the end of each row. When you
+select a row its title string is written to the standard output,
+usually the screen.<br>
+
+      <br>
+
+      
+      <hr style="width: 100%; height: 1px;"> </div>
+
+      </div>
+
+      
+      <table style="width: 100%; text-align: left;" border="0" cellpadding="2" cellspacing="0">
+
+        <tbody>
+
+          <tr>
+
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+
+            <td style="text-align: center;"><a class="qindexF" href="treeview.html">Top</a><br>
+
+            </td>
+
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+
+            </td>
+
+          </tr>
+
+        
+        </tbody>
+      
+      </table>
+
+      
+      <div style="text-align: center;"><br>
+
+      </div>
+
+      </td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+</body>
+</html>

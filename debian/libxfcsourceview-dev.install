@@ -1,0 +1,2 @@
+debian/tmp/usr/include/xfce4/xfc/sourceview/*.hh
+debian/tmp/usr/lib/pkgconfig/xfcsourceview-*.pc

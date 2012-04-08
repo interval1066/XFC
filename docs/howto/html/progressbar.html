@@ -1,0 +1,453 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Progress Bars" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Progress
+Bars</h1>
+      <br>
+      <div style="text-align: left;">Progress
+bars are used to show the
+status of
+an
+operation. They are pretty easy to use, as you will see with the code
+below. But first lets start out with the constructors that create a new
+progress bar.<br>
+      </div>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <div class="fbox"><samp>ProgressBar();<br>
+      <br>
+      </samp><samp>ProgressBar(Gtk::ProgressBarOrientation
+orientation);</samp></div>
+      <br>
+      </div>
+The 'orientation' argument&nbsp; can be one of the following values
+to indicate the direction in which the progress bar moves:<br>
+      <div style="text-align: left;">
+      <ul style="list-style-type: square;">
+        <li>PROGRESS_LEFT_TO_RIGHT
+(the default)</li>
+        <li>PROGRESS_RIGHT_TO_LEFT</li>
+        <li>PROGRESS_BOTTOM_TO_TOP</li>
+        <li>PROGRESS_TOP_TO_BOTTOM</li>
+      </ul>
+The first constructor takes no arguments and
+creates a progress bar with the default orientation. You can set the
+orientation at any time with the following method:<br>
+      <br>
+      <div class="fbox"><code>void
+set_orientation(Gtk::ProgressBarOrientation orientation);</code></div>
+      <br>
+      </div>
+Now that the progress bar has been created and the orientation set we
+can use it.<br>
+      <div style="text-align: left;"> <br>
+      <div class="fbox"><code>void
+set_fraction(double fraction);</code></div>
+      <br>
+The 'fraction' argument is the amount completed,
+meaning the amount the progress bar has been filled from 0-100%. This
+is
+passed to the method as a real number ranging from 0 to 1.<br>
+      <br>
+As well as indicating the amount of progress that has occurred, the
+progress bar may be set to just indicate that there is some activity.
+This can be useful in situations where progress cannot be measured
+against a value range. The following method indicates that some
+progress
+has been made.<br>
+      <br>
+      <div class="fbox"><code>void
+pulse();</code></div>
+      <br>
+The step size of the activity indicator is set using the following
+method:<br>
+      <br>
+      <div class="fbox"><code>void
+set_pulse_step(double fraction);</code></div>
+      <br>
+When not in activity mode, the progress bar can also display a
+configurable text string within its trough, using the following method:<br>
+      <br>
+      <div class="fbox"><code>void
+set_text(const String&amp; text);</code></div>
+      <br>
+You can turn off the display of the string by calling
+Gtk::ProgessBar::set_text() again with null as the argument.<br>
+      <br>
+The current text setting of a progress bar can be retrieved with the
+following method: <br>
+      <br>
+      <div class="fbox"><code>String
+get_text() const;</code></div>
+      <br>
+Progress Bars are usually used with <a href="mainloop.html#ML04">timeouts</a>
+or
+other such functions to give the illusion of multitasking. All
+will employ the Gtk::ProgressBar set_fraction() or pulse() methods in
+the same manner.<br>
+      <div style="text-align: left;"> <br>
+      <h2><a name="example"></a><span style="color: rgb(21, 67, 116);">ProgessBar
+Example</span></h2>
+Here is an example of a progress bar updated using timeouts. This
+code also shows you how to reset the progress bar.<br>
+      </div>
+      <br>
+The header file for the ProgressBar example is
+&lt;progressbar.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include
+&lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/progressbar.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class ProgressBarWindow : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Gtk::ProgressBar *progress_bar;<br>
+&nbsp;&nbsp;&nbsp; bool activity_mode;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; sigc::connection timeout_connection;<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; bool on_timeout();<br>
+&nbsp;&nbsp;&nbsp; void
+on_toggle_show_text();<br>
+&nbsp;&nbsp;&nbsp; void
+on_toggle_activity_mode();<br>
+&nbsp;&nbsp;&nbsp; void
+on_toggle_orientation();<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; ProgressBarWindow();<br>
+&nbsp;&nbsp;&nbsp; ~ProgressBarWindow();<br>
+};</code></div>
+      <br>
+and the source file is &lt;progressbar.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include
+"progressbar.hh"<br>
+#include &lt;xfc/gtk/alignment.hh&gt;<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+#include &lt;xfc/gtk/checkbutton.hh&gt;<br>
+#include &lt;xfc/gtk/separator.hh&gt;<br>
+#include &lt;xfc/gtk/table.hh&gt;<br>
+#include &lt;xfc/glib/main.hh&gt;<br>
+      <br>
+ProgressBarWindow::ProgressBarWindow()<br>
+: activity_mode(false)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_resizable(true);<br>
+&nbsp;&nbsp;&nbsp; set_title("ProgressBar Example");<br>
+&nbsp;&nbsp;&nbsp; set_border_width(0);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::VBox *vbox = new
+Gtk::VBox(false, 5);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;set_border_width(10);<br>
+&nbsp;&nbsp;&nbsp; add(*vbox);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create a
+centering
+alignment object<br>
+&nbsp;&nbsp;&nbsp; Gtk::Alignment *align = new
+Gtk::Alignment(0.5, 0.5);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*align,
+false,false, 5);<br>
+&nbsp;&nbsp;&nbsp; align-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create the
+GtkProgressBar<br>
+&nbsp;&nbsp;&nbsp; progress_bar = new
+Gtk::ProgressBar;<br>
+&nbsp;&nbsp;&nbsp; align-&gt;add(*progress_bar);<br>
+&nbsp;&nbsp;&nbsp; progress_bar-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Add a timer callback to
+update the value of the progress bar<br>
+&nbsp;&nbsp;&nbsp; timeout_connection =
+G::timeout_signal.connect(sigc::mem_fun(this,
+&amp;ProgressBarWindow::on_timeout), 100);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::HSeparator *separator = new
+Gtk::HSeparator;<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*separator,
+false, false);<br>
+&nbsp;&nbsp;&nbsp; separator-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Add table:
+rows,
+columns, homogeneous = false (by default)<br>
+&nbsp;&nbsp;&nbsp; Gtk::Table *table = new Gtk::Table(2, 2);<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*table, false);<br>
+&nbsp;&nbsp;&nbsp; table-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Add a check
+button to
+select displaying of the trough text<br>
+&nbsp;&nbsp;&nbsp; Gtk::CheckButton *check = new
+Gtk::CheckButton("Show
+text");<br>
+&nbsp;&nbsp;&nbsp; table-&gt;attach(*check, 0, 1, 0, 1,
+Gtk::EXPAND |
+Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 5, 5);<br>
+&nbsp;&nbsp;&nbsp;
+check-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;ProgressBarWindow::on_toggle_show_text));<br>
+&nbsp;&nbsp;&nbsp; check-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Add a check
+button to
+toggle activity mode<br>
+&nbsp;&nbsp;&nbsp; check = new
+Gtk::CheckButton("Activity mode");<br>
+&nbsp;&nbsp;&nbsp; table-&gt;attach(*check, 0, 1, 1, 2,
+Gtk::EXPAND |
+Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 5, 5);<br>
+&nbsp;&nbsp;&nbsp;
+check-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;ProgressBarWindow::on_toggle_activity_mode));<br>
+&nbsp;&nbsp;&nbsp; check-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Add a check
+button to
+toggle orientation<br>
+&nbsp;&nbsp;&nbsp; check = new
+Gtk::CheckButton("Right to Left");<br>
+&nbsp;&nbsp;&nbsp; table-&gt;attach(*check, 0, 1, 2, 3,
+Gtk::EXPAND |
+Gtk::FILL, Gtk::EXPAND | Gtk::FILL, 5, 5);<br>
+&nbsp;&nbsp;&nbsp;
+check-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;ProgressBarWindow::on_toggle_orientation));<br>
+&nbsp;&nbsp;&nbsp; check-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Add a button to
+exit
+the program<br>
+&nbsp;&nbsp;&nbsp; Gtk::Button *button = new
+Gtk::Button("close");<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;ProgressBarWindow::dispose));<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*button, false,
+false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // This makes it
+so the
+button is the default.<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;set_flags(Gtk::CAN_DEFAULT);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // This grabs this
+button to be the default button. Simply hitting the "Enter" key<br>
+&nbsp;&nbsp;&nbsp; // will cause this button to activate.<br>
+&nbsp;&nbsp;&nbsp; button-&gt;grab_default();<br>
+&nbsp;&nbsp;&nbsp; button-&gt;show();<br>
+}<br>
+      <br>
+ProgressBarWindow::~ProgressBarWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; timeout_connection.disconnect();<br>
+}<br>
+      <br>
+bool<br>
+ProgressBarWindow::on_timeout()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; if
+(activity_mode)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+progress_bar-&gt;pulse();<br>
+&nbsp;&nbsp;&nbsp; else<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; //
+Calculate the value of the progress bar using the value range set in
+the
+adjustment object<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; double
+new_value = progress_bar-&gt;get_fraction() + 0.01;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if
+(new_value &gt; 1.0)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; new_value =
+0.0;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; // Set
+the
+new value<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+progress_bar-&gt;set_fraction(new_value);<br>
+&nbsp;&nbsp;&nbsp; }<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // As this is a timeout slot,
+return true so that it continues to get called<br>
+&nbsp;&nbsp;&nbsp; return true;<br>
+}<br>
+      <br>
+void<br>
+ProgressBarWindow::on_toggle_show_text()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; // Toggles the text display
+within the progress bar trough<br>
+&nbsp;&nbsp;&nbsp; String text =
+progress_bar-&gt;get_text();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; if (!text.empty())<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+progress_bar-&gt;set_text("");<br>
+&nbsp;&nbsp;&nbsp; else<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+progress_bar-&gt;set_text("some
+text");<br>
+}<br>
+      <br>
+void<br>
+ProgressBarWindow::on_toggle_activity_mode()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; // Toggles the activity mode
+of the progress bar<br>
+&nbsp;&nbsp;&nbsp; activity_mode = !activity_mode;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; if (activity_mode)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+progress_bar-&gt;pulse();<br>
+&nbsp;&nbsp;&nbsp; else<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+progress_bar-&gt;set_fraction(0.0);<br>
+}<br>
+      <br>
+void<br>
+ProgressBarWindow::on_toggle_orientation()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; // Toggles the orientation of
+the progress bar<br>
+&nbsp;&nbsp;&nbsp; if
+(progress_bar-&gt;get_orientation() == Gtk::PROGRESS_LEFT_TO_RIGHT)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+progress_bar-&gt;set_orientation(Gtk::PROGRESS_RIGHT_TO_LEFT);<br>
+&nbsp;&nbsp;&nbsp; else<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+progress_bar-&gt;set_orientation(Gtk::PROGRESS_LEFT_TO_RIGHT);<br>
+}<br>
+      <br>
+int main (int
+argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; ProgressBarWindow window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp;&nbsp; window.show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return 0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling ProgressBar<br>
+      </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for ProgressBar in the
+&lt;examples/howto/progressbar&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/progressbar&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for ProgressBar, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+progressbar: progressbar.cc progressbar.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) progressbar.cc -o progressbar $(CFLAGS)
+`pkg-config xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o progressbar</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 248px; height: 245px;" alt=""
+ src="../../images/progressbar.png"><br>
+      </div>
+      <br>
+Checking the 'Show text' check button displays the text string 'some
+text' in the progress bar trough. Checking the right-to-left
+check button will make the progress bar update from the right side
+instead of the left. Checking the 'Activity mode' check button will
+switch the progess bar into action mode. In this mode the progess bar
+displays a block that moves up and down the trough at a constant rate
+to indicate that some activity is occuring.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="progressbar.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

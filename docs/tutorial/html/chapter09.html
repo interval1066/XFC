@@ -1,0 +1,880 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+  <meta content="Tutorial: Adding International Support"
+ name="description">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="0" cellspacing="0">
+        <tbody>
+          <tr>
+            <td class="qindexF" style="white-space: nowrap; width: 50%;">&nbsp;&laquo;
+            <a class="qindexH" href="index.html">Index</a><span
+ class="qindexH"> | </span><a class="qindexH" href="chapter08.html">Building
+a GNU
+autotools project</a><span class="qindexH"></span><span class="qindexH"></span>
+            </td>
+            <td
+ style="white-space: nowrap; text-align: right; width: 50px;"><a
+ href="pretend"><span class="qindexF"></span><span class="qindexF"></span></a>&nbsp;
+            <br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+    <tr>
+      <td rowspan="1" colspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1><span style="color: rgb(21, 67, 116);">Chapter
+9: Adding International Support</span></h1>
+      <h3>Table of Contents</h3>
+      <ol>
+        <li><a class="mhl" href="chapter09.html#C901">Preparing program
+sources</a></li>
+        <li><a class="mhl" href="chapter09.html#C902">Invoking the
+gettextize
+program</a></li>
+        <li><a class="mhl" href="chapter09.html#C903">Internationalizing
+an XFC
+package</a></li>
+        <li><a class="mhl" href="chapter09.html#C904">Compiling XfcApp</a><br>
+        </li>
+        <li><a class="mhl" href="chapter09.html#C905">Creating the PO
+template file</a></li>
+        <li><a class="mhl" href="chapter09.html#C906">The GNOME
+Translation
+Project</a><br>
+        </li>
+        <li><a class="mhl" href="chapter09.html#C907">Some helpful links</a></li>
+      </ol>
+      <br>
+      <span style="font-family: sans-serif;">This chapter will take you
+step-by-step through the process of adding
+international support to the project you built in the previous
+chapter: </span><a style="font-family: sans-serif;"
+ href="chapter08.html">Building
+a GNU autotools project</a><span style="font-family: sans-serif;">.&nbsp;
+You should work through that chapter
+first, if you haven't done so, and come back to this chapter later.
+Most
+of the information presented here is from the GNU gettext
+documentation.
+The first two sections cover some important background
+information. The remaining sections show you how to add international
+support to an
+XFC package and explains how to get help with your translations.</span><br
+ style="font-family: sans-serif;">
+      <br style="font-family: sans-serif;">
+      <span style="font-family: sans-serif;">To be useful, a program
+must present its messages in a language that
+the user can understand. </span><span
+ style="font-family: sans-serif; font-weight: bold;">Internationalization</span><span
+ style="font-family: sans-serif;">
+is the process of making your software support a range of languages. </span><span
+ style="font-weight: bold; font-family: sans-serif;">Localization</span><span
+ style="font-family: sans-serif;"> is the process of
+modifying a program so that it can display its messages in an
+appropriately translated form. These terms are often abbreviated </span>to
+      <span style="font-weight: bold; font-family: sans-serif;">i18n</span><span
+ style="font-family: sans-serif;"> and </span><span
+ style="font-weight: bold; font-family: sans-serif;">l10n</span><span
+ style="font-family: sans-serif;"> respectively, after the number
+of letters between the first and last letters of each word. </span><br
+ style="font-family: sans-serif;">
+      <br style="font-family: sans-serif;">
+      <span style="font-family: sans-serif;">For localization,
+GTK+/GNOME uses the GNU <span style="font-weight: bold;">gettext</span>
+interface. </span><span style="font-family: sans-serif;">GNU </span><span
+ style="font-family: sans-serif;">gettext</span><span
+ style="font-family: sans-serif;"> works by using the strings in
+the original language (usually English) as the keys by which the
+translations are looked up. All the strings marked as needing
+translation are extracted from the source code with a helper program.
+Human translators then translate the strings into each target language.
+      </span><br style="font-family: sans-serif;">
+      <br style="font-family: sans-serif;">
+      <span style="font-family: sans-serif;">The </span><span
+ style="font-weight: bold; font-family: sans-serif;">locale</span><span
+ style="font-family: sans-serif;"> is the set of
+settings for the user's country and/or language. It is usually
+specified
+by a string like "en_UK". The first two letters identify the language
+(English) the second two the country (the United Kingdom). Included in
+the locale is information about things like the currency for the
+country
+and how numbers are formatted, but more importantly, it describes the
+characters used for the language. The character set is the set of
+characters used to display the language. When storing characters in
+memory or on disk, a given character set may be stored in different
+ways - the way it is stored is termed the </span><span
+ style="font-weight: bold; font-family: sans-serif;">encoding</span>. <br>
+      <br>
+      <h2 style="color: rgb(21, 67, 116);"><a name="C901"></a>Preparing
+program sources</h2>
+The changes required to prepare a program's source code falls into
+three categories. First, you have to make the
+localization functions known to all modules that need strings
+translated. Second, you should properly trigger the operation of GNU
+gettext when your program initializes, usually from within the main
+function. Last, you should identify and especially mark all constant
+strings in your program that need translation. <br>
+      <br>
+Presuming that your program, or package, has been adjusted so all
+needed GNU gettext files are available, and your Makefile files have
+been updated (see later), each XFC module having translatable strings
+should contain the following line: <br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/i18n.hh&gt;</code></div>
+      <br>
+This<em></em> header file contains the XFC C++ interface to GNU
+gettext, and
+is the only internationalization header you need #include in your
+sources.<br>
+      <br>
+The initialization of locale data should be done with more or less the
+same code in every program, as demonstrated below: <br>
+      <br>
+      <div class="fbox"><code>int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; i18n::set_text_domain_dir(PACKAGE, LOCALEDIR);<br>
+&nbsp;&nbsp;&nbsp; i18n::set_text_domain(PACKAGE);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+&nbsp;&nbsp;&nbsp; ....<br>
+&nbsp;&nbsp;&nbsp; return
+0;<br>
+}</code> <samp> </samp></div>
+      <br>
+      <span style="font-family: sans-serif;">i18n:: is the XFC
+internationalization namespace. The set_text_domain_dir() method sets
+the </span><span style="font-family: sans-serif;">locale</span><span
+ style="font-family: sans-serif;"> directory for the specified domain.
+The
+set_text_domain() method sets the translation domain for your program.
+PACKAGE and LOCALEDIR are preprocessor macros, and should be provided
+either by config.h or by the Makefile (see later).&nbsp; </span><br
+ style="font-family: sans-serif;">
+      <br style="font-family: sans-serif;">
+      <div style="text-align: justify; font-family: sans-serif;">You
+don't need to explicitly set the
+locale because GTK+ sets the locale for you when you call Main::init().
+If you want to set the locale, see the GTK+ documentation for
+gtk_disable_setlocale().<br>
+      </div>
+      <br style="font-family: sans-serif;">
+      <span style="font-family: sans-serif;">You should modify your
+source files, marking all the translatable
+strings. Translatable strings should do the following:</span><br>
+      <ul style="list-style-type: square;">
+        <li>They should use good English style. <br>
+        </li>
+        <li>Each string should be an entire sentence.</li>
+        <li>Each string should be on a single line. <br>
+        </li>
+        <li>A string should not use slang language or abbreviations,
+translators might not understand the message and may produce
+inappropriate translations.</li>
+        <li>A string should be limited to one paragraph; don't let a
+single
+message be longer than ten lines. It's easier to maintain the
+translation that way.</li>
+        <li>Use format strings instead of string concatenation; the
+translator might need to swap the format arguments around in the
+translation.<br>
+        </li>
+      </ul>
+      <span style="font-family: sans-serif;">Marking strings as
+translatable has two goals. First, it's the trigger
+for retrieving the translation at run time, and second, it helps </span><span
+ style="font-weight: bold; font-family: sans-serif;">xgettext</span><span
+ style="font-family: sans-serif;"> to properly extract all
+translatable strings when it scans a set of program sources and
+produces
+PO template files. </span><br style="font-family: sans-serif;">
+      <br style="font-family: sans-serif;">
+      <span style="font-family: sans-serif;">The canonical keyword for
+marking translatable strings is </span><span
+ style="font-weight: bold; font-family: sans-serif;">gettext.</span><span
+ style="font-family: sans-serif;"> This keyword resolves at run
+time to dynamically return the proper translation, as far as possible.
+Rather than litter sources with gettext, many programmers use a simple
+underscore as a keyword, and write: _("Translatable string") instead of
+gettext("Translatable string"). This reduces the textual overhead per
+translatable string to only three characters: the underscore and the
+two
+parentheses.</span><br style="font-family: sans-serif;">
+      <br style="font-family: sans-serif;">
+      <span style="font-family: sans-serif;">Most strings are found in
+executable positions, that is, attached to
+variables or given as parameters to functions. However, a special case
+occurs where a function call to gettext() is not allowed, such as in an
+array initializer. In this case N_() (N stands for no-op) is used to
+mark a string for translation but no translation actually occurs; it's
+just a marker that resolves at run time to the string. Eventually you
+have to call gettext() on the string to actually fetch the translation.
+In C both _() and N_() are macros. In XFC, _() is a function call
+declared in &lt;xfc/i18n.hh&gt; and N_() is a macro.<br>
+      </span><span style="font-family: sans-serif;"><br>
+      </span>
+      <h2 style="color: rgb(21, 67, 116);"><a name="C902"></a>Invoking
+the gettextize program</h2>
+      <span style="font-family: sans-serif;">Before using gettextize
+you should
+ensure that you have recent versions of GNU M4, GNU Autoconf and GNU
+gettext installed on your system. Most recent Linux distributions come
+with these programs already installed, if you installed the development
+packages. Also your project should use Autoconf and have a </span><span
+ style="font-family: sans-serif;">configure.ac</span><span
+ style="font-family: sans-serif;"> file. </span><br
+ style="font-family: sans-serif;">
+      <br style="font-family: sans-serif;">
+      <span style="font-family: sans-serif;">The </span><span
+ style="font-weight: bold; font-family: sans-serif;">gettextize</span><span
+ style="font-family: sans-serif;"> program is an
+interactive tool that helps the maintainer of a package
+internationalize through GNU gettext. It is used for two purposes: </span><br>
+      <ul style="list-style-type: square;">
+        <li>As a wizard, when a package is modified to use GNU gettext
+for
+the first time. </li>
+        <li>As a migration tool, for upgrading the GNU gettext support
+in a
+package from a previous to a newer version of GNU gettext.</li>
+      </ul>
+gettextize performs the following tasks: <br>
+      <ul style="list-style-type: square;">
+        <li>It copies into the package some files that every package
+internationalized with GNU gettext needs. </li>
+        <li>It performs as many tasks as it can automatically. </li>
+        <li>It removes obsolete files and idioms from previous GNU
+gettext
+versions to conform to the current GNU gettext version. </li>
+        <li>It prints a summary of the tasks that ought to be done
+manually
+and could not be done automatically by gettextize. </li>
+      </ul>
+gettextize can be invoked as follows: <br>
+      <br>
+      <div class="fbox"><code>gettextize
+[ option... ] [ directory ]</code></div>
+      <br>
+and accepts the following options: <br>
+      <br>
+      <table class="ftable" style="width: 100%; text-align: left;"
+ border="0" cellpadding="4" cellspacing="1">
+        <tbody>
+          <tr>
+            <td class="ftd">--copy</td>
+            <td class="ftd" align="undefined" valign="undefined">Copy
+the needed files instead of
+making symbolic links.</td>
+          </tr>
+          <tr>
+            <td class="ftd" align="undefined" valign="undefined">--force</td>
+            <td class="ftd" align="undefined" valign="undefined">Force
+the replacement of files
+which already exist.</td>
+          </tr>
+          <tr>
+            <td class="ftd" align="undefined" valign="undefined">--no-changelog</td>
+            <td class="ftd" align="undefined" valign="undefined">Don't
+update or create a
+ChangeLog file.</td>
+          </tr>
+          <tr>
+            <td class="ftd" align="undefined" valign="undefined">--dry-run</td>
+            <td class="ftd" align="undefined" valign="undefined">Print
+modifications to standard
+output but but don't perform them.</td>
+          </tr>
+          <tr>
+            <td class="ftd" align="undefined" valign="undefined">--help</td>
+            <td class="ftd" align="undefined" valign="undefined">Display
+the help text and exit. </td>
+          </tr>
+          <tr>
+            <td class="ftd" align="undefined" valign="undefined">--version</td>
+            <td class="ftd" align="undefined" valign="undefined">Output
+version information and
+exit.</td>
+          </tr>
+          <tr>
+            <td class="ftd" align="undefined" valign="undefined">--intl</td>
+            <td class="ftd" align="undefined" valign="undefined">Install
+the libintl sources in a
+subdirectory named &lt;intl&gt;. This libintl will be used to provide
+internationalization on systems that don't have GNU libintl installed.
+If this option is omitted, the call to AM_GNU_GETTEXT in configure.ac
+should read: AM_GNU_GETTEXT([external]), and internationalization will
+not be enabled on systems lacking GNU gettext.</td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      <div style="text-align: left; font-family: sans-serif;"> If the
+directory is given, it
+should be the top-level directory of the package to prepare for using
+GNU gettext. If it is not given, it is assumed that the current
+directory is
+the top-level directory. <br>
+      </div>
+      <br style="font-family: sans-serif;">
+      <span style="font-family: sans-serif;">A usual invocation for
+gettextize would be:</span><br>
+      <br>
+      <div class="fbox"><code>$
+gettextize --copy --force --intl</code></div>
+      <br>
+gettextize provides the following files and carries out several
+tasks: <br>
+      <ul style="list-style-type: square;">
+        <li>The ABOUT-NLS file is copied into the top level directory
+of the
+package. This file provides information on how to install and use the
+Native Language Support features of your program.</li>
+        <li>A &lt;po&gt; directory is created that will eventually hold
+all
+translation files, but initially only contains the file
+&lt;po/Makefile.in.in&gt; from the GNU gettext distribution and a few
+auxiliary files. </li>
+        <li>Only if the --intl option was specified will an
+&lt;intl&gt;
+directory be created and filled with most of the files originally in
+the
+&lt;intl&gt; directory of the GNU gettext distribution. If the --force
+option was given, the &lt;intl&gt; directory is emptied first.&nbsp;</li>
+        <li>The files config.rpath and mkinstalldirs are
+copied into the (top level) directory containing the configuration
+support files. These files are needed by the AM_GNU_GETTEXT autoconf
+macro.</li>
+        <li>If the project is using GNU Automake a set of
+Autoconf
+macro files are copied into the package's Autoconf macro repository,
+usually a directory called &lt;m4&gt;.&nbsp;</li>
+        <li>If your package uses symbolic links, using the -h option
+while
+creating the tar archive for your distribution will resolve each link
+and copy the file to the distribution archive.</li>
+        <li>gettextize will update all Makefile.am files in each
+affected
+directory, as well as the top level configure.ac.&nbsp;</li>
+        <li>No existing file is replaced unless the --force option
+is specified. <br>
+        </li>
+      </ul>
+One distinction between &lt;intl&gt;
+and the two other directories (m4, po) is that &lt;intl&gt; is meant to
+be identical in all packages using GNU gettext, whereas the other two
+directories contain mostly package dependent files. <br>
+      <br>
+The gettextize program makes backup files for all files it replaces or
+changes, and also writes ChangeLog entries about these changes. This
+way, the careful maintainer can check after running gettextize whether
+its changes are acceptable, and possibly adjust them. An exception to
+this rule is the &lt;intl&gt; directory, which is added, or replaced or
+removed as a whole. <br>
+      <br>
+      <h2><span style="color: rgb(0, 55, 85);"><a name="C903"></a><span
+ style="color: rgb(21, 67, 116);">Internationalizing
+an XFC package</span></span></h2>
+      <span style="font-family: sans-serif;">With all that information
+on board we
+can now start to internationalize the XfcApp project you built in
+the previous chapter. For this example you will have to use the source
+files
+you created in the &lt;examples/tutorial/chapter08&gt; subdirectory.</span><span
+ style="font-family: sans-serif;"> </span><span
+ style="font-family: sans-serif;"></span><br
+ style="font-family: sans-serif;">
+      <br style="font-family: sans-serif;">
+      <span style="font-family: sans-serif;"></span><span
+ style="font-family: sans-serif;">First we need to add a few lines to </span><span
+ style="font-family: sans-serif;">configure.ac</span><span
+ style="font-family: sans-serif;">, the input file from which Autoconf
+generates the
+configure script.</span><span style="font-family: sans-serif;"> Add the
+following line to
+configure.ac just below the AC_INIT macro:</span><br>
+      <code></code><br>
+      <div class="fbox"><code>AC_CONFIG_HEADER(config.h)</code></div>
+      <br>
+      <div style="text-align: left;"> The AC_CONFIG_HEADER macro
+indicates
+that you want to use a config header to define all the C preprocessor
+macros, and that the name of the header should be config.h.<br>
+      </div>
+      <br>
+Next, you need to enable gettext support by adding the following lines
+to configure.ac, between the AC_PROG_CXX and AC_OUTPUT macros:<br>
+      <br>
+      <div class="fbox"><code>ALL_LINGUAS=""<br>
+AM_GNU_GETTEXT<br>
+AC_DEFINE_UNQUOTED(LOCALEDIR, "${prefix}/${DATADIRNAME}/locale", [Name
+of gettext locale directory])</code><samp> </samp></div>
+      <br>
+      <div style="text-align: justify;"> The ALL_LINGUAS variable lists
+all
+the available translations in your package. It is a whitespace
+separated
+quoted string, such as "de es fr hu". Initially there are no
+translations so its just an empty string.<br>
+      </div>
+      <br>
+The AM_GNU_GETTEXT macro checks for internationalization support. If
+you
+didn't pass the --intl option to gettextize this macro should
+instead read:<br>
+      <br>
+      <div class="fbox"><code>AM_GNU_GETTEXT([external])</code><samp> </samp></div>
+      <br>
+The AC_DEFINE_UNQUOTED macro defines the preprocessor macro LOCALEDIR
+in config.h, and computes its value.<br>
+      <br>
+Now run gettextize by executing the following shell
+command:<br>
+      <br>
+      <div class="fbox"><code>$
+gettextize --copy --force --intl</code></div>
+      <br>
+The '--copy' option copies the files into the source tree
+instead of using symbolic links. The '-intl' option copies the libintl
+sources in a subdirectory named &lt;intl&gt; for use on systems that
+don't provide gettext(). The '--force' option overwrites
+any existing
+files.<br>
+      <br>
+gettextize adds
+&lt;m4/Makefile&gt; to the AC_OUTPUT in configure.ac, and the m4
+subdirectory to the SUBDIRS variable in Makefile.am. These are not
+really necessary since nothing gets compiled in the m4 subdirectory;
+many any maintainers remove them but don't worry about it for this
+example.<br>
+      <br>
+      <span style="font-weight: bold;"></span>If you haven't suppressed
+the
+&lt;intl&gt; subdirectory, you need to add the GNU config.guess<span
+ style="font-weight: bold;"> </span>and config.sub and files to your
+package. These files are needed because the &lt;intl&gt; directory has
+platform
+dependent support for determining the locale's character encoding, and
+these files are needed to identify the platform. You can obtain the
+newest version of config.guess and config.sub from <a
+ href="ftp://ftp.gnu.org/pub/gnu/config">ftp://ftp.gnu.org/gnu/config</a>.
+Less recent versions are also contained in the GNU automake and GNU
+libtool packages.&nbsp; <br>
+      <br>
+You
+don't have to worry about adding these
+files
+to the XfcApp project because they were added when you called
+libtoolize in the previous chapter. Normally, config.guess and
+config.sub are put in the top level
+directory of your package. Alternatively, you can put them in a
+separate
+&lt;config&gt; subdirectory, together with the other configuration
+support files like install-sh, ltconfig, ltmain.sh,
+mkinstalldirs and missing. If you do this, you will need to add
+the following line to your configure.ac script:<br>
+      <br>
+      <div class="fbox"><code>AC_CONFIG_AUX_DIR(config)</code><samp> </samp></div>
+      <br>
+But don't add AC_CONFIG_AUX_DIR to your configure.ac script; for this
+example, we won't worry
+about it.<br>
+      <br>
+gettextize adds
+&lt;intl/Makefile&gt;
+and &lt;po/Makefile.in&gt; to the AC_OUTPUT macro at the end of
+configure.ac. If the macro and arguments are all on the same line you
+wont need to modify the additions. If the macro runs over several lines
+you will need to check that the syntax is still correct, after the
+additions. For the purposes of this example leave the AC_OUTPUT macro
+and its arguments on one line. If you didn't pass the '--intl'
+option to gettextize then you don't need to add &lt;intl/Makefile&gt;
+to the AC_OUTPUT line.<br>
+      <br>
+After running gettextize your configure.ac script should look
+like this:<br>
+      <br>
+      <div class="fbox"><samp>AC_INIT(src/main.cc)<br>
+AC_CONFIG_HEADER(config.h)<br>
+      <br>
+PACKAGE=xfcapp<br>
+VERSION=0.1.0<br>
+      <br>
+AM_INIT_AUTOMAKE($PACKAGE, $VERSION)<br>
+      <br>
+XFCUI_REQUIRED_VERSION=4.3<br>
+PKG_CHECK_MODULES(XFCUI, xfcui-4.3 &gt;= $XFCUI_REQUIRED_VERSION)<br>
+AC_SUBST(XFCUI_CFLAGS)<br>
+AC_SUBST(XFCUI_LIBS)<br>
+      <br>
+GCONF_REQUIRED_VERSION=2.0.0<br>
+PKG_CHECK_MODULES(GCONF, gconf-2.0 &gt;= $GCONF_REQUIRED_VERSION)<br>
+AC_SUBST(GCONF_CFLAGS)<br>
+AC_SUBST(GCONF_LIBS)<br>
+      <br>
+AC_PROG_CXX<br>
+AC_PROG_LIBTOOL<br>
+      <br>
+ALL_LINGUAS=""<br>
+AM_GNU_GETTEXT<br>
+AC_DEFINE_UNQUOTED(LOCALEDIR, "${prefix}/${DATADIRNAME}/locale", [Name
+of gettext locale directory])<br>
+      <br>
+AC_OUTPUT(Makefile src/Makefile </samp><code>intl/Makefile
+po/Makefile.in
+m4/Makefile</code><samp>)</samp></div>
+      <br>
+Now you need to make a few changes and add a new file. First, add the
+&lt;po&gt; subdirectory to the SUBDIRS variable in the
+top-level Makefile.am, so that it reads:<br>
+      <br>
+      <div class="fbox"><code>SUDDIRS
+= intl m4 po src</code></div>
+      <br>
+You could remove m4 because it is not really needed, but don't worry
+about it for this example. <br>
+      <br>
+In the &lt;po&gt; subdirectory change the name of the file
+Makevars.template to Makevars<span style="font-weight: bold;">.</span>
+Also in the &lt;po&gt;
+subdirectory
+create the text file POTFILES.in
+and add the following lines to it and save the file:<br>
+      <br>
+      <div class="fbox"><code>#
+List of source files containing translatable strings.<br>
+      <br>
+src/xfcapp.cc</code><samp> </samp></div>
+      <br>
+Now you need to call Autoheader to create
+config.h, the file listed <em></em>in configure.ac above. Then you
+need to run aclocal to add the contents of the
+&lt;m4&gt; directory to aclocal.m4.<br>
+      <br>
+Execute the following two shell commands:<br>
+      <br>
+      <div class="fbox"><code>$
+autoheader<br>
+$ aclocal -I m4</code></div>
+      <br>
+and then run Autoconf to regenerate the configure script:<br>
+      <br>
+      <div class="fbox"><code>$
+autoconf</code></div>
+      <br>
+Next, you need to make some changes to the XfcApp sources. Insert
+the following line at the beginning of &lt;src/main.cc&gt;, so the main
+function can use the preprocessor macros&nbsp; PACKAGE and LOCALEDIR:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;config.h&gt;</code></div>
+      <br>
+XFC provides a convenient C++ wrapper for the GNU gettext interface in
+the header file &lt;xfc/i18n.hh&gt;. This is the only
+internationalization
+header that you need to include in your program. Add the following
+include statement to &lt;src/xfcapp.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include
+&lt;xfc/i18n.hh&gt;</code></div>
+      <br>
+Next you need to initialize the locale data. This is done by adding the
+following two lines to the main function, before the call to init():<br>
+      <br>
+      <div class="fbox"><code>i18n::set_text_domain_dir(PACKAGE,
+LOCALEDIR);<br>
+i18n::set_text_domain(PACKAGE);</code></div>
+      <br>
+i18n:: is the XFC internationalization namespace. The
+set_text_domain_dir() method sets the locale directory for
+the
+specified domain. The set_text_domain() method sets the translation
+domain for your package.<br>
+      <br>
+After making the above changes, your &lt;src/main.cc&gt; file should
+look like this:<br>
+      <br>
+      <div class="fbox"><code>#include
+&lt;config.h&gt; <br style="color: rgb(0, 102, 0);">
+#include &lt;xfc/main.hh&gt;<br>
+#include
+&lt;xfc/i18n.hh&gt;<br style="color: rgb(0, 102, 0);">
+#include
+"xfcapp.hh"<br>
+      <br>
+int main (int argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace
+Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; i18n::set_text_domain_dir(PACKAGE, LOCALEDIR);<br>
+&nbsp;&nbsp;&nbsp; i18n::set_text_domain(PACKAGE);<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; XfcApp window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+&nbsp;&nbsp;&nbsp; window.show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return
+0;<br>
+}</code> </div>
+      <br>
+Now you have to mark the translatable strings in the sources. In this
+example we will add one translatable string to XfcApp. <br>
+      <br>
+Add the following include statement to the top of &lt;src/
+xfcapp.cc&gt;: <br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/gtk/label.hh&gt;<br>
+      </code> </div>
+      <br>
+and
+then these lines of code to the end of the XfcApp constructor, before
+the call to main_vbox-&gt;show():<br>
+      <br>
+      <div class="fbox"><code>Gtk::Label *label = new
+Gtk::Label(_("Right click here..."));<br>
+client_vbox-&gt;pack_start(*label);<br>
+label-&gt;show();</code> </div>
+      <br>
+The function call _() from &lt;xfc/i18n.hh&gt; marks the string "Right
+click here..." for translation.<br>
+      <br>
+      <h2><a name="C904"></a>Compiling XfcApp</h2>
+Now your ready to run configure, make and install to check that XfcApp
+compiles and installs alright:<br>
+      <br>
+      <div class="fbox"><code>$
+autoconf<br>
+$ ./configure<br>
+$ make<br>
+$ make-install</code><samp> </samp></div>
+      <br>
+If
+you
+work through this chapter adding the appropriate files and entries as
+instructed, and you compile and run this version of XfcApp, you will
+see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 422px; height: 342px;" alt=""
+ src="../../images/chapter09.png"><br>
+      </div>
+      <br>
+Remember in the previous chapter you created an autogen.sh file to
+regenerate the
+project's output files after editing any input files. You can now add
+gettextize to this file so that the internationalization files also get
+updated:<br>
+      <br>
+After adding gettextize(), your autogen.sh file should look like this:<br>
+      <br>
+      <div class="fbox"><code>#!
+/bin/sh<br>
+&nbsp;<br>
+aclocal \<br>
+&amp;&amp; automake --add-missing \<br>
+&amp;&amp; autoconf \<br>
+&amp;&amp; </code><code>gettextize --copy --force --intl</code></div>
+      <br>
+      <h2><span style="color: rgb(0, 55, 85);"><a name="C905"></a><span
+ style="color: rgb(21, 67, 116);">Creating
+the PO template file</span></span></h2>
+After preparing your sources by
+marking all translatable strings, you need to create a PO template file
+using the <span style="font-weight: bold;">xgettext</span> program.
+xgettext creates a file named<em> </em><span style="font-weight: bold;">domainname.po</span>.
+You need to change its name to <span style="font-weight: bold;">domainname.pot</span>.
+Why doesn't xgettext create it under the name domainname.pot right
+away? The answer is: for historical reasons. When xgettext was
+specified, the distinction between a PO file and PO file template was
+fuzzy, and the suffix <span style="font-weight: bold;">.pot</span>
+wasn't in use at that time. <br>
+      <div style="text-align: justify;"><br>
+Before you create the PO template file there is one thing you need to
+do first. I don't know why, but when POTFILES is created automatically
+from POTFILES.in it inserts whitespace at the beginning of each line,
+before the file name. xgettext doesn't skip over this whitespace, and
+so
+looks for a file name that includes the whitespace. Of course xgettext
+doesn't find it and so it reports an error. You will have to manually
+remove all the whitespace from the beginning of each line in POTFILES
+before running xgettext.<br>
+      </div>
+      <br>
+There are a lot of options that can be passed to xgettext so I suggest
+you read the GNU gettext documentation, its very thorough. If you
+invoke
+xgettext from the &lt;po&gt; subdirectory the command line is
+simplified
+somewhat. <br>
+      <br>
+Execute the following shell command from the &lt;po&gt; subdirectory:<br>
+      <br>
+      <div class="fbox"><code>xgettext
+--files-from=POTFILES --default-domain=xfcapp --keyword=_</code></div>
+      <br>
+      <span style="font-family: sans-serif;"> xgettext parses the
+specified input
+file POTFILES, and creates the output file </span><span
+ style="font-family: sans-serif; font-weight: bold;">xfcapp.po</span><span
+ style="font-family: sans-serif;">. If it can't find any
+translatable strings in the sources no PO file will be created. You can
+specify the </span><span style="font-family: sans-serif;">'--force-po'</span><span
+ style="font-family: sans-serif;"> option to force xgettext to create
+an
+empty PO file when no translatable strings are found.</span><br
+ style="font-family: sans-serif;">
+      <br style="font-family: sans-serif;">
+      <span style="font-family: sans-serif;">The </span><span
+ style="font-family: sans-serif;">'--default-domain'</span><span
+ style="font-family: sans-serif;"> option specifies the default
+translation
+domain for the package, in this case 'xfcapp'. Remember, you
+specified
+the domain name in the main function with a call to </span><code
+ style="font-family: sans-serif;">i18n::set_text_domain().</code><br
+ style="font-family: sans-serif;">
+      <br style="font-family: sans-serif;">
+      <span style="font-family: sans-serif;">The '--keyword' option is
+important. It specifies that an alternate
+keyword is being used to mark translatable strings. In XFC this should
+always be an underscore.</span><br style="font-family: sans-serif;">
+      <br style="font-family: sans-serif;">
+      <span style="font-family: sans-serif;">Before doing anything else
+rename xfcapp.po to </span><span
+ style="font-family: sans-serif; font-weight: bold;">xfcapp.pot</span><span
+ style="font-family: sans-serif;">. This POT file is
+your project's PO template file. When starting a new translation, the
+translator creates a file called LANG.po, as a copy of the
+domainname.pot template file. For example, </span><span
+ style="font-family: sans-serif;">de.po</span><span
+ style="font-family: sans-serif;"> for a German
+translation or </span><span style="font-family: sans-serif;">fr.po</span><span
+ style="font-family: sans-serif;"> for a French translation (or c3.po
+for a
+cyborg translation).<br>
+      <br>
+If you looked in the &lt;po&gt; subdirectory before reading this
+section and found a </span><span style="font-family: sans-serif;">xfcapp.pot</span><span
+ style="font-family: sans-serif;"> file </span><span
+ style="font-family: sans-serif;">already</span><span
+ style="font-family: sans-serif;"> there, that was because you compiled
+the project before creating your own. When no pot file is found make
+will call xgettext to create it. <br>
+      <br>
+      </span>
+      <h2 style="color: rgb(21, 67, 116);"><a name="C906"></a>The GNOME
+Translation Project</h2>
+The GNOME Translation Project is a
+project devoted to helping you with your translations. The way it works
+is that you contact the <a href="mailto:gnome-i18n@gnome.org">gnome-i18n</a>
+mailing list to find out how the translators can access your &lt;po&gt;
+subdirectory, and to add your project to the big <a
+ href="http://developer.gnome.org/projects/gtp/status">status tables</a>.
+Then you update the POTFILES.in file in your &lt;po&gt; subdirectory so
+that the translators always have access to updated domainname.pot
+files.
+Then, simply freeze the strings at least a couple of days before you
+make a new release, and announce it on gnome-i18n. Depending on the
+number of translatable strings in your program, and how popular it is,
+translations will then start to appear in your &lt;po&gt; subdirectory
+as LANG.po files.<br>
+      <br>
+It's not easy to get translation work done before your package gets
+internationalized and available! Since the cycle has to start
+somewhere,
+the easiest thing to do is start with absolutely no PO files, and wait
+until various translator teams get interested in your package, and
+submit PO files. Most language teams only consist of 1-3 persons, so if
+your program contains a lot of strings, it might take a while before
+anyone has the time to look at it. Also, most translators don't want to
+waste their time on unstable and poorly maintained packages, so they
+may
+decide to spend their time on some other project.<br>
+      <br>
+For the Translation Project to work smoothly, it is important that
+project maintainers do not get involved in translation concerns, and
+that translators be kept as free as possible of programming concerns.
+The only concern maintainers should have is marking new strings as
+translatable, when they should be, and do not worry about them being
+translated, as this will come in due course. <br>
+      <br>
+Also, it's important for translators and maintainers to understand that
+package translation is a continuous process over the lifetime of a
+package, and not something which is done once and for all at the start.
+After an initial burst of translation activity for a given package,
+interventions are needed once in a while, because here and there,
+translated entries become obsolete, and new untranslated entries
+appear,
+needing translation. <br>
+      <div style="text-align: left;"><br>
+      <h2 style="color: rgb(21, 67, 116);"><a name="C907"></a>Some
+helpful links</h2>
+There are a couple of sections you
+should look at in the <a
+ href="http://www.gnu.org/software/gettext/manual/">GNU gettext
+documentation</a>. Section 3: "Preparing Program Sources" covers the
+ins and outs of marking translatable strings very well. You should also
+look at section 12.6: "Integrating with CVS". <br>
+      </div>
+      <br>
+      <div align="justify">
+      <div style="text-align: left;">
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="chapter09.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><a class="qindexF"
+ href="index.html">Index</a><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

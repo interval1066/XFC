@@ -1,0 +1,12 @@
+Example HOWTO Programs.
+=======================
+The <examples/howto> directory contains all the example applications that
+the XFC widget HOWTOs work through. The widget HOWTOs can be found in the
+<docs/howto> subdirectory. If you compiled XFC from source code yourself,
+each example will have a makefile. You can compile all the examples at 
+once by running make in the <examples/howto> directory. If you installed
+XFC from a binary RPM file, each widget HOWTO will show you how to write
+a simple makefile for the relevent example. 
+
+The example programs are compiled by default but you can disable this by
+passing the "--disable-examples" option to configure.

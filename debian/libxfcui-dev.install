@@ -1,0 +1,16 @@
+debian/tmp/usr/include/xfce4/xfc/main.hh
+debian/tmp/usr/include/xfce4/xfc/ui.hh
+debian/tmp/usr/include/xfce4/xfc/xfcui.hh
+debian/tmp/usr/include/xfce4/xfc/atk/*.hh
+debian/tmp/usr/include/xfce4/xfc/atk/inline/*.inl
+debian/tmp/usr/include/xfce4/xfc/gdk/*.hh
+debian/tmp/usr/include/xfce4/xfc/gdk/inline/*.inl
+debian/tmp/usr/include/xfce4/xfc/gdk-pixbuf/*.hh
+debian/tmp/usr/include/xfce4/xfc/gdk-pixbuf/inline/*.inl
+debian/tmp/usr/include/xfce4/xfc/gtk/*.hh
+debian/tmp/usr/include/xfce4/xfc/gtk/inline/*.inl
+debian/tmp/usr/include/xfce4/xfc/pango/*.hh
+debian/tmp/usr/include/xfce4/xfc/pango/inline/*.inl
+debian/tmp/usr/include/xfce4/xfc/cairo/*.hh
+debian/tmp/usr/include/xfce4/xfc/config.h
+debian/tmp/usr/lib/pkgconfig/xfcui-*.pc

@@ -1,0 +1,13 @@
+debian/tmp/usr/include/xfce4/xfc/convert.hh
+debian/tmp/usr/include/xfce4/xfc/i18n.hh
+debian/tmp/usr/include/xfce4/xfc/object.hh
+debian/tmp/usr/include/xfce4/xfc/pointer.hh
+debian/tmp/usr/include/xfce4/xfc/stackobject.hh
+debian/tmp/usr/include/xfce4/xfc/trackable.hh
+debian/tmp/usr/include/xfce4/xfc/utfstring.hh
+debian/tmp/usr/include/xfce4/xfc/version.hh
+debian/tmp/usr/include/xfce4/xfc/xfccore.hh
+debian/tmp/usr/include/xfce4/xfc/integerobject.hh
+debian/tmp/usr/include/xfce4/xfc/glib/*.hh
+debian/tmp/usr/include/xfce4/xfc/glib/inline/*.inl
+debian/tmp/usr/lib/pkgconfig/xfccore-*.pc

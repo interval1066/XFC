@@ -1,0 +1,376 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+  <meta content="String Handling" name="description">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"></span> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>String Handling<br>
+      </h1>
+      <br>
+The most basic task that applications using GTK+ have to handle when
+dealing with international text is manipulating strings. The strings in
+the GTK+ interfaces are handled in the multi-byte encoding for the
+current locale. This allows good compatibility with existing
+applications that aren't explicitly enabled for multi-byte support.
+UTF-8 is the multi-byte encoding standard used by GTK+. <br>
+      <br>
+      <div align="justify">UTF-8 is an efficient encoding of Unicode
+character-strings that recognizes the fact that the majority of
+text-based communications are in ASCII, and it therefore optimizes the
+encoding of these characters. Most code translates directly to UTF-8
+with no changes at all, but because UTF-8 is a variable-length
+multi-byte
+encoding you cannot calculate the number of characters from the number
+of bytes. Also, there is a small performance hit for working in
+UTF-8, probably about 5%, but this is more than offset by it's
+advantages:<br>
+      </div>
+      <ul>
+        <li>UTF-8 preserves the uniqueness for ASCII characters so you
+wont
+mistake any non-ASCII character for an ASCII character. </li>
+        <li>UTF-8 is self-segregating: you can always distinguish a
+lead byte
+from a fill byte and you will never be mistaken about the beginning or
+the length of a multi-byte character. You can start parsing backwards
+at
+the end or in the middle of a multi-byte string and will soon find a
+synchronization point. </li>
+        <li>UTF-8 is a reasonably compact encoding: ASCII characters
+are not
+inflated, most other alphabetic characters occupy only two bytes each,
+no basic Unicode character needs more than three bytes and all extended
+Unicode characters can be expressed with four bytes. </li>
+        <li>UTF-8 multi-byte character strings preserve the
+lexicographic
+sorting and tree-search order and there are no byte-order problems.</li>
+      </ul>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+The GTK+ UTF-8 string functions
+are declared in &lt;glib/unicode.h&gt;.
+If you look through this header file you will soon realize that a lot
+of extra work is required when working with UTF-8 strings. By
+comparison, the
+use of UTF-8 strings in XFC is completely transparent because XFC
+provides a
+standard string compatible UTF-8 string class,
+called String, which does the extra work for you. The only string
+functions you will ever need to use in an XFC application are those
+defined by the Xfc::String class. It's that easy.<br>
+      <br>
+      </div>
+      <div style="text-align: left;">Xfc::String provides a
+comprehensive API which is declared in
+&lt;xfc/utfstring.hh&gt;. All the familiar member functions defined
+std::string are available, as well as convenient
+wrappers for all the GLib UTF-8 string functions. You can use an
+Xfc::String just as you would use a std::string, however, there are a
+few important
+differences that you need to be aware of.<br>
+      </div>
+      <br>
+      <div style="text-align: left;">String is implemented using an
+internal std::string as a byte array. This allows construction from a
+std::string and simple conversion to a
+std::string with the method:<br>
+      </div>
+      <div style="text-align: left;"><br>
+      <div class="fbox"><code>const
+std::string&amp; str();</code></div>
+      <br>
+      </div>
+      <div style="text-align: left;">str() returns a const reference to
+the internal std::string, allowing
+the user to pass a String to functions that expect a std::string. <br>
+      </div>
+      <br>
+String's std::string-like methods use the
+corresponding std::string name but the meaning two of the argument
+types is different. In a std::string function 'pos' refers to a
+byte position within the string and 'n' refers to the number of
+bytes. In a Xfc::String method, 'char_pos' refers to a
+character
+position within the String, 'byte_pos' refers to a byte
+position
+within the String, 'n_chars' refers to the number of characters
+and 'n_bytes' refers to the number of bytes. A special value, npos, can
+be passed as the n_bytes or n_chars argument to imply all the remaining
+bytes or characters, just as it does in a std::string.<br>
+      <br>
+Internally,
+methods
+that take an n_chars argument have to parse the input string
+or
+character array for the number of valid UTF-8 characters, and this take
+time. Therefore you can improve efficiency by using methods that don't
+need to know the number of characters. Another efficiency measure is in
+the
+implementation of the substring search methods. The find(), rfind(),
+find_first_of(), find_last_of(), find_first_not_of() and
+find_last_not_of()
+methods take the byte position from which to start their search and
+return the byte position of the first element found or npos
+if
+unsuccessful. This is the same as with a std::string. <br>
+      <br>
+For example, the
+find() methods in Xfc::String are:<br>
+      <br>
+      <div class="fbox"><code>size_t find(const char *s, size_t
+byte_pos, size_t n_chars) const;<br>
+      <br>
+size_t find(const String&amp; str, size_t
+byte_pos = 0) const;<br>
+      <br>
+size_t find(const char *s, size_t byte_pos
+= 0) const;<br>
+      <br>
+size_t find(char c, size_t byte_pos = 0) const;<br>
+      <br>
+size_t find(gunichar c, size_t byte_pos = 0) const;</code> </div>
+      <br>
+A 'byte_pos' of zero implies the
+beginning of
+the string, which is where you usually start searching from. The return
+value is
+then passed back to the search method as the byte_pos for the
+next search, and so on until you are done. <br>
+      <br>
+For example, here is a simple forward search:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;iostream&gt;<br>
+      <br>
+String s = "This is a string";<br>
+&nbsp;&nbsp; &nbsp;<br>
+size_t i = 0;<br>
+&nbsp;&nbsp; &nbsp;<br>
+while ((i = s.find("is", i+1)) != String::npos)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; std::cout &lt;&lt; i &lt;&lt; std::endl;<br>
+}</code><br>
+      </div>
+      <br>
+which could also be written like this:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;iostream&gt;<br>
+      <br>
+String s = "This is a string";<br>
+&nbsp;&nbsp; &nbsp;<br>
+size_t i = s.find("is");<br>
+&nbsp;&nbsp;&nbsp; <br>
+while (i != std::string::npos)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; std::cout &lt;&lt; i &lt;&lt; std::endl;<br>
+&nbsp;&nbsp;&nbsp; i = s.find("is", ++i);&nbsp;&nbsp;&nbsp; <br>
+}</code><br>
+      </div>
+      <br>
+The output is of course 2 and 5. Remember, after one search you have to
+increment the byte index 'i' by one before the next search, to move
+along the string. If you did not, the output here would be an endless
+loop outputting 2.<br>
+      <br>
+You can convert from a character offset within a String to an integer
+byte index by calling:<br>
+      <br>
+      <div class="fbox"><code>size_t index(size_t
+char_pos) const;</code></div>
+      <br>
+      </div>
+You can convert from a constant pointer to a position within a String
+to an integer character offset by calling:<br>
+      <br>
+      <div class="fbox"><code>size_t
+offset(const_pointer p) const;</code></div>
+      <br>
+      <div style="text-align: left;">You can convert an integer
+character offset within
+a String to a constant pointer to a position within the string by
+calling:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>const_pointer
+pointer(size_t char_pos) const;</code></div>
+      <br>
+      <div style="text-align: left;">As with std::string, the size()
+method returns the
+number of allocated bytes in a String. To get the number of UTF-8
+characters
+in a String you must instead call:<br>
+      <br>
+      <div class="fbox"><code>size_t length() const;</code></div>
+      <br>
+For a std::string, size() and length return the same value. <br>
+      <br>
+Unlike std::string, a Xfc::String understands the concept of being
+null.
+This simplifies passing a String to a function that accepts a
+C-string and the assigning of a C-string to a Xfc::String. A null
+string
+can only be constructed with the following call:<br>
+      <br>
+      <div class="fbox"><code>String s(0);</code></div>
+      <br>
+but you would never do this; there is no point. What you would do is
+something like this:<br>
+      <br>
+      <div class="fbox"><code>String s =
+gtk_some_function_that_returns_a_c_string();</code></div>
+      <br>
+      <div style="text-align: left;">If
+gtk_some_function_that_returns_a_c_string()
+returns a null pointer, the Xfc::String will be null and the null()
+method will return true.<br>
+      </div>
+      <br>
+      </div>
+      <div class="fbox"><code>bool
+null() const;</code></div>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+When you want to pass a C-string to some function, you call the
+following
+method:<br>
+      <br>
+      <div class="fbox"><code>const
+char* c_str() const { return null() ? (char*)0
+: string_.c_str(); }</code></div>
+      <br>
+      <div style="text-align: left;">As you can see, c_str() is an
+inline function that
+returns a null pointer if the string is null, otherwise it
+calls the internal std::string's c_str() function.<br>
+      </div>
+      <br>
+      <div style="text-align: left;">The index operator can be called
+to return the
+UTF-8 character at a given position in a String, as a G::Unichar:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>G::Unichar operator[](size_t char_pos)
+const;</code></div>
+      <br>
+      <div align="justify">
+      <div style="text-align: left;">The 'char_pos'
+argument is a character position within the String. The G::Unichar
+character is returned by value, not by reference. G::Unichar is a
+convenient gunichar wrapper class and is declared in
+&lt;xfc/glib/unichar.hh&gt;.<br>
+      </div>
+      <br>
+      <div style="text-align: left;">Another useful method is format()
+which lets you
+do inline sprintf-style text formatting:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>static String format(const char
+*message_format, ...);</code></div>
+      <br>
+Calling
+format() is equivalent
+to formatting a temporary character array and then calling
+String::assign(). <br>
+      <br>
+      </div>
+You can convert one or more characters in a String from lower case to
+upper case, and vice versa, by calling:<br>
+      <br>
+      <div class="fbox"><code>String upper();<br>
+      <br>
+String upper(size_t char_pos, size_t n_bytes = npos);<br>
+      <br>
+String lower();<br>
+      <br>
+String lower(size_t char_pos, size_t n_bytes = npos);</code> </div>
+      <br>
+      <div style="position: absolute; left: 32px; top: 1804px;"><br>
+      </div>
+The upper() and lower() methods return a new String correctly converted
+to UTF-8 upper or lower case. <br>
+      <br>
+You can check the validity of the UTF-8 characters in a String by
+calling one of the following methods:<br>
+      <br>
+      <div class="fbox"><code>bool
+validate(size_t&amp; byte_pos) const;<br>
+      <br>
+bool validate(const_pointer *end =
+0) const;</code> </div>
+      <br>
+Both methods return true if the String
+is
+a valid UTF-8 string. After returning, the 'byte_pos' and 'end'
+arguments point to the first invalid byte, or the end of the string.<br>
+      <br>
+A word about iterators. String defines its own iterators that know how
+to iterate over UTF-8 characters in a forward direction (iterator) or
+reverse direction (reverse_iterator). These iterators are used just
+like
+std::string iterators but note: std::string iterators can't be used on
+UTF-8 strings.<br>
+      <br>
+String defines it's own standard i/o stream operators so you can pass a
+String to any stream using the &gt;&gt; and &lt;&lt; operators. There
+are also equivalence operators so you compare two strings or a string
+and a character array using the equivalence operators == and !=.<br>
+      <br>
+The String class is declared in &lt;xfc/utfstring.hh&gt;
+and exports many more methods than discussed here. Most XFC class
+methods
+take a String argument as a reference and return a String by value. For
+efficiency when passing string literals, all methods that take a String
+argument are overloaded to accept a 'const char *' argument as well.<br>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="strings.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

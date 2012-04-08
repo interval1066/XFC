@@ -1,0 +1,562 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Spin Buttons" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1">
+      <div style="text-align: center;"><br>
+      </div>
+      <h1>Spin
+Buttons</h1>
+      <br>
+The Spin Button widget is generally used to allow
+the user to select a value from a range of numeric values. It consists
+of a text entry box with up and down arrow buttons attached to the
+side.
+Selecting one of the buttons causes the value to 'spin' up and down the
+range of possible values. The entry box may also be edited directly to
+enter a specific value.<br>
+      <br>
+The Spin Button allows the value to have zero or a number of decimal
+places and to be incremented/decremented in configurable steps. The
+action of holding down one of the buttons optionally results in an
+acceleration of change in the value according to how long it is
+depressed.<br>
+      <br>
+The Spin Button uses an <a href="adjustments.html">Adjustment</a>
+object to hold information about the range of values that the spin
+button can take. This makes for a powerful Spin Button widget. Recall
+that an adjustment widget can be created with the following
+constructor, which illustrates the information that it holds:<br>
+      <span style="color: rgb(0, 55, 85);"></span>
+      <div align="justify">
+      <div style="text-align: left;"><br>
+      <div class="fbox"><code>Adjustment(double value, double
+lower, double upper, double step_increment, double
+page_increment, double page_size);</code></div>
+      <br>
+      </div>
+The attributes of an Adjustment are used by the Spin Button in the
+following way:<br>
+      <div style="text-align: left;">
+      <ul style="list-style-type: square;">
+        <li>value - initial value for the Spin Button</li>
+        <li>lower - lower range value</li>
+        <li>upper - upper range value</li>
+        <li>step_increment - value to increment/decrement when
+pressing mouse button 1 on a button</li>
+        <li>page_increment - value to increment/decrement when
+pressing mouse button 2 on a button</li>
+        <li>page_size - unused</li>
+      </ul>
+Additionally, mouse button 3 can be used to jump directly to the upper
+or lower values when used to select one of the buttons. Lets look at
+the
+constructors that create a Spin Button.<br>
+      <br>
+      <div class="fbox"><code>SpinButton();<br>
+      <br>
+SpinButton(Gtk::Adjustment *adjustment, double
+climb_rate, unsigned int digits);<br>
+      <br>
+SpinButton(double min, double max, double
+step = 1.0);</code></div>
+      <br>
+      </div>
+The 'climb_rate' argument takes a value
+between 0.0 and 1.0 and indicates the amount of acceleration that the
+Spin Button has. The 'digits'<em> </em>argument specifies the number
+of
+decimal places to which the value will be displayed. The last
+constructor creates a Spin Button and an Adjustment with the
+appropriate climb_rate and digit values based on the 'min', 'max' and
+'step'
+arguments specified. <br>
+      <div style="text-align: left;"> <br>
+      <div style="text-align: left;">A Spin Button can be reconfigured
+after creation using the following
+method:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>void
+configure(Gtk::Adjustment *adjustment, double
+climb_rate, unsigned int digits);</code></div>
+      <br>
+The adjustment can be set and retrieved independently using the
+following two methods respectively:<br>
+      <br>
+      <div class="fbox"><code>void
+set_adjustment(Gtk::Adjustment *adjustment);<br>
+      <br>
+Gtk::Adjustment* get_adjustment() const;</code></div>
+      <br>
+The number of decimal places can also be altered using:<br>
+      <br>
+      <div class="fbox"><code>void
+set_digits(unsigned int digits);</code></div>
+      <br>
+The value that a Spin Button is currently displaying can be changed
+using the following method:<br>
+      <br>
+      <div class="fbox"><code>void
+set_value(double value);</code></div>
+      <br>
+The current value of a Spin Button can be retrieved as either a
+floating point or integer value with the following methods respectively:<br>
+      <br>
+      <div class="fbox"><code>double
+get_value() const;<br>
+      <br>
+int get_value_as_int() const;</code></div>
+      <br>
+If you want to alter the value of a Spin Button relative to its current
+value, then the following method can be used:<br>
+      <br>
+      <div class="fbox"><code>void
+spin(Gtk::SpinType direction, double
+increment);</code></div>
+      <br>
+The 'direction' argument can take one of the following values from the
+Gtk::SpinType enum:<br>
+      <ul style="list-style-type: square;">
+        <li>SPIN_STEP_FORWARD</li>
+        <li>SPIN_STEP_BACKWARD</li>
+        <li>SPIN_PAGE_FORWARD</li>
+        <li>SPIN_PAGE_BACKWARD</li>
+        <li>SPIN_HOME</li>
+        <li>SPIN_END</li>
+        <li>SPIN_USER_DEFINED</li>
+      </ul>
+This function packs in quite a bit of
+functionality, which I will attempt to clearly explain. Many of these
+settings use values from the Adjustment object that is associated with
+a
+Spin Button. SPIN_STEP_FORWARD and SPIN_STEP_BACKWARD change the value
+of the Spin
+Button by the amount specified by increment, unless increment is equal
+to 0, in which case the value is changed by the value of step_increment
+in the Adjustment. SPIN_PAGE_FORWARD and SPIN_PAGE_BACKWARD simply
+alter the value of the
+Spin Button by increment. SPIN_HOME sets the value of the Spin Button
+to the bottom of the
+Adjustments range. SPIN_END sets the value of the Spin Button to the
+top of the
+Adjustments range. SPIN_USER_DEFINED simply alters the value of the
+Spin Button by the
+specified amount. <br>
+      <br>
+We move away from methods for setting and retrieving the range
+attributes of the Spin Button now, and move onto methods that effect
+the
+appearance and behaviour of the Spin Button widget itself. The first of
+these methods is used to constrain the text box of the
+Spin Button such that it may only contain a numeric value. This
+prevents
+a user from typing anything other than numeric values into the text box
+of a Spin Button.<br>
+      <br>
+      <div class="fbox"><code>void
+set_numeric(bool numeric);</code></div>
+      <br>
+You can set whether a Spin Button will wrap around between the upper
+and lower range values with the following method:<br>
+      <br>
+      <div class="fbox"><code>void
+set_wrap(bool wrap);</code></div>
+      <br>
+      <div align="justify">You can set a Spin Button to round the value
+to
+the nearest step_increment, which is set within the Adjustment object
+used with the Spin Button. This is accomplished with the following
+method:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>void
+set_snap_to_ticks(bool snap_to_ticks);</code></div>
+      <br>
+The update policy of a Spin Button can be changed with the following
+method:<br>
+      <br>
+      <div class="fbox"><code>void
+set_update_policy(Gtk::SpinButtonUpdatePolicy policy);</code></div>
+      <br>
+The 'policy' argument can be one of the
+values from the Gtk::SpinButtonUpdatePolicy enum:<br>
+      <ul style="list-style-type: square;">
+        <li>UPDATE_ALWAYS</li>
+        <li>UPDATE_IF_VALID</li>
+      </ul>
+These policies affect the behavior of a Spin Button when parsing
+inserted text and syncing its value with the values of the Adjustment.
+In the case of UPDATE_IF_VALID the Spin Button only value gets
+changed if the text input is a numeric value that is within the range
+specified by the Adjustment. Otherwise the text is reset to the current
+value. In the case of UPDATE_ALWAYS we ignore errors while converting
+text
+into a numeric value.<br>
+      <br>
+Finally, you can explicitly request that a Spin Button update itself:<br>
+      <br>
+      <div class="fbox"><code>void
+update();</code></div>
+      <br>
+      <h2><a name="example"></a>Spin
+Button Example</h2>
+Here is an example that uses several spin buttons, some accelerated and
+some not. You can set the number of digits displayed by the spin
+buttons and you can display their current values as either a double or
+an integer.
+Checking and unchecking the 'Numeric only input mode' checkbutton
+toggles the spin button numeric mode on and off.<br>
+      <br>
+The header file for the SpinButton example is &lt;spinbutton.hh&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include &lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/checkbutton.hh&gt;<br>
+#include &lt;xfc/gtk/label.hh&gt;<br>
+#include &lt;xfc/gtk/spinbutton.hh&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Xfc;<br>
+      <br>
+class SpinButtonWindow : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp;&nbsp; Gtk::SpinButton *spinner1;<br>
+&nbsp;&nbsp;&nbsp; Gtk::Label *val_label;<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; void
+on_change_digits(Gtk::SpinButton *spin);<br>
+&nbsp;&nbsp;&nbsp; void
+on_toggle_snap(Gtk::CheckButton *button);<br>
+&nbsp;&nbsp;&nbsp; void
+on_toggle_numeric(Gtk::CheckButton *button);<br>
+&nbsp;&nbsp;&nbsp; void on_get_value(bool value_as_int);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; SpinButtonWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual
+~SpinButtonWindow();<br>
+};</code></div>
+      <br>
+and the source file is &lt;spinbutton.cc&gt;:<br>
+      <br>
+      <div class="fbox"><code>#include "spinbutton.hh"<br>
+#include &lt;xfc/gtk/adjustment.h&gt;<br>
+#include &lt;xfc/gtk/box.hh&gt;<br>
+#include &lt;xfc/gtk/frame.h&gt;<br>
+      <br>
+SpinButtonWindow::SpinButtonWindow()<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("Spin Button");<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::VBox *main_vbox = new
+Gtk::VBox(false, 5);<br>
+&nbsp;&nbsp;&nbsp; main_vbox-&gt;set_border_width(10);<br>
+&nbsp;&nbsp;&nbsp; add(*main_vbox);<br>
+&nbsp; <br>
+&nbsp;&nbsp;&nbsp; Gtk::Frame *frame = new
+Gtk::Frame("Not accelerated");<br>
+&nbsp;&nbsp;&nbsp; main_vbox-&gt;pack_start(*frame);<br>
+&nbsp; <br>
+&nbsp;&nbsp;&nbsp; Gtk::VBox *vbox = new
+Gtk::VBox;<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;set_border_width(5);<br>
+&nbsp;&nbsp;&nbsp; frame-&gt;add(*vbox);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Day, month, year spinners<br>
+&nbsp;&nbsp;&nbsp; Gtk::HBox *hbox = new
+Gtk::HBox;<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*hbox, true, true, 5);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::VBox *vbox2 = new
+Gtk::VBox;<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*vbox2, true, true, 5);<br>
+&nbsp; <br>
+&nbsp;&nbsp;&nbsp; Gtk::Label *label = new
+Gtk::Label("Day :");<br>
+&nbsp;&nbsp;&nbsp; label-&gt;set_alignment(0, 0.5);<br>
+&nbsp;&nbsp;&nbsp; vbox2-&gt;pack_start(*label, false);<br>
+&nbsp; <br>
+&nbsp;&nbsp;&nbsp; Gtk::Adjustment *adj = new
+Gtk::Adjustment(1.0, 1.0, 31.0, 1.0, 5.0, 0.0);<br>
+&nbsp;&nbsp;&nbsp; Gtk::SpinButton *spinner = new
+Gtk::SpinButton(adj, 0, 0);<br>
+&nbsp;&nbsp;&nbsp; spinner-&gt;set_wrap(true);<br>
+&nbsp;&nbsp;&nbsp; vbox2-&gt;pack_start(*spinner, false);<br>
+&nbsp; <br>
+&nbsp;&nbsp;&nbsp; vbox2 = new Gtk::VBox;<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*vbox2, true, true, 5);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; label = new
+Gtk::Label("Month :");<br>
+&nbsp;&nbsp;&nbsp; label-&gt;set_alignment(0, 0.5);<br>
+&nbsp;&nbsp;&nbsp; vbox2-&gt;pack_start(*label, false);<br>
+&nbsp; <br>
+&nbsp;&nbsp;&nbsp; adj = new
+Gtk::Adjustment(1.0, 1.0, 12.0, 1.0, 5.0, 0.0);<br>
+&nbsp;&nbsp;&nbsp; spinner = new
+Gtk::SpinButton(adj, 0, 0);<br>
+&nbsp;&nbsp;&nbsp; spinner-&gt;set_wrap(true);<br>
+&nbsp;&nbsp;&nbsp; vbox2-&gt;pack_start(*spinner, false);<br>
+&nbsp; <br>
+&nbsp;&nbsp;&nbsp; vbox2 = new Gtk::VBox;<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*vbox2, true, true, 5);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; label = new
+Gtk::Label("Year :");<br>
+&nbsp;&nbsp;&nbsp; label-&gt;set_alignment(0, 0.5);<br>
+&nbsp;&nbsp;&nbsp; vbox2-&gt;pack_start(*label, false);<br>
+&nbsp; <br>
+&nbsp;&nbsp;&nbsp; adj = new
+Gtk::Adjustment(1998.0, 0.0, 2100.0, 1.0, 100.0, 0.0);<br>
+&nbsp;&nbsp;&nbsp; spinner = new
+Gtk::SpinButton(adj, 0, 0);<br>
+&nbsp;&nbsp;&nbsp; spinner-&gt;set_wrap(false);<br>
+&nbsp;&nbsp;&nbsp; spinner-&gt;set_size_request(55, -1);<br>
+&nbsp;&nbsp;&nbsp; vbox2-&gt;pack_start(*spinner, false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; frame = new
+Gtk::Frame("Accelerated");<br>
+&nbsp;&nbsp;&nbsp; main_vbox-&gt;pack_start(*frame);<br>
+&nbsp; <br>
+&nbsp;&nbsp;&nbsp; vbox = new Gtk::VBox;<br>
+&nbsp;&nbsp;&nbsp; set_border_width(5);<br>
+&nbsp;&nbsp;&nbsp; frame-&gt;add(*vbox);<br>
+&nbsp; <br>
+&nbsp;&nbsp;&nbsp; hbox = new Gtk::HBox;<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*hbox, false, true, 5);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; vbox2 = new Gtk::VBox;<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*vbox2, true, true, 5);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; label = new
+Gtk::Label("Value :");<br>
+&nbsp;&nbsp;&nbsp; label-&gt;set_alignment(0, 0.5);<br>
+&nbsp;&nbsp;&nbsp; vbox2-&gt;pack_start(*label, false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; adj = new
+Gtk::Adjustment(0.0, -10000.0, 10000.0, 0.5, 100.0, 0.0);<br>
+&nbsp;&nbsp;&nbsp; spinner1 = new
+Gtk::SpinButton(adj, 1.0, 2);<br>
+&nbsp;&nbsp;&nbsp; spinner1-&gt;set_wrap(true);<br>
+&nbsp;&nbsp;&nbsp; spinner1-&gt;set_size_request(100, -1);<br>
+&nbsp;&nbsp;&nbsp; vbox2-&gt;pack_start(*spinner1, false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; vbox2 = new Gtk::VBox;<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*vbox2, true, true, 5);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; label = new
+Gtk::Label("Digits :");<br>
+&nbsp;&nbsp;&nbsp; label-&gt;set_alignment(0, 0.5);<br>
+&nbsp;&nbsp;&nbsp; vbox2-&gt;pack_start(*label, false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; adj = new
+Gtk::Adjustment(2, 1, 5, 1, 1, 0);<br>
+&nbsp;&nbsp;&nbsp; Gtk::SpinButton *spinner2 = new
+Gtk::SpinButton(adj, 0.0, 0);<br>
+&nbsp;&nbsp;&nbsp; spinner2-&gt;set_wrap(true);<br>
+&nbsp;&nbsp;&nbsp;
+spinner2-&gt;signal_value_changed().connect(sigc::bind(sigc::mem_fun(this,
+&amp;SpinButtonWindow::on_change_digits),
+spinner2));<br>
+&nbsp;&nbsp;&nbsp; vbox2-&gt;pack_start(*spinner2, false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; hbox = new Gtk::HBox;<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*hbox, false, true, 5);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; Gtk::CheckButton *check_button = new
+Gtk::CheckButton("Snap to 0.5-ticks");<br>
+&nbsp;&nbsp;&nbsp;
+check_button-&gt;signal_clicked().connect(sigc::bind(sigc::mem_fun(this,
+&amp;SpinButtonWindow::on_toggle_snap),
+check_button));<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*check_button);<br>
+&nbsp;&nbsp;&nbsp; check_button-&gt;set_active(true);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; check_button = new
+Gtk::CheckButton("Numeric only input mode");<br>
+&nbsp;&nbsp;&nbsp;
+check_button-&gt;signal_clicked().connect(sigc::bind(sigc::mem_fun(this,
+&amp;SpinButtonWindow::on_toggle_numeric), check_button));<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*check_button);<br>
+&nbsp;&nbsp;&nbsp; check_button-&gt;set_active(true);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; hbox = new Gtk::HBox;<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*hbox, false, true, 5);<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; Gtk::Button *button = new
+Gtk::Button("Value as Int");<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::bind(sigc::mem_fun(this,
+&amp;SpinButtonWindow::on_get_value), true));<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*button, true,true, 5);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; button = new
+Gtk::Button("Value as Float");<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::bind(sigc::mem_fun(this,
+&amp;SpinButtonWindow::on_get_value), false));<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*button, true, true, 5);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; val_label = new
+Gtk::Label("0");<br>
+&nbsp;&nbsp;&nbsp; vbox-&gt;pack_start(*val_label);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; hbox = new Gtk::HBox;<br>
+&nbsp;&nbsp;&nbsp; main_vbox-&gt;pack_start(*hbox, false);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; button = new
+Gtk::Button("Close");<br>
+&nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::mem_fun(this,
+&amp;SpinButtonWindow::dispose));<br>
+&nbsp;&nbsp;&nbsp; hbox-&gt;pack_start(*button, true, true, 5);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; show_all();<br>
+}<br>
+      <br>
+SpinButtonWindow::~SpinButtonWindow()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+SpinButtonWindow::on_change_digits(Gtk::SpinButton *spin)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; spinner1-&gt;set_digits(spin-&gt;get_value_as_int());<br>
+}<br>
+      <br>
+void<br>
+SpinButtonWindow::on_toggle_snap(Gtk::CheckButton *button)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;
+spinner1-&gt;set_snap_to_ticks(button-&gt;get_active());<br>
+}<br>
+      <br>
+void<br>
+SpinButtonWindow::on_toggle_numeric(Gtk::CheckButton *button)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; spinner1-&gt;set_numeric(button-&gt;get_active());<br>
+}<br>
+      <br>
+void<br>
+SpinButtonWindow::on_get_value(bool
+value_as_int)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; String text;<br>
+&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; if (value_as_int)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; text = String::format("%d",
+spinner1-&gt;get_value_as_int());<br>
+&nbsp;&nbsp;&nbsp; else<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; text = String::format("%0.*f",
+spinner1-&gt;get_digits(), spinner1-&gt;get_value());<br>
+      <br>
+&nbsp;&nbsp;&nbsp; val_label-&gt;set_text(text);<br>
+}<br>
+      <br>
+int main (int
+argc, char *argv[])<br>
+{<br>
+&nbsp;&nbsp;&nbsp; using namespace Main;<br>
+      <br>
+&nbsp;&nbsp;&nbsp; init(&amp;argc, &amp;argv);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; SpinButtonWindow window;<br>
+&nbsp;&nbsp;&nbsp;
+window.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; run();<br>
+&nbsp;&nbsp;&nbsp; return 0;<br>
+}</code></div>
+      <br>
+      <h2>Compiling Spin Button </h2>
+If you compiled and installed XFC yourself, you will find the source
+code for Spin Button in the
+&lt;examples/howto/spinbutton&gt; source directory along with a Makefile. If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/spinbutton&gt; subdirectory. In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Spin Button, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      <br>
+      <div class="fbox"><code>CC = g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+spinbutton: spinbutton.cc spinbutton.hh <br>
+&nbsp;&nbsp;&nbsp; $(CC) spinbutton.cc -o spinbutton $(CFLAGS)
+`pkg-config xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o spinbutton</code><br>
+      </div>
+      <br>
+If you cut and paste these lines make sure the whitespace before $(CC)
+and rm is a tab character. When
+you
+compile and run this program you will see the following window appear:<br>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 247px; height: 358px;" alt=""
+ src="../../images/spinbutton.png"><br>
+      </div>
+      <br>
+      <hr style="width: 100%; height: 1px;"> </div>
+      </div>
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="spinbuttons.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

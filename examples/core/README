@@ -1,0 +1,10 @@
+Example Core Library Programs.
+============================== 
+The <examples/core> subdirectory contains several libXFCCore test programs
+that show you how to use the G::IOChannel, G::MainLoop and G::SpawnAsync
+classes. The <examples/core/threads> subdirectory contains several threaded
+test programs including a threadpool example. Although simple, these 
+programs show you some important thread basics.
+
+The example programs are compiled by default but you can disable this by 
+passing the "--disable-examples" option to configure. 

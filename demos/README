@@ -1,0 +1,13 @@
+The XFC widget demonstration program.
+=====================================
+The <docs/xfc-demo> directory contains xfc-demo, an XFC version
+of the GTK+ widget demonstration program gtk-demo which is written
+in C and comes with the GTK+ source code. 
+
+The xfc-demo program looks and behaves exactly like gtk-demo. It
+is not meant to be a good example of C++ program design. Its only
+purpose is to show you examples of the many widgets available in 
+the GTK+ library and how to use them in your XFC applications.
+
+The xfc-demo program is compiled by default but you can disable 
+this by passing the "--disable-demos" option to configure.

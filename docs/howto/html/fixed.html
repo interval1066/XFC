@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Xfce Foundation Classes</title>
+  <meta content="The XFC Development Team" name="author">
+  <meta content="Widgets: Fixed Container" name="description">
+  <link rel="stylesheet" href="../../images/xfc.css" type="text/css">
+</head>
+<body>
+<table style="text-align: left; width: 100%;" border="0" cellpadding="0"
+ cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="height: 25px;" class="darkbluestripe"><br>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: center; height: 25px;" class="whitestripe">Xfce
+Foundation Classes<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 25px;" class="greybluestripe" colspan="1"
+ rowspan="1">&nbsp;&laquo; <a class="qindexH" href="../../index.html">Main
+Page</a><span class="qindexH"> | </span><a class="qindexH"
+ href="index.html">Index</a> </td>
+    </tr>
+    <tr>
+      <td colspan="1" rowspan="1"><br>
+      <h1>Fixed
+Container</h1>
+      <br>
+      <div style="text-align: left;">The
+Fixed container allows you to
+place widgets at
+a fixed position within its window, relative to its upper left hand
+corner. The position of the widgets can be changed dynamically. There
+are only a few methods associated with the fixed widget.<br>
+      <br>
+You can create a new Fixed widget with the following
+constructors:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>Fixed();<br>
+      <br>
+Fixed(Widget&amp; widget, int x, int y);</code></div>
+      <br>
+      <div style="text-align: left;">The
+first constructor creates an
+empty fixed
+container and the second creates a fixed container an places the
+specified
+'widget'
+fixed at position 'x' and 'y'.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>void
+put(Widget&amp; widget, int x, int y);<br>
+      <br>
+void move(Widget&amp; widget, int x, int y);</code></div>
+      <br>
+      <div style="text-align: left;">The put() method places widget in
+the container fixed at the
+position specified by x and y. The move() method allows the specified
+widget to be moved to a new
+position.<br>
+      </div>
+      <br>
+      <div class="fbox"><code>void
+set_has_window(bool has_window);<br>
+      <br>
+bool get_has_window() const;</code></div>
+      <br>
+      <div style="text-align: left;">Normally,
+Fixed widgets don't have
+their own X
+window. Since this is different from the behaviour of Fixed widgets in
+earlier releases of GTK, the method set_has_window() allows
+the creation of Fixed widgets with their own window. It has to be
+called
+before realizing the widget.<br>
+      </div>
+      <br>
+      <h2><a name="example"></a>Fixed
+Container Example</h2>
+      <div style="text-align: left;">The following example illustrates
+how to use the Fixed Container. It
+displays a window that contains three buttons inside a fixed container.
+Each time you click on a button it moves to a new fixed position.<br>
+      <br>
+The
+header file for the Fixed container example
+is
+&lt;fixed.hh&gt;:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>#include
+&lt;xfc/main.hh&gt;<br>
+#include &lt;xfc/gtk/button.hh&gt;<br>
+#include &lt;xfc/gtk/fixed.h&gt;<br>
+#include &lt;xfc/gtk/window.hh&gt;<br>
+      <br>
+using namespace Inti;<br>
+      <br>
+class FixedWindow : public Gtk::Window<br>
+{<br>
+&nbsp;&nbsp;&nbsp; int x;<br>
+&nbsp;&nbsp;&nbsp; int y;<br>
+&nbsp;&nbsp;&nbsp; Gtk::Fixed *fixed;<br>
+      <br>
+protected:<br>
+&nbsp;&nbsp;&nbsp; void
+on_move_button(Gtk::Button *button);<br>
+      <br>
+public:<br>
+&nbsp;&nbsp;&nbsp; FixedWindow();<br>
+&nbsp;&nbsp;&nbsp; virtual ~FixedWindow();<br>
+};</code></div>
+      <br>
+      <div style="text-align: left;">and the source file is
+&lt;fixed.cc&gt;:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>#include
+"fixed.hh"<br>
+      <br>
+FixedWindow::FixedWindow() <br>
+: x(30), y(50), fixed(0)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; set_title("Fixed Container");<br>
+&nbsp;&nbsp;&nbsp; set_border_width(10);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; // Create a Fixed
+Container<br>
+&nbsp;&nbsp;&nbsp; fixed = new
+Gtk::Fixed;<br>
+&nbsp;&nbsp;&nbsp; add(*fixed);<br>
+&nbsp;&nbsp;&nbsp; fixed-&gt;show();<br>
+      <br>
+&nbsp;&nbsp;&nbsp; for (int i = 1 ; i &lt;= 3 ; i++)<br>
+&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; //
+Creates
+a new button with the label "Press me"<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+Gtk::Button *button = new
+Gtk::Button("Press me");<br>
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; // When
+the button receives the "clicked" signal, it will call the
+move_button()
+slot<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; //
+passing it the Fixed Container
+as its argument.<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+button-&gt;signal_clicked().connect(sigc::bind(sigc::mem_fun(this,
+&amp;FixedWindow::on_move_button), button));<br>
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; // This
+packs the button into the fixed containers window.<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+fixed-&gt;put(*button, i * 50, i
+* 50);<br>
+      <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; // The
+final step is to display this newly created widget.<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+button-&gt;show();<br>
+&nbsp;&nbsp;&nbsp; }<br>
+}<br>
+      <br>
+FixedWindow::~FixedWindow()<br>
+{<br>
+}<br>
+      <br>
+void<br>
+FixedWindow::on_move_button(Gtk::Button *button)<br>
+{<br>
+&nbsp;&nbsp;&nbsp; x = (x + 30) % 300;<br>
+&nbsp;&nbsp;&nbsp; y = (y + 50) % 300;<br>
+&nbsp;&nbsp;&nbsp; fixed-&gt;move(*button, x, y);<br>
+}<br>
+      <br>
+XFC_MAIN(FixedWindow)</code></div>
+      <br>
+      <h2>Compiling Fixed<br>
+      </h2>
+      <div style="text-align: left;">If you compiled and installed XFC
+yourself, you will find the source
+code for Fixed in the
+&lt;examples/howto/fixed&gt; source directory along with a Makefile.
+If
+XFC came pre-installed, or you installed it from an RPM package, you
+will
+find the source code in the
+&lt;/usr/share/doc/xfcui-X.X/examples/howto/fixed&gt; subdirectory.
+In
+this case you will have to create the Makefile yourself (replace X.X
+with the
+version number of the libXFCui library you have installed).<br>
+      <br>
+To create a Makefile for Fixed, add the following lines to a new
+text
+file
+and save it using the name "Makefile":<br>
+      </div>
+      <br>
+      <div class="fbox"><code>CC
+= g++<br>
+      <br>
+CFLAGS = -Wall -O2<br>
+      <br>
+fixed: fixed.cc fixed.hh<br>
+&nbsp;&nbsp;&nbsp; $(CC) fixed.cc -o fixed $(CFLAGS)
+`pkg-config
+xfcui-X.X --cflags --libs`<br>
+      <br>
+clean: <br>
+&nbsp;&nbsp;&nbsp; rm -f *.o fixed</code><br>
+      </div>
+      <br>
+      <div style="text-align: left;">If you cut and paste these lines
+make sure the whitespace before $(CC)
+and rm is a tab character. When you
+compile and run this program you will see the following window appear:<br>
+      </div>
+      <br>
+      <div style="text-align: center;"><img
+ style="width: 258px; height: 238px;" alt=""
+ src="../../images/fixed.png"><br>
+      </div>
+      <div style="text-align: left;">The XFC_MAIN macro is a
+convenience macro that
+writes a simple main function, its only argument is the name of the
+main
+window class. The macro is defined in &lt;xfc/main.hh&gt;
+as:<br>
+      </div>
+      <br>
+      <div class="fbox"><code>#define
+XFC_MAIN(MainWidget)\<br>
+&nbsp;&nbsp;&nbsp; int main (int argc, char *argv[])\<br>
+&nbsp;&nbsp;&nbsp; {\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+Xfc::Main::init(&amp;argc,
+&amp;argv);\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+MainWidget main_widget;\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+main_widget.signal_destroy().connect(sigc::ptr_fun(&amp;Xfc::Main::quit));\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+main_widget.show();\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+Xfc::Main::run();\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return 0;\<br>
+&nbsp;&nbsp;&nbsp; }</code></div>
+      <br>
+      <div style="text-align: left;">Most
+main functions in C++ are as simple as this because all the creation
+work for the main window is done inside its constructor, not the main
+function.<br>
+      </div>
+      <br>
+      <hr style="width: 100%; height: 1px;">
+      <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td style="width: 33%; font-style: italic;"><font size="-1">Copyright
+&copy; 2004-2005 The XFC
+Development Team</font></td>
+            <td style="text-align: center;"><a class="qindexF"
+ href="fixed.html">Top</a><br>
+            </td>
+            <td style="width: 33%; text-align: right;"><font size="-1">XFC
+4.4</font><br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="text-align: center;"><br>
+      </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>
